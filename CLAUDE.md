@@ -1,6 +1,6 @@
 # Job Scan Console — project instructions
 
-A self-serve job-search system: the `/scan-jobs` skill (in `.claude/skills/`) scans Indeed against `profile.md` and writes timestamped reports to `reports/`; the static console in `console/` displays both. Nothing in this repo executes scans — Claude runs them, in sessions like this one.
+A self-serve job-search system: the `/scan-jobs` skill (in `.claude/skills/`) scans Indeed against `profile.md` and writes timestamped reports to `reports/`; `/apply` builds per-job application packages into `applications/`; `/interview-prep` builds interview research and a prep deck into those same package folders; the static console in `console/` displays the profile and reports. Nothing in this repo executes scans — Claude runs them, in sessions like this one.
 
 ## If `profile.md` does not exist yet → onboard the user
 
@@ -22,7 +22,7 @@ Run setup conversationally, one step at a time. Never invent answers, and never 
 
    - `/scan-jobs`: unaffected — scans, scores, and reports all work exactly the same.
    - `/apply`: still builds the full package, but the tailored résumé will carry an **UNVERIFIED** banner — no tracer, no lint, no gap analysis can run, because nothing exists yet to check claims against.
-   - Interview prep: any deck built from that résumé inherits its unverified status.
+   - `/interview-prep`: any deck built from that résumé inherits its unverified status.
 
    Also tell the user they can say **"finish my registry"** any time to come back and run this step later. When that happens, run step 3 as written above, then offer to re-lint every existing package whose `notes.md` header carries `registry: deferred` — that's the moment those packages' banners come off.
 4. **Interview for preferences.** A resume says what they've done, not what they want — ask, with brief examples: target titles (2–3, plus any explicit exclusions), location (remote / a city / both), salary floor, job type (full-time / contract / both), dealbreakers (e.g. unpaid roles, mandatory relocation), freshness window (default 48 hours).
