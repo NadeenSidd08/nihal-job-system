@@ -53,7 +53,7 @@ Claude will then, with you in the loop:
 
 ## Manual setup
 
-1. **Code → Download ZIP** on this repo, unzip into your Claude-Workshop folder as `job-scan-console`
+1. **Code → Download ZIP** on this repo, unzip into your project folder as `job-scan-console`
 2. Open Claude in that folder and say: *"Follow the setup instructions in CLAUDE.md and onboard me."*
 
 ## Everyday use
