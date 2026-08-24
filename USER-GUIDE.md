@@ -163,11 +163,17 @@ Your dashboard lives at **http://localhost:8642/console/** in your web browser. 
 - **Job boards** — shows Indeed as **Connected**. Other boards appear marked **Coming soon** — they're not wired up yet.
 - **Reports** — a dropdown of every scan you've run. Pick one and you get a sortable table of matches; click any row to expand it and see why the job was recommended, how the score breaks down, and the posting's main points.
 
+![The console's Profile panel and Job boards sidebar, populated with sample data](docs/images/dashboard.png)
+*Sample data — "Jordan Lee" is a fictional example profile, not a real person or account.*
+
 Three things to know about how the console works:
 
 - **It's read-only.** There are no settings to change in the browser. To change anything, you ask Claude in a chat session, and the console shows the update the next time you click **Refresh** (top right).
 - **The Run scan button doesn't run scans.** Scans only happen inside Claude sessions. Clicking the button just tells you that — it's not broken.
 - **If you ever see a Welcome screen instead of your profile**, setup didn't finish (or your profile file moved). The Welcome screen includes its own copy-paste prompt to get you back on track.
+
+![The Welcome panel with three numbered setup steps and a copy-paste prompt](docs/images/welcome.png)
+*The Welcome screen — this is what the console shows before onboarding is finished. Use its built-in Copy button; by this point the repo is already on your machine, so its prompt skips the download step.*
 
 ## `/scan-jobs` — searching and scoring
 
@@ -192,6 +198,9 @@ Every job's score out of 10 is built from three parts:
 - **Logistics (0–2)** — how cleanly location and salary line up, versus friction like a hybrid requirement or a salary band that straddles your floor
 
 Expand any row in the console and the score section shows exactly how it adds up, one line per part — like *Title 4/4: exact match on "Product Manager."*
+
+![The Reports panel showing a fit-score table with an expanded rationale row](docs/images/reports.png)
+*A sample report in the console — "Shoply" and "Meridian Health" are fictional test-fixture companies, not real employers.*
 
 **Calibration anchors:** after your first scan, Claude offers to record a few real scored examples into your rubric (like *"Shoply Product Designer: 4+3+2 = 9"*) so future scans stay consistent with how the first ones were judged. Say yes — it keeps scoring stable over time.
 
