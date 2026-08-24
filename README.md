@@ -9,7 +9,7 @@ A personal job-search system you run with Claude. It has four parts:
 
 Scans run inside Claude sessions (or on a daily schedule you can ask Claude to set up). The console is the dashboard over the results — your resume, profile, and reports never leave your machine.
 
-**New here? Start with the [User guide](USER-GUIDE.md)** — a step-by-step walkthrough with screenshots, from install to your first scored report.
+**New here? Start with the [User guide](USER-GUIDE.md)** — a plain-language walkthrough in three parts: install and setup, every feature, and a troubleshooting FAQ.
 
 ## Prerequisites
 

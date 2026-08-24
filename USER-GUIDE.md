@@ -1,215 +1,423 @@
-# Job Scan Console — user guide
+# Job Scan Console — User Guide
 
-Job Scan Console is a personal job-search system you run through Claude — it searches Indeed against criteria you set, scores every listing against your own background, and saves the results as reports you can browse anytime. Claude does the actual searching and scoring inside your chat sessions; the console is just the dashboard you read the results in; and your resume, profile, and reports stay on your machine the whole time.
+*A guide in three parts: **Part 1** gets it installed and running, **Part 2** walks through every feature, and **Part 3** is a troubleshooting FAQ. You don't need any coding experience — if you can paste a message into Claude, you can do all of this.*
 
-## What you'll end up with
+---
 
-Once setup is done, you'll have:
+## What is Job Scan Console?
 
-- **`/scan-jobs`** — a Claude skill you invoke any time you want a fresh scan
-- **`/apply`** and **`/interview-prep`** — skills that build a per-job application package, then turn a scheduled interview into research and a flip-card prep deck (both covered below)
-- **`profile.md`** — your search profile: target titles, location, salary floor, dealbreakers, and a scoring rubric written around your background
-- **`resume.md`** — a markdown copy of your resume that Claude reads instead of re-parsing the original file every time
-- **`facts.md`** — a registry of the facts pulled from your résumé, in your résumé's own words, plus a few things you've done that never made it onto the résumé itself; this is what your tailored résumés get checked against later
-- **The console** — a local dashboard that shows your profile and every report you've run
+Job Scan Console is a personal job-search system you run through Claude. Instead of scrolling job boards yourself, you tell Claude what you're looking for once, and from then on:
 
-![Search profile and Job boards panels populated with sample data](docs/images/dashboard.png)
-*Sample data — "Jordan Lee" is a fictional example profile, not a real person or account.*
+- Claude **searches Indeed** for you, against your own criteria
+- Claude **scores every posting** out of 10 using a rubric built from *your* résumé
+- Results are saved as **reports** you can browse on a local dashboard
+- When you find a job you like, Claude builds a full **application package** — tailored résumé, company research, and an honesty check that verifies every claim in that résumé traces back to something real
+- When an interview gets scheduled, Claude builds your **interview prep** — deep company and interviewer research, plus an interactive flip-card practice deck
 
-## Before you start
+Everything personal — your résumé, your preferences, your reports — stays on your own computer. Nothing gets uploaded anywhere.
 
-- The Claude desktop app, with your `Claude-Workshop` folder connected
-- The **Indeed connector** added to your Claude account — go to **Settings → Connectors** and add **Indeed**. Without it, scans can't run.
-- Your resume as a PDF (or `.docx`) somewhere inside your `Claude-Workshop` folder
-- If your resume is a Google Doc: use **File → Download → PDF** to save a copy into the folder, or connect the **Google Drive connector** so Claude can fetch it directly
-- A Mac with `python3` installed — it serves the dashboard locally, and it's also what runs the honesty check behind `/apply` (below), so it's a real requirement now, not just a convenience
+### Install in one message
 
-## Install and onboard (one prompt)
-
-Open Claude with your `Claude-Workshop` folder connected, and paste this exact prompt:
+Ready to go right now? Open the Claude Code desktop app in a folder that has your résumé PDF in it, and paste:
 
 ```
-Download https://github.com/ai-build-club-dc/job-scan-console into my Claude-Workshop folder, then follow the setup instructions in job-scan-console/CLAUDE.md and onboard me.
+Download https://github.com/ai-build-club-dc/job-scan-console into this folder, then follow the setup instructions in job-scan-console/CLAUDE.md and onboard me.
 ```
 
-Claude takes it from there. Here's what happens next:
+Claude handles the rest and walks you through setup one question at a time. (Full prerequisites and what to expect are in [Part 1](#part-1--find-it-install-it-start-using-it) — one of them: add the **Indeed connector** in Claude's Settings → Connectors first, or scans can't run.)
 
-1. **Finds your resume.** Claude looks for a PDF or `.docx` in the new `job-scan-console` folder and in `Claude-Workshop` itself. If it can't find one, it'll ask you where it is.
-2. **Writes `resume.md`.** A faithful markdown transcription of your resume, saved next to the original file — outside the `job-scan-console` folder, so it's never part of the repo. From this point on, `resume.md` is what Claude actually reads.
-3. **Builds your fact registry.** Claude pulls every number, title, date range, and credential out of `resume.md` into a new file, `facts.md`, quoting your résumé's own wording for each one — so checking it means comparing it to your résumé, not passing a quiz. You confirm it's right, then Claude asks a few questions about wins that never made it onto the résumé itself. This registry is what your tailored résumés get checked against later, so it's worth doing carefully.
-4. **Interviews you.** A short back-and-forth: your target titles (2–3, plus anything you explicitly don't want to see), location, salary floor, job type, dealbreakers, and how fresh a posting has to be (defaults to 48 hours).
-5. **Writes your `profile.md`.** Your interview answers, plus a scoring rubric written specifically around your background — more on how that scoring works below.
-6. **Starts the console.** Claude runs a small local server and gives you a link to open.
-7. **Offers your first scan.** Claude asks if you'd like to run `/scan-jobs` right away, and whether you want a daily scan scheduled automatically.
+## Table of contents
 
-> You'll see: a handful of permission prompts along the way, as Claude asks to run shell commands to download the repo and start the server. Clicking **Allow** is normal and expected — that's just Claude checking in before it touches your machine.
+**[Features at a glance](#features-at-a-glance)** — the whole system in nine numbered items
 
-The whole process takes about fifteen minutes, split mostly between building your fact registry in step 3 and the interview in step 4.
+**[Part 1 — Find it, install it, start using it](#part-1--find-it-install-it-start-using-it)**
 
-> **In a hurry?** Step 3 (the fact registry) is the longest part of onboarding, and you don't have to do it now — just tell Claude "I'll do this later" when it gets there. You can still scan for jobs and build application packages without it. What you don't get until it's done: a *verified* tailored résumé (until then it's marked UNVERIFIED), the honesty check (`lint-report.md`), and the gap analysis. Finish it any time by telling Claude: *"Finish my registry."*
+- [What you need before you start](#what-you-need-before-you-start)
+- [Where to find the repo](#where-to-find-the-repo)
+- [Install and set up — one message does it all](#install-and-set-up--one-message-does-it-all)
+- [What onboarding looks like](#what-onboarding-looks-like)
+- [Your first scan](#your-first-scan)
 
-### Manual alternative
+**[Part 2 — Feature guide](#part-2--feature-guide)**
 
-If you'd rather not have Claude download anything itself:
+- [The console (your dashboard)](#the-console-your-dashboard)
+- [`/scan-jobs` — searching and scoring](#scan-jobs--searching-and-scoring)
+- [`/apply` — building an application package](#apply--building-an-application-package)
+- [`/interview-prep` — prepping for a scheduled interview](#interview-prep--prepping-for-a-scheduled-interview)
+- [Changing your profile](#changing-your-profile)
+- [The fact registry (`facts.md`)](#the-fact-registry-factsmd)
+- [Automatic daily scans (optional)](#automatic-daily-scans-optional)
+- [Updating to the latest version](#updating-to-the-latest-version)
+- [Privacy — what stays and what leaves](#privacy--what-stays-and-what-leaves)
 
-1. On the repo page, click **Code → Download ZIP**, then unzip it into your `Claude-Workshop` folder so it's named `job-scan-console`.
-2. Open Claude in that folder and say: *"Follow the setup instructions in CLAUDE.md and onboard me."*
+**[Part 3 — Troubleshooting FAQ](#part-3--troubleshooting-faq)**
 
-From here, onboarding proceeds exactly as described above.
+- [Setup and install](#setup-and-install)
+- [The console](#the-console)
+- [Scanning](#scanning)
+- [Applications and the honesty check](#applications-and-the-honesty-check)
+- [Interview prep](#interview-prep)
+- [General](#general)
 
-## The console
+---
 
-Once onboarding finishes, your dashboard lives at `http://localhost:8642/console/`. It has three panels, listed in the left sidebar:
+## Features at a glance
 
-- **Profile** — a read-only view of `profile.md`: target titles, location, salary floor, job type, dealbreakers, and freshness rule. Near the bottom, a collapsible **Scoring rubric** section shows exactly how your fit scores get calculated.
-- **Job boards** — shows Indeed as **Connected**. Other boards are listed too, marked **Coming soon** — they're not wired up yet.
-- **Reports** — a dropdown picker over every scan you've run, each one shown as a table of matches.
+*The whole system on one page. Everything here is explained in full in Part 2.*
 
-Everything here is read-only. There's no in-app editing — to change anything, you ask Claude in a session, and the console picks up the updated file the next time you click **Refresh** (top right). A **Run scan** button is there too, but clicking it just explains this same thing: the console can't execute a scan itself, because scanning only happens inside a Claude session.
+### 🔍 Finding jobs
 
-![Welcome panel with three numbered setup steps and a copy-paste prompt](docs/images/welcome.png)
-*Sample screen — if you ever open the console before onboarding is finished, this Welcome panel appears with its own copy-paste prompt and a Copy button. Use that one instead of the prompt above — by this point the repo is already on your machine, so it skips the download step.*
+1. **`/scan-jobs`** — searches Indeed against your profile and scores every posting 0–10 with your personal rubric. Only 6+/10 makes the report, max 10 results.
+   1. Paste extra job links in the same message to score them too.
+2. **The console** — your read-only dashboard at `localhost:8642/console/`: profile, job boards, and every report in sortable tables.
+   1. Click **Refresh** after anything changes.
 
-## Running scans and reading fit scores
+### 📝 Applying
 
-Ask Claude, in a session opened in `job-scan-console`: `/scan-jobs`
+3. **`/apply <company>`** — builds a complete application package: job post, company research, tailored résumé, gap analysis, notes tracker, honesty check.
+   1. Nothing is written until you reply **`go`**.
+   2. Also takes a pasted URL — that job comes in unscored.
+4. **Honesty check** (`lint-report.md`) — traces every résumé claim to your fact registry and flags anything unsourced.
+   1. Confident in a flagged claim? **Attest** it once and the warning clears.
 
-You can also paste specific job postings or links in the same message — Claude scores those alongside the automatic Indeed search, using the same rubric.
+### 🎤 Interviewing
 
-> You'll see: after the scan finishes, a short chat summary — how many results it found, the top few by score, and the file path of the new report. Claude won't dump the whole report into the chat; the file itself is the artifact.
+5. **`/interview-prep`** — turns a scheduled interview into a company brief, an interviewer dossier, and a flip-card practice deck built from your tailored résumé.
+   1. Later rounds never overwrite earlier decks.
 
-Claude writes one new report per run into `reports/`, named for the date and time. Each entry lists the job title and company, location, salary (or "not listed" if the posting doesn't show one), a fit score, and a real apply link. Click a row in the console to expand it, and you'll see three short sections: why the job's recommended, what drove the score, and the posting's main points.
+### ⚙️ Maintaining
 
-Every job is scored out of 10, built from three parts:
+6. **Fact registry** (`facts.md`) — the confirmed-facts table everything is checked against. Skippable at setup; say *"finish my registry"* anytime.
+7. **Profile changes** — just tell Claude: *"raise my salary floor to $95K."*
+8. **Daily scans** — *"schedule a daily morning job scan."*
+9. **Updates** — *"pull the latest job-scan-console."* Personal files are never touched.
+
+---
+
+# Part 1 — Find it, install it, start using it
+
+## What you need before you start
+
+1. **The Claude Code desktop app** installed on a Mac.
+2. **A folder for this project.** Any folder works, named anything you like — make a new one anywhere (like your Desktop) if you don't have one. These instructions just call it "your project folder."
+3. **Your résumé as a PDF** (a `.docx` also works), saved inside that folder.
+   - Résumé lives in Google Docs? Open it, click **File → Download → PDF**, and save the PDF into your folder.
+4. **The Indeed connector** added to your Claude account. In Claude, open **Settings → Connectors** and add **Indeed**. This is what actually searches for jobs — without it, scans can't run.
+
+## Where to find the repo
+
+The project lives on GitHub at:
+
+**https://github.com/ai-build-club-dc/job-scan-console**
+
+You don't need a GitHub account, and you don't need to download anything from that page yourself — Claude does the downloading for you in the next step. (The page is worth a bookmark, though: it's where updates come from.)
+
+## Install and set up — one message does it all
+
+1. Open the Claude Code desktop app.
+2. Open a session in your project folder (the app will ask which folder to work in — pick that one).
+3. Paste this message, exactly as written:
+
+```
+Download https://github.com/ai-build-club-dc/job-scan-console into this folder, then follow the setup instructions in job-scan-console/CLAUDE.md and onboard me.
+```
+
+That's the whole install. Claude downloads the project, reads its built-in instructions, and walks you through setup one question at a time.
+
+**Along the way, Claude will ask permission to run commands** — for example, to download the project or start your dashboard. A small prompt appears asking you to allow it. Clicking **Allow** is normal and expected; it's just Claude checking in before touching your machine.
+
+## What onboarding looks like
+
+Setup is a conversation, not a form. Here's what happens, in order — the whole thing takes about fifteen minutes:
+
+1. **Claude finds your résumé** in the folder. If it can't, it asks where the file is.
+2. **Claude writes `resume.md`** — a plain-text copy of your résumé that it reads from now on, so it never has to re-open the PDF.
+3. **Claude builds your fact registry (`facts.md`).** It pulls every number, job title, date, and credential out of your résumé into a table, quoting your résumé word-for-word, and shows it to you to confirm. Then it asks a few questions about things you've done that never made it onto the résumé. This registry is what your tailored résumés get fact-checked against later, so it's worth doing carefully.
+   - **In a hurry?** This is the longest step, and you can skip it — just say *"I'll do this later."* Job scanning works fine without it. What you lose until it's done: tailored résumés come out marked **UNVERIFIED**, with no honesty check and no gap analysis. Come back any time by telling Claude: *"Finish my registry."*
+4. **Claude interviews you** about what you actually want: 2–3 target job titles (plus any you *don't* want to see), location, minimum salary, full-time vs. contract, dealbreakers, and how recent a posting has to be (48 hours is the default).
+5. **Claude writes your `profile.md`** — your answers plus a scoring rubric personalized to your background.
+6. **Claude starts your dashboard** and gives you a link: **http://localhost:8642/console/** — open it in your browser and check that your profile appears.
+7. **Claude offers your first scan**, and asks whether you'd like a daily scan scheduled automatically.
+
+## Your first scan
+
+In the same session, type:
+
+```
+/scan-jobs
+```
+
+Claude searches Indeed for every combination of your target titles and locations, scores what it finds, filters out anything that fails your dealbreakers, and saves a report. When it's done, it gives you a short summary in chat — the full results are in the report, which you read on your dashboard.
+
+That's it — you're set up. Part 2 explains everything you can do from here.
+
+---
+
+# Part 2 — Feature guide
+
+## The console (your dashboard)
+
+Your dashboard lives at **http://localhost:8642/console/** in your web browser. It has three panels, listed in the left sidebar:
+
+- **Profile** — a read-only view of your search profile: target titles, location, salary floor, job type, dealbreakers, and freshness rule. Near the bottom, a collapsible **Scoring rubric** section shows exactly how your fit scores are calculated.
+- **Job boards** — shows Indeed as **Connected**. Other boards appear marked **Coming soon** — they're not wired up yet.
+- **Reports** — a dropdown of every scan you've run. Pick one and you get a sortable table of matches; click any row to expand it and see why the job was recommended, how the score breaks down, and the posting's main points.
+
+Three things to know about how the console works:
+
+- **It's read-only.** There are no settings to change in the browser. To change anything, you ask Claude in a chat session, and the console shows the update the next time you click **Refresh** (top right).
+- **The Run scan button doesn't run scans.** Scans only happen inside Claude sessions. Clicking the button just tells you that — it's not broken.
+- **If you ever see a Welcome screen instead of your profile**, setup didn't finish (or your profile file moved). The Welcome screen includes its own copy-paste prompt to get you back on track.
+
+## `/scan-jobs` — searching and scoring
+
+Type `/scan-jobs` in any Claude session opened in the `job-scan-console` folder. Each run:
+
+1. Searches Indeed for every combination of your target titles and locations
+2. Merges the results and removes duplicates
+3. Scores each job out of 10 against your personal rubric
+4. Drops anything that fails your hard filters — salary below your floor, too old, a dealbreaker, or an excluded title
+5. Saves a report to the `reports/` folder, named by date and time
+
+Only jobs scoring **6/10 or higher** make the report, capped at **10 results**, each with a real apply link.
+
+**You can also hand Claude specific jobs.** Found something on LinkedIn or a company site? Paste the link (or the posting text) in the same message as `/scan-jobs`, and Claude scores it with the same rubric, right alongside the Indeed results.
+
+### How fit scores work
+
+Every job's score out of 10 is built from three parts:
 
 - **Title match (0–4)** — how closely the role matches one of your target titles
-- **Substance (0–4)** — how well the actual work matches your background; this dimension is personalized to you during onboarding, built from your resume
-- **Logistics (0–2)** — how cleanly location and salary line up with no friction, versus things like a hybrid requirement or a salary band that straddles your floor
+- **Substance (0–4)** — how well the actual work matches your background; this part was personalized to you during onboarding
+- **Logistics (0–2)** — how cleanly location and salary line up, versus friction like a hybrid requirement or a salary band that straddles your floor
 
-Only jobs scoring 6/10 or higher make it into the report, and each report is capped at 10 results. Expand a row and the score section shows exactly how it adds up — each of the three parts with its points and a one-line reason, like *Title 4/4: exact match on "Product Manager"*. Reports written before this existed still open fine — they just show their original one-line rationale instead of the expanded sections.
+Expand any row in the console and the score section shows exactly how it adds up, one line per part — like *Title 4/4: exact match on "Product Manager."*
 
-After your first scan, Claude will offer to record a few real results as **Calibration anchors** in your rubric — short examples like "Shoply Product Designer: 4+3+2 = 9" — so future scans stay consistent with how you actually judged the results.
+**Calibration anchors:** after your first scan, Claude offers to record a few real scored examples into your rubric (like *"Shoply Product Designer: 4+3+2 = 9"*) so future scans stay consistent with how the first ones were judged. Say yes — it keeps scoring stable over time.
 
-![Reports panel with a fit-score table and an expanded rationale row](docs/images/reports.png)
-*Sample report — "Shoply" and "Meridian Health" are fictional test-fixture companies, not real employers.*
+## `/apply` — building an application package
 
-## Building an application package
+Found a job worth pursuing? Ask Claude:
 
-Once you've found a job worth pursuing — in the console, or in a report Claude showed you in chat — ask Claude: `/apply <company name>` (add the role too if that company has more than one posting across your reports).
+```
+/apply <company name>
+```
 
-### Applying to a job you found yourself
+Add the role too if that company shows up more than once in your reports (like `/apply Shoply Product Designer`).
 
-Found something outside a scan entirely — on LinkedIn, a company's careers page, Greenhouse, a link a friend sent you — and want a package for it anyway? Paste the link straight into `/apply`:
+**Nothing is created until you approve it.** Claude first prints a **manifest** — the company, role, fit score, which report the job came from, the files it's about to write, and roughly how many web pages it plans to read for company research. Reply **`go`** to build it. Doing several at once? Reply `go, skip <company>` to leave one out.
 
-    /apply https://boards.greenhouse.io/acme/jobs/12345
-
-One URL at a time: `/apply` can't take more than one link in a message, and it can't mix a pasted URL with company names. If you've got several jobs in mind, run `/apply` again for each one.
-
-A job that arrives this way is different in two ways worth knowing before you build it:
-
-- **No fit score.** Nothing has scored this job against your rubric, so instead of a number out of 10, the manifest and every file in the package show `unscored`. That number is normally your early warning — it's what tells you whether a job is worth the effort *before* you spend it. With a pasted URL, that signal just isn't there; the closest thing you get back is `gap-analysis.md`, and that only arrives at the very end, after the package is already built. (The manifest reflects this too: instead of naming which report the job came from, it shows the link you pasted.)
-- **It will not show up in your console.** The console only reads `reports/`, and a URL-sourced job is never written there — the whole package lives in `applications/<company>-<role>/` instead. If you go looking for it on your dashboard afterward and don't find it, that's expected, not a sign the build failed.
-
-If the link doesn't fetch cleanly — a login wall, a dead link, a site that blocks automated reads — see the troubleshooting table below; it's handled differently for a pasted URL than for a scan-sourced job. Past that, everything else about `/apply` works the same from here: the manifest, the `go` reply, the six files it builds.
-
-Claude first prints a **manifest**: the company, role, fit score, which report it came from, the files it's about to write, where they'll land, and roughly how many web pages it plans to fetch for company research. **Nothing is created until you reply.** Say `go` to build it, or, if you're doing several at once, `go, skip <company>` to leave one out. If you ask Claude to "process my queue," it'll tell you plainly that it can't see the console's Queue panel — that list only lives in your browser — and show you a numbered list to pick from instead, rather than guessing which jobs you meant.
-
-Once you say go, Claude builds a folder — `applications/<Company>-<Role-Title>/` — with six files:
+Once you say go, Claude builds a folder — `applications/<Company>-<Role>/` — with six files:
 
 | File | What it's for |
 |---|---|
-| `job-post.md` | The job posting in markdown, with a link back to where it came from |
-| `company-context.md` | Research on the company — what they do, size, recent news, why it might fit — every claim with a link to a page Claude actually fetched this run |
+| `job-post.md` | The job posting, saved in plain text with a link back to the source |
+| `company-context.md` | Research on the company — what they do, size, recent news, why it might fit — every claim linked to a page Claude actually read |
 | `tailored-resume.md` | Your résumé, rewritten for this specific job |
-| `gap-analysis.md` | What the posting asks for, checked against your fact registry — what you clearly evidence, partially evidence, or don't |
-| `notes.md` | A tracker for this application — status, dates, anything you want to log by hand as things move |
-| `lint-report.md` | The honesty check on `tailored-resume.md` — see below |
+| `gap-analysis.md` | What the posting asks for, checked against your fact registry — what you clearly show, partly show, or don't |
+| `notes.md` | A tracker for this application — status, dates, anything you want to jot down as things move |
+| `lint-report.md` | The honesty check on the tailored résumé (explained below) |
 
-If this is your first time running `/apply` and you set up `job-scan-console` before this feature existed, you won't have a `facts.md` yet. Claude will notice and offer to build it on the spot — the same process as step 3 of onboarding — before it shows you the manifest.
+### Applying to a job you found yourself
 
-### Reading `lint-report.md`
+You can paste a link straight into `/apply`:
 
-This file lists every factual claim in `tailored-resume.md` and says, for each one, which row of `facts.md` backs it up — or `NO SOURCE` if nothing does. It also flags specific problems automatically: numbers that don't match your registry, date ranges that don't line up, credentials it can't trace, and self-reported claims (things you told Claude during the interview, rather than things pulled from your actual résumé) that haven't been confirmed yet.
+```
+/apply https://boards.greenhouse.io/acme/jobs/12345
+```
 
-Two labels show up: **WARN** and **ERROR**. `NO SOURCE` and any ERROR are worth checking closely — that's a claim in your résumé with nothing in your registry behind it. A WARN on a self-reported claim just means it came from something you said rather than a document; if you're confident in it, tell Claude to **attest** it (a one-time "I stand behind this and can defend it in an interview"), and it stops warning on that claim from then on.
+One link at a time — `/apply` can't take multiple links in one message, or mix a link with a company name. Two things are different about a link-sourced job:
 
-Edited `tailored-resume.md` by hand after reading the report? Ask Claude to re-lint that folder and it'll refresh `lint-report.md` against your edits — it won't rebuild anything else in the folder.
+- **No fit score.** Nothing has scored it against your rubric, so the package shows `unscored` instead of a number. The score is normally your early warning about whether a job is worth the effort — with a pasted link, that signal isn't there.
+- **It won't appear on your dashboard.** The console only shows scan reports, and a pasted-link job never becomes one. The package still gets built in `applications/` — it's just not on the dashboard. That's expected, not a failure.
 
-## What "passing the check" doesn't mean
+### The honesty check (`lint-report.md`)
 
-Read this before you send anything `/apply` produces anywhere.
+This file lists every factual claim in your tailored résumé and says, for each one, which row of your fact registry backs it up — or **NO SOURCE** if nothing does. It also automatically flags numbers that don't match your registry, dates that don't line up, credentials it can't trace, and self-reported claims you haven't confirmed yet.
 
-`tailored-resume.md` and `gap-analysis.md` make claims about you and your work — Claude writes them, but they go out under your name. The lint report catches one specific, narrow thing: whether a claim traces back to something in your fact registry. It does **not** catch whether a claim is a *fair description of what actually happened*, and it never blocks anything — `lint-report.md` is a passive report, not a gate; it always finishes and never stops a file from being written. A result that says "0 `NO SOURCE`, 0 ERROR" means every claim traces to a source. It does not mean the résumé is honest.
+Two labels appear:
 
-Here's the gap: a claim can trace perfectly and still be a stretch. If `facts.md` has a row saying "coordinated sprint planning," and `tailored-resume.md` turns that into "owned the product roadmap," the lint sees a traceable claim and says nothing, because a source technically exists. It has no way to notice that "coordinated" quietly became "owned." That's not a bug in the check — no automated check can tell overstatement apart from an accurate rewrite. It's why `gap-analysis.md` ends with a question instead of a verdict: *can you defend this out loud, in an interview, without walking it back?*
+- **ERROR** (and NO SOURCE) — a claim with nothing behind it. Check these closely before sending anything.
+- **WARN** — usually a self-reported claim: something you *told* Claude rather than something on your résumé. If you're confident in it, tell Claude to **attest** it — a one-time *"I stand behind this and can defend it in an interview"* — and it stops warning about that claim forever.
 
-So before you send anything: read the tailored résumé line by line yourself, not just the lint report. Anything you couldn't say out loud and defend under a follow-up question — anything you'd wince at if a recruiter said "tell me more about that" — take it out or reword it down to what actually happened. The check tells you what's sourced. Only you can tell what's true.
+Edited the tailored résumé by hand afterward? Ask Claude to **re-lint that folder** and the report refreshes against your edits without rebuilding anything else.
 
-## Prepping for an interview
+### ⚠️ What "passing the check" does NOT mean
 
-Landed an interview for one of your applications? Ask Claude — either `/interview-prep`, or just say it naturally:
+Read this before you send anything `/apply` produces to a real employer.
 
-> *I have a first round with Acme Health on Thursday, with Dana Whitcomb.*
+The check verifies one narrow thing: that each claim **traces to a source**. It cannot tell whether a claim is a *fair description of what actually happened*. If your registry says you "coordinated sprint planning" and the tailored résumé says you "owned the product roadmap," the check sees a traceable claim and stays silent — it can't notice that "coordinated" quietly became "owned."
 
-Claude matches the company to your application folder in `applications/`, reads the tailored résumé and job posting already in it, and asks one combined question for anything missing — always including who you're meeting, because a name is what unlocks the interviewer research, plus the round and what kind of interview it is (recruiter screen, hiring manager, panel, technical, and so on — the type shapes what the deck emphasizes).
+So a clean report means every claim is sourced — not that the résumé is honest. Before you send anything, read the tailored résumé line by line yourself. If there's anything you couldn't say out loud and defend when a recruiter asks "tell me more about that," reword it down to what actually happened. **The check tells you what's sourced. Only you can tell what's true.**
 
-Then it builds, into that same application folder:
+## `/interview-prep` — prepping for a scheduled interview
 
-- **`research/company-brief.md`** — deep company research: market position, competitors, funding, leadership, recent press, and where your role sits
-- **`research/interviewer-<name>.md`** — when you named someone: their role and tenure, career arc, what they'll likely probe, and what to ask them back. Anything it couldn't confirm goes into an uncertainty register instead of becoming a confident guess.
-- **`interview-prep.html`** — an interactive flip-card deck: question on the front, your talking points on the back, plus collapsible reference panels for what you want to check five minutes before the call. Self-contained HTML — opens anywhere, including your phone, no internet needed.
+When one of your applications turns into an actual interview, ask Claude — either type `/interview-prep`, or just say it naturally:
 
-Three rules worth knowing:
+> *"I have a first round with Acme Health on Thursday, with Dana Whitcomb."*
 
-- **Every talking point traces to that folder's `tailored-resume.md`.** When the posting asks for something you haven't done, the deck names the gap and coaches you to raise it yourself, instead of inventing a bullet — a gap you raise first is a conversation; a gap the interviewer finds is a problem.
-- **Later rounds never overwrite earlier ones.** Round 2 writes `interview-prep-round2.html` beside round 1. And if you drop rough notes from round 1 into `research/round-1-debrief.md` after the call, the round-2 deck is shaped by what actually happened in the room.
-- **Resumes are thin on stories.** They carry results, not the situation or the judgment call that STAR stories are made of — so when the deck needs detail your résumé doesn't hold, Claude asks you rather than making it up, and offers to save your answers as `career-notes.md` for later rounds.
+Claude finds that job's application folder (the one `/apply` built), reads the tailored résumé and job posting already in it, and asks one combined question for whatever's missing: which round it is, who you're meeting (say "don't know yet" if you don't — but a name is what unlocks the interviewer research), and what kind of interview it is — recruiter screen, hiring manager, panel, technical deep-dive, and so on. The type shapes what the deck emphasizes.
 
-No application package yet? You can still prep — give `/interview-prep` the company name or posting link and it builds a **prep-only** folder (marked as such, so it's never mistaken for a tailored, checked application). Keep the interviewer research to yourself — it's prep, not a dossier to circulate.
+Then it builds, into that same folder:
+
+- **A company brief** — market position, competitors, funding, leadership, recent news, and where your role sits
+- **An interviewer dossier** (when you named someone) — their role, career arc, what they'll likely probe, and what to ask them back. Anything Claude couldn't confirm is listed as unconfirmed instead of guessed.
+- **The prep deck** (`interview-prep.html`) — flip cards: likely question on the front, your talking points on the back, plus collapsible panels for what you want to check five minutes before the call. It's a single file that opens in any browser — including on your phone, with no internet.
+
+Three things worth knowing:
+
+- **Every talking point comes from your own tailored résumé.** If the posting asks for something you haven't done, the deck names the gap and coaches you to bring it up yourself — a gap you raise first is a conversation; a gap the interviewer finds is a problem.
+- **Round 2 doesn't overwrite round 1.** Each round's deck is a new file, and old decks are never touched. After a round, jot rough notes about how it went into the folder (Claude can tell you where) or just tell Claude what happened — the next round's deck is shaped by what actually happened in the room.
+- **Claude will ask you for stories.** Résumés carry results, not the situations behind them — so when the deck needs detail your résumé doesn't hold, Claude asks you instead of making it up, and offers to save your answers so later rounds get better automatically.
+
+No application package for the job yet? You can still prep — give `/interview-prep` the company name or the posting link, and it builds a clearly-marked "prep-only" folder instead. And keep the interviewer research to yourself — it's prep, not something to share around.
 
 ## Changing your profile
 
-Your profile isn't a settings page you edit directly — you just tell Claude what to change, in a session opened in `job-scan-console`. For example:
+Your profile isn't a settings page — you just tell Claude what to change, in a session opened in the `job-scan-console` folder:
 
 - *"Raise my salary floor to $95K"*
 - *"Add Product Owner to my target titles"*
 - *"Switch me to remote only"*
 
-Claude edits `profile.md` directly, and the next scan (or console refresh) reflects the change right away. Resume edits work the same way — ask Claude to update `resume.md` and it will.
+Claude edits the file, and your next scan (or a click of **Refresh** on the dashboard) reflects it immediately. Résumé updates work the same way — ask Claude to update `resume.md`.
+
+One caution: **if your résumé changes, mention it to Claude** so it can refresh the fact registry rows that quoted the old wording — otherwise the honesty check is silently comparing against text that no longer exists.
+
+## The fact registry (`facts.md`)
+
+The registry is the table of confirmed facts behind the honesty check. Everyday phrases worth knowing:
+
+- *"Finish my registry"* — if you skipped the registry during setup, this runs that step now. Claude will also offer to re-check any application packages that were built without it, which is when their UNVERIFIED banners come off.
+- *"Attest that claim"* — upgrades a self-reported fact to one you formally stand behind, silencing its warning.
+- Saying **"no"** to a fact marks it *declined* — Claude records that you disavowed it, which is different from just not confirming it yet.
 
 ## Automatic daily scans (optional)
 
-If you'd rather not remember to run `/scan-jobs` yourself, ask Claude: *"Schedule a daily morning job scan."* From then on, a fresh report lands in `reports/` each morning the Claude app is open at scan time. (Laptop was closed? Just ask for a scan manually.)
+Rather not remember to run `/scan-jobs`? Tell Claude:
 
-Scheduled runs follow the same rule as manual ones: they never invent results. If the Indeed connector isn't available when a scheduled scan tries to run, the report says so plainly instead of pretending to have found something.
+> *"Schedule a daily morning job scan."*
 
-## Troubleshooting
+From then on, a fresh report lands each morning the Claude app is open at scan time. (Laptop was closed? Just ask for a scan manually.) Scheduled scans follow the same honesty rule as manual ones: if Indeed isn't reachable when one runs, the report says so plainly instead of inventing results.
 
-| Problem | What to do |
-|---|---|
-| Scan says the Indeed connector is unavailable | Add the Indeed connector in Claude's settings, then re-run the scan |
-| Console shows the Welcome panel, but you already onboarded | `profile.md` is missing or got moved — ask Claude to check |
-| Console won't load / connection refused | Ask Claude to "start the job scan console server" |
-| You opened `index.html` directly and the page looks broken | It needs to be served over HTTP, not opened as a file — ask Claude to start the server |
-| Claude asks permission to run a command | Normal — click **Allow** |
-| A report exists but the console doesn't show it | Click **Refresh** (top right) |
-| `/apply` says it can't find `facts.md` | Normal the first time you run it if you onboarded before this feature existed — Claude will offer to build the registry from `resume.md` on the spot, before showing you the manifest |
-| `/apply` asks which report or job you meant | Normal when a company name matches more than once — name the specific role, or the report date, and it'll narrow it down |
-| `lint-report.md` has `NO SOURCE` or ERROR rows | Not a crash — read "What passing the check doesn't mean" above, then check that claim against `facts.md` and your own memory before you send anything |
-| A job **from a report** is behind a login or the link is dead | `/apply` still builds `job-post.md` from the report summary alone and marks it "degraded" — the job description content will be thinner than usual |
-| A **pasted URL** is behind a login or won't fetch | There's no report summary to fall back on for a URL job, so `/apply` says the fetch failed and asks you to paste the posting text into chat yourself. Paste it and the build continues normally, marked `provenance: user-pasted`; decline and `/apply` stops cleanly with nothing written |
-| `/interview-prep` says a file is missing or the package is incomplete | It needs `tailored-resume.md` and `job-post.md` in the application folder — run `/apply` for that job first, or let it build a prep-only folder instead |
-| The interviewer dossier is thin or says LinkedIn was blocked | Normal — LinkedIn blocks automated reads. The research leans on the company's own site and published bios instead, and anything unconfirmed is listed in the dossier's uncertainty register rather than guessed |
-| You prepped a round but the deck for it already exists | Decks are frozen once written — `/interview-prep` stops and asks before touching an existing file. Confirm the round number; a later round gets its own new file |
+## Updating to the latest version
 
-## Updating
+Ask Claude: *"Pull the latest job-scan-console."* Your profile, résumé, fact registry, reports, and application packages are all excluded from updates by design — you get the newest features with your personal data untouched.
 
-Ask Claude: *"Pull the latest job-scan-console."* Your `profile.md`, `facts.md`, `resume.md`, everything in `reports/`, and everything in `applications/` are gitignored, so updates never touch them — you get the newest skill and console code with all your personal data left exactly as it was.
+## Privacy — what stays and what leaves
 
-## Privacy
+**Stays on your machine, always:** your résumé, `resume.md`, `profile.md`, `facts.md`, every report, and every application package. All of them are blocked from ever being uploaded to GitHub, even accidentally.
 
-Your resume, profile, fact registry, reports, and application packages live only on your machine. `profile.md`, `facts.md`, `resume.md`, `reports/`, and `applications/` are all gitignored, so none of them can be committed or pushed anywhere — by you or anyone else.
+**Leaves your machine, by design, only:**
 
-Two things do leave your machine, both by design. The job search itself goes through your own Claude account's Indeed connector. And the research steps read public web pages: `/apply` fetches roughly five per application — the company's own site, recent news, that kind of thing — plus the job posting itself, and `/interview-prep` does the same kind of reading for its company brief and interviewer dossier (the interviewer research uses only their public professional footprint — employer site, published writing, conference bios).
+1. Job searches, through your own Claude account's Indeed connector.
+2. If you use `/apply`, the company-research step reads about five public web pages per application (the company's site, recent news, the posting itself). For scan-sourced jobs, none of this happens until you reply `go`. For a pasted link, Claude reads that one page first — so the manifest can tell you what it's about to build — but everything else still waits for your `go`.
+3. If you use `/interview-prep`, the research step reads public pages the same way — the company's site and press for the brief, and for a named interviewer only their public professional footprint: their employer's site, their own published writing, conference bios.
 
-For a job that came from a scan report, all of that waits for you: `/apply` prints the full plan and fetches nothing until you reply `go`. If you instead paste a link straight into `/apply` (see "Applying to a job you found yourself," above), one fetch happens *before* the plan is printed — the posting you pasted, read once so the manifest can actually tell you which company and role it's about to build for. Nothing else jumps the queue: no company research, no files, no folder — those still wait for `go`, exactly as above. What leaves is Claude reading a page you chose to paste, not your résumé or `facts.md` being sent anywhere — none of your personal data is ever uploaded.
+Your résumé and facts are never sent anywhere in either case.
+
+---
+
+# Part 3 — Troubleshooting FAQ
+
+### Setup and install
+
+**Claude says it can't find my résumé.**
+Make sure the PDF (or `.docx`) is inside your project folder — not on your Desktop next to it, and not still in Google Docs. If it's a Google Doc, use **File → Download → PDF** and save into the folder. Then tell Claude where it is.
+
+**Claude keeps asking permission to run commands. Is something wrong?**
+No — that's normal and by design. Claude checks in before running anything on your machine. Click **Allow**.
+
+**Can I install without letting Claude download anything?**
+Yes. On the GitHub page, click the green **Code** button → **Download ZIP**, unzip it into your project folder so the folder inside is named `job-scan-console`, then open Claude in that folder and say: *"Follow the setup instructions in CLAUDE.md and onboard me."*
+
+**I skipped the fact registry during setup. Did I break something?**
+No. Scanning works fully without it. Tailored résumés will carry an **UNVERIFIED** banner until you finish it — say *"Finish my registry"* whenever you're ready, and Claude will also offer to remove the banners from packages built in the meantime.
+
+### The console
+
+**The console won't load / "connection refused" / "can't connect."**
+The little local server that shows the dashboard isn't running (it stops when your computer restarts, for example). Ask Claude: *"Start the job scan console server."* Then reload the page.
+
+**I opened `index.html` by double-clicking it and the page looks broken.**
+The console has to be viewed through the server address, not opened as a file. Ask Claude to start the server, then go to **http://localhost:8642/console/**.
+
+**The console shows a Welcome screen, but I already finished setup.**
+Your `profile.md` file is missing or got moved. Ask Claude to check — it can usually spot and fix this in seconds.
+
+**I ran a scan but the new report isn't on the dashboard.**
+Click **Refresh** in the top-right corner. The console reads files from disk and doesn't know about new ones until you refresh.
+
+**I clicked "Run scan" and nothing happened.**
+That button can't run scans — scanning only works inside a Claude session. Type `/scan-jobs` in Claude instead.
+
+**My dashboard shows a job type I told Claude I *don't* want.**
+Tell Claude — this happens if an excluded type got written into the wrong section of your profile. Claude fixes it by moving the exclusion to your Dealbreakers.
+
+**I built a package from a pasted link but it's not on my dashboard.**
+Expected — the dashboard only shows scan reports, and pasted-link jobs never become reports. Your package is in the `applications/` folder; ask Claude to open or list it.
+
+### Scanning
+
+**The scan says the Indeed connector is unavailable.**
+Add the Indeed connector in Claude's **Settings → Connectors**, then run `/scan-jobs` again. Claude will never fake results when the connector is missing — it tells you instead.
+
+**My scan found nothing.**
+Usually your filters, not a bug. The freshness window defaults to 48 hours, and every job must clear your salary floor, dealbreakers, and score at least 6/10. Ask Claude to loosen one thing at a time — *"widen my freshness window to a week"* is a common first fix.
+
+**The same jobs keep appearing in every scan.**
+Expected for now — each scan is independent and doesn't remember previous ones. Repeats across reports are normal.
+
+**A report file ends in `-FAILED.md`.**
+A scheduled scan ran while Indeed wasn't reachable. The file explains why, and no results were invented. Run `/scan-jobs` manually once the connector is back.
+
+**My scheduled morning scan didn't run.**
+Scheduled scans only run while the Claude app is open at scan time. If your laptop was closed or the app wasn't running, just ask for a scan manually.
+
+### Applications and the honesty check
+
+**`/apply` says it can't find `facts.md`.**
+Normal the first time if you skipped the registry (or set up before this feature existed). Claude offers to build it on the spot before continuing.
+
+**`/apply` asks which report or job I meant.**
+Normal when a company name matches more than one posting. Name the specific role or the report date and it narrows down.
+
+**I asked Claude to "process my queue" and it said it can't see the queue.**
+Also normal — the console's queue list lives only in your browser, where Claude can't see it. Claude shows you a numbered list of jobs to pick from instead.
+
+**`lint-report.md` has NO SOURCE or ERROR rows. Did it crash?**
+No — that's the report doing its job. Each flagged row is a résumé claim with nothing in your fact registry behind it. Check the claim against your registry and your own memory, fix or remove what you can't back, then ask Claude to re-lint.
+
+**Every warning is about things I told Claude in the interview.**
+Those are self-reported claims. If you stand behind one, tell Claude to **attest** it and the warning goes away permanently.
+
+**The job link is behind a login wall or dead.**
+For a job **from a scan report**: `/apply` still builds the package from the report's summary and marks it "degraded" — thinner job details, everything else normal. For a **pasted link**: there's no summary to fall back on, so Claude asks you to paste the posting text into the chat yourself. Paste it and the build continues; decline and `/apply` stops cleanly with nothing written.
+
+**I edited the tailored résumé myself. Is the lint report now wrong?**
+It's stale until you refresh it — ask Claude to *"re-lint that folder."* Only the report is redone; your edits are kept.
+
+### Interview prep
+
+**`/interview-prep` says a file is missing or the application is incomplete.**
+It needs the tailored résumé and job posting that `/apply` puts in the application folder. Run `/apply` for that job first — or tell Claude to build a prep-only folder if you're prepping before applying.
+
+**The interviewer research came back thin, or mentions LinkedIn being blocked.**
+Normal — LinkedIn blocks automated reading. Claude leans on the company's own site and the person's published writing instead, and anything it couldn't confirm is listed as unconfirmed rather than guessed. A thin dossier means little was publicly available, not that something broke.
+
+**I asked to prep a round and Claude stopped, saying a deck already exists.**
+By design — finished decks are never overwritten. Double-check the round number: a second round gets its own new file next to the first.
+
+**The deck's cards don't flip when I click them.**
+Tell Claude — it's supposed to verify the deck works in a browser before handing it over, and it can rebuild the file.
+
+### General
+
+**Is my résumé being uploaded somewhere?**
+No. Your résumé, profile, facts, reports, and packages never leave your machine. The only outbound traffic is the Indeed search through your own Claude account, and (during `/apply`, with your approval) reading a handful of public web pages for company research.
+
+**How do I get new features later?**
+Ask Claude: *"Pull the latest job-scan-console."* Your personal files are never touched by updates.
+
+**Something else is wrong and it's not listed here.**
+Describe the problem to Claude in a session opened in the `job-scan-console` folder — it has the project's full instructions and can usually diagnose from there.
