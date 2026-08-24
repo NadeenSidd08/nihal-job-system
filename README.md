@@ -70,20 +70,46 @@ Claude will then, with you in the loop:
 
 ## What's in the repo
 
-| Path | What it is |
-|---|---|
-| `console/index.html` | The dashboard — single file, no dependencies, reads `profile.md` + `reports/` |
-| `profile.template.md` | Skeleton Claude fills in to create your `profile.md` |
-| `.claude/skills/scan-jobs/` | The scan skill — available automatically in sessions opened here |
-| `CLAUDE.md` | Instructions your Claude follows to onboard you and run the system |
-| `spec.md` | Design spec — how scanning, scoring, and reports work |
-| `reports/` | Your scan reports land here (gitignored) |
-| `.claude/skills/apply/` | The `/apply` skill — builds a per-job application package |
-| `.claude/skills/interview-prep/` | The `/interview-prep` skill — round-aware interview research and a flip-card prep deck, with a worked example in `example/` |
-| `scripts/honesty_lint.py` | Passive checker `/apply` runs over tailored résumés — reports, never blocks |
-| `applications/` | Your `/apply` packages land here (gitignored) |
+### 🤖 The three Claude skills — `.claude/skills/`
 
-Your personal files — `profile.md`, `facts.md`, `resume*`, `reports/*`, `applications/` — are **gitignored**: they can't be committed or pushed, by you or anyone.
+- **`scan-jobs/`** — the `/scan-jobs` skill: searches Indeed, scores against your profile, writes reports
+- **`apply/`** — the `/apply` skill: builds a per-job application package, manifest-first
+- **`interview-prep/`** — the `/interview-prep` skill: round-aware interview research and a flip-card prep deck
+  - `templates/deck.html` — the deck engine Claude copies and fills
+  - `example/` — a complete worked run (fictional "Amberlyn Health") to see finished output
+
+### 🖥️ The dashboard
+
+- **`console/index.html`** — the entire console: one self-contained file, no dependencies, reads `profile.md` + `reports/`
+
+### 📖 Documentation
+
+- **`README.md`** — this page
+- **`USER-GUIDE.md`** — the guide: install, every feature, troubleshooting FAQ
+- **`CLAUDE.md`** — instructions your Claude follows to onboard you and run the system
+- **`spec.md`** — design spec for scanning, scoring, and reports
+- **`docs/apply-package-spec.md`** — design spec for the `/apply` package and honesty check
+
+### 🔬 The honesty-check machinery — `scripts/`
+
+- **`honesty_lint.py`** — passive checker `/apply` runs over tailored résumés — reports, never blocks
+- **`test_honesty_lint.py`** + **`fixtures/`** — its test suite and the sample résumés/registries it runs against
+
+### 📄 Templates & housekeeping
+
+- **`profile.template.md`** — skeleton Claude fills in to create your `profile.md`
+- **`.gitignore`** — the privacy guarantee: keeps personal files out of git
+- **`LICENSE`** — MIT
+
+### 🔒 Created during use — never in git
+
+Once you onboard, these appear on your machine; the `.gitignore` means they can't be committed or pushed, by you or anyone:
+
+- `profile.md` — your search profile
+- `facts.md` — your fact registry
+- `resume.md` — your résumé transcription (lives in the folder *above* the repo)
+- `reports/` — your scan reports
+- `applications/` — your application packages and prep decks
 
 ## Updating
 
