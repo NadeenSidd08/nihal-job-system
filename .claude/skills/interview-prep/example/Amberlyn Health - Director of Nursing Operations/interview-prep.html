@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!--
+  WORKED EXAMPLE — filled-in interview-prep deck for the interview-prep skill.
+  Scenario, company, interviewer, and every fact below are fictional. See
+  ../README.md for what this folder demonstrates. Every career claim on this
+  deck traces to this application folder's own tailored-resume.md — the
+  source-of-truth convention this repo demonstrates; do not treat any of
+  this as real research or a template to copy verbatim.
+-->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Amberlyn Health System Interview Prep — Round 1</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #f4f4f4;
+    color: #1a1a1a;
+    line-height: 1.6;
+    padding: 2rem 1rem 4rem;
+  }
+
+  .page-header {
+    max-width: 760px;
+    margin: 0 auto 2.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #1a1a1a;
+  }
+
+  .page-header h1 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  .page-header p {
+    font-size: 0.82rem;
+    color: #777;
+    margin-top: 0.2rem;
+  }
+
+  /* ── THESIS BANNER ── */
+  .thesis {
+    max-width: 760px;
+    margin: 0 auto 2.5rem;
+    background: #1a1a1a;
+    color: #fff;
+    border-radius: 8px;
+    padding: 1.1rem 1.25rem;
+  }
+  .thesis .thesis-label {
+    font-size: 0.66rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #999;
+    margin-bottom: 0.4rem;
+  }
+  .thesis p { font-size: 0.92rem; }
+  .thesis strong { color: #fff; font-weight: 700; }
+
+  .section-label {
+    max-width: 760px;
+    margin: 0 auto 1.2rem;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #888;
+  }
+
+  /* ── DECK ── */
+  .deck {
+    max-width: 760px;
+    margin: 0 auto 1.5rem;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .deck-header {
+    padding: 0.65rem 1.1rem;
+    background: #fafafa;
+    border-bottom: 1px solid #e8e8e8;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .deck-title {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: #555;
+  }
+
+  .deck-counter {
+    font-size: 0.72rem;
+    color: #aaa;
+  }
+
+  .card-area {
+    padding: 1.4rem 1.25rem;
+    min-height: 200px;
+  }
+
+  .card-back { display: none; }
+  .card-area.flipped .card-front { display: none; }
+  .card-area.flipped .card-back { display: block; }
+
+  .card-question {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #1a1a1a;
+    margin-bottom: 1.2rem;
+  }
+
+  .card-hint {
+    font-size: 0.78rem;
+    color: #bbb;
+    margin-top: 0.75rem;
+  }
+
+  .card-back-label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #aaa;
+    margin-bottom: 0.65rem;
+  }
+
+  .card-back ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  .card-back ul li {
+    padding: 0.32rem 0 0.32rem 1.1rem;
+    position: relative;
+    font-size: 0.88rem;
+    border-bottom: 1px solid #f2f2f2;
+  }
+
+  .card-back ul li:last-child { border-bottom: none; }
+
+  .card-back ul li::before {
+    content: "–";
+    position: absolute;
+    left: 0;
+    color: #ccc;
+  }
+
+  .card-back ul li strong { font-weight: 600; }
+
+  .card-nav {
+    padding: 0.65rem 1.1rem;
+    border-top: 1px solid #e8e8e8;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .nav-btn {
+    background: none;
+    border: 1px solid #d5d5d5;
+    border-radius: 4px;
+    padding: 0.35rem 0.85rem;
+    font-size: 0.78rem;
+    cursor: pointer;
+    color: #555;
+    transition: background 0.12s, border-color 0.12s;
+  }
+
+  .nav-btn:hover { background: #f5f5f5; border-color: #bbb; }
+  .nav-btn:disabled { opacity: 0.28; cursor: default; }
+
+  .flip-btn {
+    background: #1a1a1a;
+    border: none;
+    border-radius: 4px;
+    padding: 0.35rem 1.2rem;
+    font-size: 0.78rem;
+    cursor: pointer;
+    color: #fff;
+    transition: background 0.12s;
+  }
+
+  .flip-btn:hover { background: #333; }
+
+  /* ── DIVIDER ── */
+  .section-divider {
+    max-width: 760px;
+    margin: 2.5rem auto 2rem;
+    border: none;
+    border-top: 2px solid #1a1a1a;
+  }
+
+  /* ── REFERENCE PANELS ── */
+  .ref-panel {
+    max-width: 760px;
+    margin: 0 auto 1.2rem;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .panel-header {
+    padding: 0.65rem 1.1rem;
+    background: #fafafa;
+    border-bottom: 1px solid #e8e8e8;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .panel-header:hover { background: #f3f3f3; }
+
+  .panel-title {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: #555;
+  }
+
+  .panel-caret {
+    font-size: 0.72rem;
+    color: #bbb;
+    transition: transform 0.18s;
+  }
+
+  .panel-caret.open { transform: rotate(180deg); }
+
+  .panel-body {
+    padding: 1.2rem 1.25rem;
+    display: none;
+    font-size: 0.88rem;
+  }
+
+  .panel-body.open { display: block; }
+
+  .panel-body p { margin-bottom: 0.75rem; }
+  .panel-body p:last-child { margin-bottom: 0; }
+
+  .panel-body ul {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 1rem;
+  }
+
+  .panel-body ul:last-child { margin-bottom: 0; }
+
+  .panel-body ul li {
+    padding: 0.28rem 0 0.28rem 1.1rem;
+    position: relative;
+    border-bottom: 1px solid #f5f5f5;
+  }
+
+  .panel-body ul li:last-child { border-bottom: none; }
+
+  .panel-body ul li::before {
+    content: "–";
+    position: absolute;
+    left: 0;
+    color: #ccc;
+  }
+
+  .sub-label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #aaa;
+    margin: 1rem 0 0.5rem;
+  }
+
+  .sub-label:first-child { margin-top: 0; }
+
+  .win { color: #2d6a2d; }
+  .risk { color: #8b2e2e; }
+  .flag { color: #7a5500; }
+
+  blockquote {
+    border-left: 3px solid #ddd;
+    padding-left: 0.9rem;
+    color: #555;
+    font-style: italic;
+    margin: 0.75rem 0;
+  }
+
+  .todo {
+    background: #fff8e6;
+    border: 1px solid #f0d98c;
+    border-radius: 6px;
+    padding: 0.7rem 0.9rem;
+    font-size: 0.85rem;
+    color: #7a5500;
+    margin-top: 0.5rem;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.83rem;
+    margin: 0.75rem 0;
+  }
+
+  th {
+    text-align: left;
+    padding: 0.45rem 0.7rem;
+    background: #f5f5f5;
+    font-weight: 600;
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+    border-bottom: 1px solid #e0e0e0;
+    color: #555;
+  }
+
+  td {
+    padding: 0.45rem 0.7rem;
+    border-bottom: 1px solid #f0f0f0;
+    vertical-align: top;
+  }
+
+  tr:last-child td { border-bottom: none; }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>Amberlyn Health System — Director of Nursing Operations</h1>
+  <p>Round 1 &nbsp;·&nbsp; Renata Dunmore, VP Patient Care Services &nbsp;·&nbsp; 2026-09-10, 10:00 AM &nbsp;·&nbsp; prep built 2026-09-05</p>
+</div>
+
+<div class="thesis">
+  <div class="thesis-label">The One Thing This Round Decides</div>
+  <p>Renata is testing whether Priya can be trusted to standardize nursing operations across three
+  campuses that don't currently agree on anything, without either steamrolling Westgate's staff or
+  producing a policy nobody follows. Priya's whole background is single-site — one ED, one hospital's
+  trauma designation, one $6.2M budget — and that gap will come up directly, probably early. The round
+  fails if Priya either pretends the gap isn't there or gets defensive about it. It's won by naming the
+  gap plainly, then showing the closest real evidence: rebuilding a process after an external body
+  found it wanting (the state survey), and validating a shared clinical standard across a whole
+  hospital during the Dellview EHR migration. Read the Honest Gaps panel before anything else.</p>
+</div>
+
+<!-- ══════════════════ FLASHCARD DECKS ══════════════════ -->
+<div class="section-label">Flashcard Decks</div>
+
+<!-- DECK A -->
+<div class="deck">
+  <div class="deck-header">
+    <span class="deck-title">A &nbsp;·&nbsp; Questions They'll Likely Ask</span>
+    <span class="deck-counter" id="ctr-a">Card 1 / 5</span>
+  </div>
+  <div class="card-area" id="card-a">
+    <div class="card-front">
+      <div class="card-question" id="q-a"></div>
+      <div class="card-hint">Answer out loud, then flip to check your talking points.</div>
+    </div>
+    <div class="card-back">
+      <div class="card-back-label">Talking Points</div>
+      <ul id="ans-a"></ul>
+    </div>
+  </div>
+  <div class="card-nav">
+    <button class="nav-btn" id="prev-a" onclick="go('a',-1)" disabled>◀ Prev</button>
+    <button class="flip-btn" id="flip-a" onclick="flip('a')">Flip</button>
+    <button class="nav-btn" id="next-a" onclick="go('a',1)">Next ▶</button>
+  </div>
+</div>
+
+<!-- DECK B -->
+<div class="deck">
+  <div class="deck-header">
+    <span class="deck-title">B &nbsp;·&nbsp; Your STAR Stories</span>
+    <span class="deck-counter" id="ctr-b">Card 1 / 5</span>
+  </div>
+  <div class="card-area" id="card-b">
+    <div class="card-front">
+      <div class="card-question" id="q-b"></div>
+      <div class="card-hint">Tell the whole arc out loud — S, T, A, R — then flip to verify.</div>
+    </div>
+    <div class="card-back">
+      <div class="card-back-label">Story + Beats</div>
+      <ul id="ans-b"></ul>
+    </div>
+  </div>
+  <div class="card-nav">
+    <button class="nav-btn" id="prev-b" onclick="go('b',-1)" disabled>◀ Prev</button>
+    <button class="flip-btn" id="flip-b" onclick="flip('b')">Flip</button>
+    <button class="nav-btn" id="next-b" onclick="go('b',1)">Next ▶</button>
+  </div>
+</div>
+
+<!-- DECK C -->
+<div class="deck">
+  <div class="deck-header">
+    <span class="deck-title">C &nbsp;·&nbsp; Facts to Recall Cold</span>
+    <span class="deck-counter" id="ctr-c">Card 1 / 5</span>
+  </div>
+  <div class="card-area" id="card-c">
+    <div class="card-front">
+      <div class="card-question" id="q-c"></div>
+      <div class="card-hint">Say the numbers out loud before flipping — this is a recall drill, not a reading exercise.</div>
+    </div>
+    <div class="card-back">
+      <div class="card-back-label">The Facts</div>
+      <ul id="ans-c"></ul>
+    </div>
+  </div>
+  <div class="card-nav">
+    <button class="nav-btn" id="prev-c" onclick="go('c',-1)" disabled>◀ Prev</button>
+    <button class="flip-btn" id="flip-c" onclick="flip('c')">Flip</button>
+    <button class="nav-btn" id="next-c" onclick="go('c',1)">Next ▶</button>
+  </div>
+</div>
+
+<!-- DECK D -->
+<div class="deck">
+  <div class="deck-header">
+    <span class="deck-title">D &nbsp;·&nbsp; What Priya Asks Them</span>
+    <span class="deck-counter" id="ctr-d">Card 1 / 5</span>
+  </div>
+  <div class="card-area" id="card-d">
+    <div class="card-front">
+      <div class="card-question" id="q-d"></div>
+      <div class="card-hint">These are Priya's questions for Renata — flip for why each one is worth asking.</div>
+    </div>
+    <div class="card-back">
+      <div class="card-back-label">Why This Question</div>
+      <ul id="ans-d"></ul>
+    </div>
+  </div>
+  <div class="card-nav">
+    <button class="nav-btn" id="prev-d" onclick="go('d',-1)" disabled>◀ Prev</button>
+    <button class="flip-btn" id="flip-d" onclick="flip('d')">Flip</button>
+    <button class="nav-btn" id="next-d" onclick="go('d',1)">Next ▶</button>
+  </div>
+</div>
+
+<!-- ══════════════════ REFERENCE PANELS ══════════════════ -->
+<hr class="section-divider">
+<div class="section-label">Reference Panels</div>
+
+<!-- Panel 1 -->
+<div class="ref-panel">
+  <div class="panel-header" onclick="togglePanel(this)">
+    <span class="panel-title">1 &nbsp;·&nbsp; Amberlyn Cheat Sheet</span>
+    <span class="panel-caret">▼</span>
+  </div>
+  <div class="panel-body">
+    <p><strong>The business in one breath:</strong> Amberlyn Health System is a not-for-profit,
+    three-hospital regional system in the Corrigan Falls metro area, anchored by the flagship's
+    Level I trauma designation and now digesting its first multi-site acquisition (Westgate,
+    18 months ago). All of this is fictional, invented for this example.</p>
+    <div class="sub-label">Key Facts</div>
+    <ul>
+      <li><strong>Footprint</strong> — Amberlyn Medical Center (420 beds, flagship, Level I trauma), Amberlyn North (180 beds), Amberlyn Westgate (140 beds, acquired ~18 months ago)</li>
+      <li><strong>Scale</strong> — ~14,000 employees system-wide, ~3,100 in nursing; metro population ~900,000</li>
+      <li><strong>Why this role exists</strong> — a system-wide accreditation survey ~8 months ago cited inconsistent competency-documentation practices across all three campuses; nobody currently owns standardizing nursing operations across sites</li>
+      <li><strong>Comp band</strong> — $148,000–$178,000 base, up to 15% incentive target (from the JD)</li>
+    </ul>
+    <div class="sub-label win">Your Overlaps (say these naturally)</div>
+    <ul>
+      <li>Rebuilt a competency-validation program from scratch after a survey citation, and closed it with zero repeat findings — the closest one-to-one match to why this role exists</li>
+      <li>Validated a clinical protocol standard (ICU order sets, drip-titration) across a hospital-wide EHR migration — the closest analog to cross-site systems standardization</li>
+      <li>Owns a $6.2M nursing labor budget today; the JD's $5M+ floor is already familiar territory, even if the multi-site span isn't</li>
+    </ul>
+  </div>
+</div>
+
+<!-- Panel 2 -->
+<div class="ref-panel">
+  <div class="panel-header" onclick="togglePanel(this)">
+    <span class="panel-title">2 &nbsp;·&nbsp; Your Intro &amp; Your Close</span>
+    <span class="panel-caret">▼</span>
+  </div>
+  <div class="panel-body">
+    <div class="sub-label">"Tell Me About Yourself"</div>
+    <blockquote>"I've spent twelve years moving from bedside to charge to management, always in the
+    highest-pressure unit in the building: med-surg, then ICU, then now a Level II trauma ED that sees
+    about 58,000 visits a year. Along the way I've owned a $6.2M labor budget, led the nursing side of
+    a triage redesign that dropped door-to-provider time from 42 to 29 minutes as part of a joint
+    effort with ED physician leadership, and rebuilt our onboarding and competency program after a
+    state survey citation, closing it clean on re-survey. What I haven't done yet is run that kind of
+    work across more than one site at once, which is exactly why a role like this, standardizing
+    nursing operations across three campuses, is the right next step for me."</blockquote>
+    <div class="sub-label win">Your Close / "Why Me"</div>
+    <blockquote>"You're looking for someone who can turn an accreditation finding into a closed,
+    durable standard, and do it in a way that doesn't feel imposed on a newly acquired site. I've done
+    the first part at one hospital. I haven't done the second part at three, but I've watched what
+    happens when a good process depends on one champion instead of being built to outlast them, and
+    that's exactly the mistake I'd be careful not to repeat here."</blockquote>
+    <div class="sub-label">Why-Me in One Line</div>
+    <p><em>"I've closed the exact kind of finding you're trying to close, I just haven't done it at
+    three-site scale yet, and I know precisely what that scaling requires."</em></p>
+  </div>
+</div>
+
+<!-- Panel 3 -->
+<div class="ref-panel">
+  <div class="panel-header" onclick="togglePanel(this)">
+    <span class="panel-title">3 &nbsp;·&nbsp; The Honest Gaps</span>
+    <span class="panel-caret">▼</span>
+  </div>
+  <div class="panel-body">
+    <div class="sub-label risk">Primary Gap — Multi-Site Operations Oversight</div>
+    <p>The JD requires 3+ years directly overseeing nursing operations across multiple hospital sites
+    concurrently. Priya has never done this. Lakeside is technically a "two-hospital system," but
+    Priya manages one ED at one site; she has no direct oversight of the second hospital's nursing
+    operations. This is a real gap, not a technicality, and Renata's own background (informatics,
+    multi-system rollouts) makes it likely to come up directly.</p>
+    <p><strong>How to handle it out loud:</strong> Name it in the first sentence of any answer that
+    touches it. Don't reframe "single-site" as something it isn't. Then bridge immediately to the two
+    closest real analogs: validating a clinical protocol standard across a hospital-wide EHR migration
+    at Dellview (Cerner to Epic — many units, one shared standard, zero rollback incidents on the
+    pieces Priya owned), and closing an accreditation finding start to finish at Lakeside. Both are
+    honest evidence of the underlying skill (building a standard that holds across more stakeholders
+    than any one manager controls) without claiming the specific multi-site experience she doesn't
+    have.</p>
+    <div class="sub-label flag">Secondary Gap — Board-Level Presentation</div>
+    <p>The JD asks for comfort presenting to executive leadership and board-level committees. Priya's
+    closest experience is the standing monthly relationship with Lakeside's quality and patient-safety
+    office, which is executive-adjacent but not the board itself. This is a softer, more coachable gap
+    than the multi-site one; if asked directly, say so plainly rather than stretching the quality-office
+    relationship into something it wasn't.</p>
+  </div>
+</div>
+
+<!-- Panel 4 -->
+<div class="ref-panel">
+  <div class="panel-header" onclick="togglePanel(this)">
+    <span class="panel-title">4 &nbsp;·&nbsp; Renata Dunmore — Interviewer Notes</span>
+    <span class="panel-caret">▼</span>
+  </div>
+  <div class="panel-body">
+    <div class="sub-label">Background (fictional, per research/interviewer-renata-dunmore.md)</div>
+    <ul>
+      <li>Started as a bedside ICU nurse at a prior fictional employer, then moved into nursing informatics roughly midway through her career</li>
+      <li>Completed an MBA; joined Amberlyn as a Director of Patient Care Services and was promoted into her current VP title</li>
+      <li>This role reports directly to her</li>
+    </ul>
+    <div class="sub-label">What She'll Likely Probe</div>
+    <ul>
+      <li>The multi-site gap directly — her own bio leans on cross-system rollout experience</li>
+      <li>Standardization philosophy: how to roll out a shared standard, not just whether to</li>
+      <li>EHR/systems fluency — her informatics background makes the Dellview story land harder with her specifically than with a typical hiring manager</li>
+    </ul>
+    <div class="sub-label flag">Uncertainty Register</div>
+    <ul>
+      <li><strong>Title:</strong> Amberlyn's own site says "VP, Patient Care Services"; a trade profile from ~8 months ago said "VP, Nursing Operations." Unresolved — use Amberlyn's site title, don't correct her if she says it differently</li>
+      <li><strong>Tenure:</strong> sources put her at roughly four to six years at Amberlyn; imprecise, don't cite a specific number</li>
+      <li><strong>LinkedIn:</strong> lookup attempted and blocked (HTTP 999); nothing from LinkedIn is reflected in this prep</li>
+    </ul>
+  </div>
+</div>
+
+<script>
+const DECKS = {
+  a: {
+    i: 0,
+    cards: [
+      {
+        q: "Tell me about your experience standardizing something across more than one site or unit.",
+        a: [
+          "<strong>Be upfront first:</strong> \"I haven't run nursing operations across more than one hospital site concurrently, my experience is single-site.\"",
+          "Bridge to the nearest real evidence: at Dellview, validated ICU order sets and drip-titration protocols carried over correctly during a hospital-wide Cerner-to-Epic migration, before go-live",
+          "Also bridge to Lakeside: rebuilt the onboarding and competency-validation program after a state survey citation, closed clean on re-survey",
+          "Name the lesson from Riverbend: a process that isn't built to outlast one champion doesn't survive a leadership change, that's exactly the discipline multi-site standardization needs",
+          "Don't claim multi-site oversight she hasn't had. See the Honest Gaps panel for the full version of this answer."
+        ]
+      },
+      {
+        q: "Walk me through how you'd approach the Westgate integration from a nursing operations standpoint.",
+        a: [
+          "Lead with the triage-protocol redesign at Lakeside as evidence of running a cross-functional workflow change: nursing, ED physician leadership, and registration all changed workflow together",
+          "Say plainly it was a joint effort, not a solo one: door-to-provider time dropped from <strong>42 to 29 minutes</strong>",
+          "Apply the Riverbend lesson: build standardization into something durable and owned, not a one-time policy rollout that depends on one champion",
+          "Acknowledge company-context watch-out directly: some Westgate staff likely feel standardization imposed from the flagship, pace matters as much as the plan"
+        ]
+      },
+      {
+        q: "You've managed a $6.2M budget at one site. How does budget ownership change when it spans three campuses with different cost structures?",
+        a: [
+          "Anchor: owns <strong>$6.2M</strong> in annual nursing labor budget for a 65-FTE ED staff across three shifts at Lakeside today",
+          "The transferable piece isn't the number, it's the judgment behind it: tied the triage-acuity staffing model directly to keeping pace during peak hours",
+          "Honest gap: has never owned a budget spanning multiple sites or cost structures, say so rather than implying otherwise",
+          "What she'd bring to a multi-site budget conversation: the habit of tying every staffing decision to a specific operational outcome, not just headcount math"
+        ]
+      },
+      {
+        q: "Tell me about a time a regulatory or accreditation finding forced you to rebuild a process. How did you approach it?",
+        a: [
+          "The state survey at Lakeside cited gaps in documented skills checks",
+          "Rebuilt the department's onboarding and competency-validation program in response",
+          "Result: citation fully resolved, closed clean on re-survey the following year, <strong>zero repeat findings</strong> in that category",
+          "Name this as the closest one-to-one match in her background to why the Director of Nursing Operations role exists at all"
+        ]
+      },
+      {
+        q: "Why this role, why now?",
+        a: [
+          "The intersection: budget ownership, a survey-finding rebuild, and cross-functional EHR validation work all show up in her background, just not yet at multi-site scale",
+          "Evidence of prep: name the Westgate acquisition and the accreditation finding specifically, not just \"I researched the company\"",
+          "Honest personal hook: her own throughline is owning things nobody handed her a playbook for, budget, hiring, survey response, and this role is more of exactly that at bigger scale",
+          "Avoid making it sound like a generic step up, name Amberlyn's specific three-site standardization problem"
+        ]
+      }
+    ]
+  },
+  b: {
+    i: 0,
+    cards: [
+      {
+        q: "PRIMARY — The triage-protocol redesign at Lakeside",
+        a: [
+          "<strong>S:</strong> Lakeside's ED sees roughly 58,000 visits a year and is the system's only Level II trauma center; median door-to-provider time was 42 minutes",
+          "<strong>T:</strong> Own the nursing side of a triage-protocol redesign meant to cut that time, as part of a joint effort with ED physician leadership and registration",
+          "<strong>A:</strong> Led the triage-acuity scoring change and the nursing-side staffing model that let triage keep pace during peak hours",
+          "<strong>R:</strong> Median door-to-provider time dropped to <strong>29 minutes</strong> — a joint result across nursing, ED physician leadership, and registration; never claim it alone",
+          "<strong>Why it wins here:</strong> shows she can own the nursing slice of a genuinely cross-functional redesign and be precise about attribution, exactly what standardizing across three sites and their CNOs will require"
+        ]
+      },
+      {
+        q: "SCALE — Validating the EHR migration at Dellview",
+        a: [
+          "<strong>S:</strong> Dellview's 24-bed ICU went through a hospital-wide Cerner-to-Epic migration",
+          "<strong>T:</strong> As part of the unit's core team, specifically responsible for validating that ICU order sets and drip-titration protocols carried over correctly before go-live",
+          "<strong>A:</strong> Validated the protocols pre-go-live as the unit's designated owner of that piece",
+          "<strong>R:</strong> <strong>Zero rollback incidents</strong> on ICU order sets, against a hospital-wide average of several per unit in the same migration window — a hospital-reported figure, cite it as \"per the hospital's own go-live report\"",
+          "<strong>Why it wins here:</strong> the direct analog to Amberlyn's own cross-site EHR optimization scope as Westgate migrates onto the shared platform, and it will land unusually hard with Renata given her informatics background"
+        ]
+      },
+      {
+        q: "QUALITY — Closing the state survey citation at Lakeside",
+        a: [
+          "<strong>S:</strong> A state survey cited gaps in documented skills checks in the Lakeside ED",
+          "<strong>T:</strong> Rebuild the department's onboarding and competency-validation program",
+          "<strong>A:</strong> Rebuilt it from the ground up after the citation",
+          "<strong>R:</strong> Citation fully resolved, closed clean on re-survey the following year, <strong>zero repeat findings</strong> in that category",
+          "<strong>Why it wins here:</strong> this is the single closest match in her whole background to the accreditation finding that created this role in the first place"
+        ]
+      },
+      {
+        q: "CONFLICT — Advocating on the falls-prevention committee at Riverbend",
+        a: [
+          "<strong>S:</strong> As a staff RN at Riverbend, sat on the hospital's falls-prevention committee, one of only two staff-level nurses in a room otherwise made up of managers and the CNO",
+          "<strong>T:</strong> Get a staff-level idea taken seriously by people several levels up, with no formal authority in the room",
+          "<strong>A:</strong> Pushed for a specific bedside-alarm placement change through that committee",
+          "<strong>R:</strong> The change shipped in year two",
+          "<strong>Why it wins here:</strong> a preview of how she'd need to sell a standardization idea to three site CNOs who don't report to her, without formal authority over any of them"
+        ]
+      },
+      {
+        q: "FAILURE — The med-rec checklist that didn't survive a leadership change",
+        a: [
+          "<strong>S:</strong> Flagged a recurring medication-reconciliation gap at shift handoff on the Riverbend med-surg unit",
+          "<strong>T:</strong> Fix it and make it stick unit-wide",
+          "<strong>A:</strong> Built a one-page checklist the charge nurse adopted unit-wide; it cut reported med-rec discrepancies by roughly a third over two quarters, based on the unit's own tracking, not a hospital-audited figure",
+          "<strong>R:</strong> The honest miss: adoption stalled when the manager who'd championed it moved on, it wasn't sustained. What changed afterward: at Dellview, facing the same class of problem, built the unit's <strong>first written</strong> orientation checklist instead of relying on one champion, and 90-day retention rose from roughly 70% to over 90% in the two cohorts hired after it shipped",
+          "<strong>Why it wins here:</strong> owning that a real early win didn't survive a leadership change, and showing exactly what she changed because of it, is more persuasive than a polished non-answer, and it's the same discipline multi-site standardization demands"
+        ]
+      }
+    ]
+  },
+  c: {
+    i: 0,
+    cards: [
+      {
+        q: "Your current scope at Lakeside — say it cold",
+        a: [
+          "<strong>65 FTEs</strong> across three shifts, ED nursing staff",
+          "<strong>$6.2M</strong> annual nursing labor budget owned",
+          "<strong>~58,000</strong> annual ED visits",
+          "Only <strong>Level II trauma center</strong> in a two-hospital system",
+          "First-line HR for the nursing staff: hiring, performance reviews, progressive discipline"
+        ]
+      },
+      {
+        q: "Your career arc and credentials — say it cold",
+        a: [
+          "Riverbend Community Hospital, Staff RN, Med-Surg (2014-2017)",
+          "Dellview Regional Medical Center, Charge Nurse, ICU (2017-2021)",
+          "Lakeside Health System, Nurse Manager, ED (2021-present)",
+          "BSN 2014; MSN, Nursing Leadership &amp; Administration, 2020 (part-time while at Dellview)",
+          "RN license active and unrestricted; CEN, TNCC, ACLS/PALS all current"
+        ]
+      },
+      {
+        q: "Your signature metrics — with the caveat attached to each one",
+        a: [
+          "<strong>42 → 29 min</strong> door-to-provider — joint result with ED physician leadership and registration, never claim it alone",
+          "<strong>Zero rollback incidents</strong>, EHR go-live — hospital-reported, cite as \"per the hospital's own go-live report\"",
+          "<strong>70% → 90%+</strong> 90-day retention — two cohorts only, say \"in the two cohorts after it shipped,\" not \"we improved retention\"",
+          "<strong>roughly a third fewer</strong> med-rec discrepancies — unit-tracked, not hospital-audited, say \"based on our own unit tracking\""
+        ]
+      },
+      {
+        q: "Amberlyn facts to recall cold",
+        a: [
+          "Three hospitals: Amberlyn Medical Center (420 beds, flagship, Level I trauma), Amberlyn North (180 beds), Amberlyn Westgate (140 beds)",
+          "Westgate acquired roughly <strong>18 months</strong> before this posting",
+          "~14,000 employees system-wide, ~3,100 in nursing; metro population ~900,000",
+          "Accreditation finding on competency-documentation consistency, roughly 8 months ago, is why this role exists",
+          "Comp band: $148,000–$178,000 base, up to 15% incentive target"
+        ]
+      },
+      {
+        q: "Renata Dunmore facts to recall cold",
+        a: [
+          "VP, Patient Care Services (per Amberlyn's own site; a trade profile called her VP Nursing Operations, unresolved)",
+          "Bedside ICU nurse early career, then nursing informatics, then MBA, then operations leadership",
+          "Roughly four to six years at Amberlyn, imprecise across sources",
+          "This role reports directly to her",
+          "No LinkedIn data available, lookup was attempted and blocked"
+        ]
+      }
+    ]
+  },
+  d: {
+    i: 0,
+    cards: [
+      {
+        q: "\"Once a system-wide standard is set, how is disagreement resolved if a site CNO doesn't want to adopt it? Who has the final call?\"",
+        a: [
+          "Gets at the actual authority structure of the role before accepting an offer built on ambiguous decision rights",
+          "Directly relevant to the multi-site gap: shows she's already thinking about the hardest part of the job, not just the parts she already knows how to do",
+          "Listen for whether Renata has a clear answer or hedges, a hedge is itself useful information"
+        ]
+      },
+      {
+        q: "\"What does success in this role look like at the end of year one, beyond what's written in the posting?\"",
+        a: [
+          "Surfaces Renata's personal bar, which may differ from the JD's formal language",
+          "Gives Priya a chance to mentally check her own plan against Renata's actual expectations in real time",
+          "A generic question would be \"what are you looking for,\" this version asks for a concrete year-one picture instead"
+        ]
+      },
+      {
+        q: "\"How is the Westgate integration actually landing with nursing staff there right now? What's the honest temperature in the room?\"",
+        a: [
+          "Tests whether Renata will give a candid answer or a polished one, which itself is useful signal about the culture",
+          "Directly informs how Priya would need to pace any standardization rollout, per the company-context watch-out",
+          "Shows she's already thinking about change management, not just policy design"
+        ]
+      },
+      {
+        q: "\"How does this role's reporting relationship work day to day: how much time would I expect to spend with you versus with the three site CNOs directly?\"",
+        a: [
+          "Practical question about whether this is a hands-on operating role or a strategy-and-reporting role, materially different jobs",
+          "Also indirectly probes the title/scope ambiguity noted in the uncertainty register, without directly asking Renata to clarify her own title",
+          "Helps Priya calibrate how much of her pitch should be about direct operational ownership versus influence-without-authority"
+        ]
+      },
+      {
+        q: "\"The accreditation finding on competency documentation, what specifically did the survey cite, and is there a deadline tied to the corrective action plan I should know about?\"",
+        a: [
+          "Shows she's already treating the finding as her problem to solve, not just a talking point she read about",
+          "A real deadline changes the first 90 days of the job substantially, worth knowing before accepting an offer",
+          "Draws directly on her own experience closing a similar finding at Lakeside, without restating that story a third time"
+        ]
+      }
+    ]
+  }
+};
+
+function render(id) {
+  const d = DECKS[id];
+  const card = d.cards[d.i];
+  const cardEl = document.getElementById('card-' + id);
+
+  cardEl.classList.remove('flipped');
+  document.getElementById('flip-' + id).textContent = 'Flip';
+  document.getElementById('q-' + id).textContent = card.q;
+  document.getElementById('ans-' + id).innerHTML = card.a.map(p => `<li>${p}</li>`).join('');
+  document.getElementById('ctr-' + id).textContent = `Card ${d.i + 1} / ${d.cards.length}`;
+  document.getElementById('prev-' + id).disabled = d.i === 0;
+  document.getElementById('next-' + id).disabled = d.i === d.cards.length - 1;
+}
+
+function go(id, dir) {
+  const d = DECKS[id];
+  d.i = Math.max(0, Math.min(d.cards.length - 1, d.i + dir));
+  render(id);
+}
+
+function flip(id) {
+  const cardEl = document.getElementById('card-' + id);
+  cardEl.classList.toggle('flipped');
+  document.getElementById('flip-' + id).textContent =
+    cardEl.classList.contains('flipped') ? 'Flip Back' : 'Flip';
+}
+
+function togglePanel(header) {
+  const body = header.nextElementSibling;
+  const caret = header.querySelector('.panel-caret');
+  body.classList.toggle('open');
+  caret.classList.toggle('open');
+}
+
+['a','b','c','d'].forEach(render);
+</script>
+</body>
+</html>

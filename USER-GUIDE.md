@@ -7,6 +7,7 @@ Job Scan Console is a personal job-search system you run through Claude — it s
 Once setup is done, you'll have:
 
 - **`/scan-jobs`** — a Claude skill you invoke any time you want a fresh scan
+- **`/apply`** and **`/interview-prep`** — skills that build a per-job application package, then turn a scheduled interview into research and a flip-card prep deck (both covered below)
 - **`profile.md`** — your search profile: target titles, location, salary floor, dealbreakers, and a scoring rubric written around your background
 - **`resume.md`** — a markdown copy of your resume that Claude reads instead of re-parsing the original file every time
 - **`facts.md`** — a registry of the facts pulled from your résumé, in your résumé's own words, plus a few things you've done that never made it onto the résumé itself; this is what your tailored résumés get checked against later
@@ -144,6 +145,28 @@ Here's the gap: a claim can trace perfectly and still be a stretch. If `facts.md
 
 So before you send anything: read the tailored résumé line by line yourself, not just the lint report. Anything you couldn't say out loud and defend under a follow-up question — anything you'd wince at if a recruiter said "tell me more about that" — take it out or reword it down to what actually happened. The check tells you what's sourced. Only you can tell what's true.
 
+## Prepping for an interview
+
+Landed an interview for one of your applications? Ask Claude — either `/interview-prep`, or just say it naturally:
+
+> *I have a first round with Acme Health on Thursday, with Dana Whitcomb.*
+
+Claude matches the company to your application folder in `applications/`, reads the tailored résumé and job posting already in it, and asks one combined question for anything missing — always including who you're meeting, because a name is what unlocks the interviewer research, plus the round and what kind of interview it is (recruiter screen, hiring manager, panel, technical, and so on — the type shapes what the deck emphasizes).
+
+Then it builds, into that same application folder:
+
+- **`research/company-brief.md`** — deep company research: market position, competitors, funding, leadership, recent press, and where your role sits
+- **`research/interviewer-<name>.md`** — when you named someone: their role and tenure, career arc, what they'll likely probe, and what to ask them back. Anything it couldn't confirm goes into an uncertainty register instead of becoming a confident guess.
+- **`interview-prep.html`** — an interactive flip-card deck: question on the front, your talking points on the back, plus collapsible reference panels for what you want to check five minutes before the call. Self-contained HTML — opens anywhere, including your phone, no internet needed.
+
+Three rules worth knowing:
+
+- **Every talking point traces to that folder's `tailored-resume.md`.** When the posting asks for something you haven't done, the deck names the gap and coaches you to raise it yourself, instead of inventing a bullet — a gap you raise first is a conversation; a gap the interviewer finds is a problem.
+- **Later rounds never overwrite earlier ones.** Round 2 writes `interview-prep-round2.html` beside round 1. And if you drop rough notes from round 1 into `research/round-1-debrief.md` after the call, the round-2 deck is shaped by what actually happened in the room.
+- **Resumes are thin on stories.** They carry results, not the situation or the judgment call that STAR stories are made of — so when the deck needs detail your résumé doesn't hold, Claude asks you rather than making it up, and offers to save your answers as `career-notes.md` for later rounds.
+
+No application package yet? You can still prep — give `/interview-prep` the company name or posting link and it builds a **prep-only** folder (marked as such, so it's never mistaken for a tailored, checked application). Keep the interviewer research to yourself — it's prep, not a dossier to circulate.
+
 ## Changing your profile
 
 Your profile isn't a settings page you edit directly — you just tell Claude what to change, in a session opened in `job-scan-console`. For example:
@@ -175,6 +198,9 @@ Scheduled runs follow the same rule as manual ones: they never invent results. I
 | `lint-report.md` has `NO SOURCE` or ERROR rows | Not a crash — read "What passing the check doesn't mean" above, then check that claim against `facts.md` and your own memory before you send anything |
 | A job **from a report** is behind a login or the link is dead | `/apply` still builds `job-post.md` from the report summary alone and marks it "degraded" — the job description content will be thinner than usual |
 | A **pasted URL** is behind a login or won't fetch | There's no report summary to fall back on for a URL job, so `/apply` says the fetch failed and asks you to paste the posting text into chat yourself. Paste it and the build continues normally, marked `provenance: user-pasted`; decline and `/apply` stops cleanly with nothing written |
+| `/interview-prep` says a file is missing or the package is incomplete | It needs `tailored-resume.md` and `job-post.md` in the application folder — run `/apply` for that job first, or let it build a prep-only folder instead |
+| The interviewer dossier is thin or says LinkedIn was blocked | Normal — LinkedIn blocks automated reads. The research leans on the company's own site and published bios instead, and anything unconfirmed is listed in the dossier's uncertainty register rather than guessed |
+| You prepped a round but the deck for it already exists | Decks are frozen once written — `/interview-prep` stops and asks before touching an existing file. Confirm the round number; a later round gets its own new file |
 
 ## Updating
 
@@ -184,6 +210,6 @@ Ask Claude: *"Pull the latest job-scan-console."* Your `profile.md`, `facts.md`,
 
 Your resume, profile, fact registry, reports, and application packages live only on your machine. `profile.md`, `facts.md`, `resume.md`, `reports/`, and `applications/` are all gitignored, so none of them can be committed or pushed anywhere — by you or anyone else.
 
-Two things do leave your machine, both by design. The job search itself goes through your own Claude account's Indeed connector. And if you use `/apply` (above), the company-research step fetches roughly five public web pages per application — the company's own site, recent news, that kind of thing — plus the job posting itself.
+Two things do leave your machine, both by design. The job search itself goes through your own Claude account's Indeed connector. And the research steps read public web pages: `/apply` fetches roughly five per application — the company's own site, recent news, that kind of thing — plus the job posting itself, and `/interview-prep` does the same kind of reading for its company brief and interviewer dossier (the interviewer research uses only their public professional footprint — employer site, published writing, conference bios).
 
 For a job that came from a scan report, all of that waits for you: `/apply` prints the full plan and fetches nothing until you reply `go`. If you instead paste a link straight into `/apply` (see "Applying to a job you found yourself," above), one fetch happens *before* the plan is printed — the posting you pasted, read once so the manifest can actually tell you which company and role it's about to build for. Nothing else jumps the queue: no company research, no files, no folder — those still wait for `go`, exactly as above. What leaves is Claude reading a page you chose to paste, not your résumé or `facts.md` being sent anywhere — none of your personal data is ever uploaded.

@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!--
+  TEMPLATE — flip-card interview prep deck engine.
+  Everything below is placeholder content, not real prep. Replace the
+  page header, thesis banner, DECKS card data, and reference panel bodies
+  with real material for the interview at hand; keep the <style> block
+  and the render/go/flip/togglePanel functions as-is.
+  If you add or remove decks, update BOTH the markup (deck-header id,
+  card-area id, and all q-/ans-/ctr-/prev-/next-/flip- element ids) and
+  the final `forEach(render)` array below — they must list the exact
+  same deck ids or the page throws on load and renders blank.
+-->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>[Company] Interview Prep — [Round Name]</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #f4f4f4;
+    color: #1a1a1a;
+    line-height: 1.6;
+    padding: 2rem 1rem 4rem;
+  }
+
+  .page-header {
+    max-width: 760px;
+    margin: 0 auto 2.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #1a1a1a;
+  }
+
+  .page-header h1 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  .page-header p {
+    font-size: 0.82rem;
+    color: #777;
+    margin-top: 0.2rem;
+  }
+
+  /* ── THESIS BANNER ── */
+  .thesis {
+    max-width: 760px;
+    margin: 0 auto 2.5rem;
+    background: #1a1a1a;
+    color: #fff;
+    border-radius: 8px;
+    padding: 1.1rem 1.25rem;
+  }
+  .thesis .thesis-label {
+    font-size: 0.66rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #999;
+    margin-bottom: 0.4rem;
+  }
+  .thesis p { font-size: 0.92rem; }
+  .thesis strong { color: #fff; font-weight: 700; }
+
+  .section-label {
+    max-width: 760px;
+    margin: 0 auto 1.2rem;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #888;
+  }
+
+  /* ── DECK ── */
+  .deck {
+    max-width: 760px;
+    margin: 0 auto 1.5rem;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .deck-header {
+    padding: 0.65rem 1.1rem;
+    background: #fafafa;
+    border-bottom: 1px solid #e8e8e8;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .deck-title {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: #555;
+  }
+
+  .deck-counter {
+    font-size: 0.72rem;
+    color: #aaa;
+  }
+
+  .card-area {
+    padding: 1.4rem 1.25rem;
+    min-height: 200px;
+  }
+
+  .card-back { display: none; }
+  .card-area.flipped .card-front { display: none; }
+  .card-area.flipped .card-back { display: block; }
+
+  .card-question {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #1a1a1a;
+    margin-bottom: 1.2rem;
+  }
+
+  .card-hint {
+    font-size: 0.78rem;
+    color: #bbb;
+    margin-top: 0.75rem;
+  }
+
+  .card-back-label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #aaa;
+    margin-bottom: 0.65rem;
+  }
+
+  .card-back ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  .card-back ul li {
+    padding: 0.32rem 0 0.32rem 1.1rem;
+    position: relative;
+    font-size: 0.88rem;
+    border-bottom: 1px solid #f2f2f2;
+  }
+
+  .card-back ul li:last-child { border-bottom: none; }
+
+  .card-back ul li::before {
+    content: "–";
+    position: absolute;
+    left: 0;
+    color: #ccc;
+  }
+
+  .card-back ul li strong { font-weight: 600; }
+
+  .card-nav {
+    padding: 0.65rem 1.1rem;
+    border-top: 1px solid #e8e8e8;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .nav-btn {
+    background: none;
+    border: 1px solid #d5d5d5;
+    border-radius: 4px;
+    padding: 0.35rem 0.85rem;
+    font-size: 0.78rem;
+    cursor: pointer;
+    color: #555;
+    transition: background 0.12s, border-color 0.12s;
+  }
+
+  .nav-btn:hover { background: #f5f5f5; border-color: #bbb; }
+  .nav-btn:disabled { opacity: 0.28; cursor: default; }
+
+  .flip-btn {
+    background: #1a1a1a;
+    border: none;
+    border-radius: 4px;
+    padding: 0.35rem 1.2rem;
+    font-size: 0.78rem;
+    cursor: pointer;
+    color: #fff;
+    transition: background 0.12s;
+  }
+
+  .flip-btn:hover { background: #333; }
+
+  /* ── DIVIDER ── */
+  .section-divider {
+    max-width: 760px;
+    margin: 2.5rem auto 2rem;
+    border: none;
+    border-top: 2px solid #1a1a1a;
+  }
+
+  /* ── REFERENCE PANELS ── */
+  .ref-panel {
+    max-width: 760px;
+    margin: 0 auto 1.2rem;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .panel-header {
+    padding: 0.65rem 1.1rem;
+    background: #fafafa;
+    border-bottom: 1px solid #e8e8e8;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .panel-header:hover { background: #f3f3f3; }
+
+  .panel-title {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: #555;
+  }
+
+  .panel-caret {
+    font-size: 0.72rem;
+    color: #bbb;
+    transition: transform 0.18s;
+  }
+
+  .panel-caret.open { transform: rotate(180deg); }
+
+  .panel-body {
+    padding: 1.2rem 1.25rem;
+    display: none;
+    font-size: 0.88rem;
+  }
+
+  .panel-body.open { display: block; }
+
+  .panel-body p { margin-bottom: 0.75rem; }
+  .panel-body p:last-child { margin-bottom: 0; }
+
+  .panel-body ul {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 1rem;
+  }
+
+  .panel-body ul:last-child { margin-bottom: 0; }
+
+  .panel-body ul li {
+    padding: 0.28rem 0 0.28rem 1.1rem;
+    position: relative;
+    border-bottom: 1px solid #f5f5f5;
+  }
+
+  .panel-body ul li:last-child { border-bottom: none; }
+
+  .panel-body ul li::before {
+    content: "–";
+    position: absolute;
+    left: 0;
+    color: #ccc;
+  }
+
+  .sub-label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #aaa;
+    margin: 1rem 0 0.5rem;
+  }
+
+  .sub-label:first-child { margin-top: 0; }
+
+  .win { color: #2d6a2d; }
+  .risk { color: #8b2e2e; }
+  .flag { color: #7a5500; }
+
+  blockquote {
+    border-left: 3px solid #ddd;
+    padding-left: 0.9rem;
+    color: #555;
+    font-style: italic;
+    margin: 0.75rem 0;
+  }
+
+  .todo {
+    background: #fff8e6;
+    border: 1px solid #f0d98c;
+    border-radius: 6px;
+    padding: 0.7rem 0.9rem;
+    font-size: 0.85rem;
+    color: #7a5500;
+    margin-top: 0.5rem;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.83rem;
+    margin: 0.75rem 0;
+  }
+
+  th {
+    text-align: left;
+    padding: 0.45rem 0.7rem;
+    background: #f5f5f5;
+    font-weight: 600;
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+    border-bottom: 1px solid #e0e0e0;
+    color: #555;
+  }
+
+  td {
+    padding: 0.45rem 0.7rem;
+    border-bottom: 1px solid #f0f0f0;
+    vertical-align: top;
+  }
+
+  tr:last-child td { border-bottom: none; }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>[Company] — [Role Title]</h1>
+  <p>[Round Name] &nbsp;·&nbsp; [Interviewer Name], [Interviewer Title] &nbsp;·&nbsp; [date/time] &nbsp;·&nbsp; prep built [date]</p>
+</div>
+
+<div class="thesis">
+  <div class="thesis-label">The One Thing This Round Decides</div>
+  <p>[Write one paragraph naming what this specific round is actually testing — the interviewer's likely lens, the two or three things you need to prove, and what would make you fail even with a good answer. This is the single highest-value paragraph in the deck: read it first every time you open this file.]</p>
+</div>
+
+<!-- ══════════════════ FLASHCARD DECKS ══════════════════ -->
+<div class="section-label">Flashcard Decks</div>
+
+<!-- DECK A -->
+<div class="deck">
+  <div class="deck-header">
+    <span class="deck-title">A &nbsp;·&nbsp; Questions They'll Likely Ask</span>
+    <span class="deck-counter" id="ctr-a">Card 1 / 3</span>
+  </div>
+  <div class="card-area" id="card-a">
+    <div class="card-front">
+      <div class="card-question" id="q-a"></div>
+      <div class="card-hint">Answer out loud, then flip to check your talking points.</div>
+    </div>
+    <div class="card-back">
+      <div class="card-back-label">Talking Points</div>
+      <ul id="ans-a"></ul>
+    </div>
+  </div>
+  <div class="card-nav">
+    <button class="nav-btn" id="prev-a" onclick="go('a',-1)" disabled>◀ Prev</button>
+    <button class="flip-btn" id="flip-a" onclick="flip('a')">Flip</button>
+    <button class="nav-btn" id="next-a" onclick="go('a',1)">Next ▶</button>
+  </div>
+</div>
+
+<!-- DECK B -->
+<div class="deck">
+  <div class="deck-header">
+    <span class="deck-title">B &nbsp;·&nbsp; Your STAR Stories</span>
+    <span class="deck-counter" id="ctr-b">Card 1 / 3</span>
+  </div>
+  <div class="card-area" id="card-b">
+    <div class="card-front">
+      <div class="card-question" id="q-b"></div>
+      <div class="card-hint">Tell the whole arc out loud — S, T, A, R — then flip to verify.</div>
+    </div>
+    <div class="card-back">
+      <div class="card-back-label">Story + Beats</div>
+      <ul id="ans-b"></ul>
+    </div>
+  </div>
+  <div class="card-nav">
+    <button class="nav-btn" id="prev-b" onclick="go('b',-1)" disabled>◀ Prev</button>
+    <button class="flip-btn" id="flip-b" onclick="flip('b')">Flip</button>
+    <button class="nav-btn" id="next-b" onclick="go('b',1)">Next ▶</button>
+  </div>
+</div>
+
+<!-- ══════════════════ REFERENCE PANELS ══════════════════ -->
+<hr class="section-divider">
+<div class="section-label">Reference Panels</div>
+
+<!-- Panel 1 -->
+<div class="ref-panel">
+  <div class="panel-header" onclick="togglePanel(this)">
+    <span class="panel-title">1 &nbsp;·&nbsp; [Company] Product &amp; Context Cheat Sheet</span>
+    <span class="panel-caret">▼</span>
+  </div>
+  <div class="panel-body">
+    <p><strong>The business in one breath:</strong> [what [Company] does, who it serves, and how it makes money — one or two sentences a stranger could repeat back].</p>
+    <div class="sub-label">Key Facts</div>
+    <ul>
+      <li><strong>[Fact label]</strong> — [detail, e.g. team size, funding stage, headline metric]</li>
+      <li><strong>[Fact label]</strong> — [detail]</li>
+      <li><strong>[Fact label]</strong> — [detail]</li>
+    </ul>
+    <div class="sub-label win">Your Overlaps (say these naturally)</div>
+    <ul>
+      <li>[A concrete point of contact between your background and their stack/market/problem]</li>
+      <li>[Another one]</li>
+    </ul>
+  </div>
+</div>
+
+<!-- Panel 2 -->
+<div class="ref-panel">
+  <div class="panel-header" onclick="togglePanel(this)">
+    <span class="panel-title">2 &nbsp;·&nbsp; Your Intro &amp; Your Close</span>
+    <span class="panel-caret">▼</span>
+  </div>
+  <div class="panel-body">
+    <div class="sub-label">"Tell Me About Yourself"</div>
+    <blockquote>"[Write the 30-45 second version tuned to this interviewer and this role — lead with the years/domain, one or two concrete wins with numbers, and land on why you're sitting in this specific seat for [the role you're targeting].]"</blockquote>
+    <div class="sub-label win">Your Close / "Why Me"</div>
+    <blockquote>"[Write the close: what they're hiring for, and the one or two experiences that map directly onto it.]"</blockquote>
+    <div class="sub-label">Why-Me in One Line</div>
+    <p><em>"[One sentence that would work as a tagline for why you're the pick.]"</em></p>
+  </div>
+</div>
+
+<script>
+const DECKS = {
+  a: {
+    i: 0,
+    cards: [
+      {
+        q: "Walk me through something you shipped end-to-end — from problem to launch.",
+        a: [
+          "<strong>Lead with:</strong> [the project name] at [Company/your employer] — name the problem in one line",
+          "What you actually did: [the specific action you owned, e.g. 'decomposed the requirements into per-team specs']",
+          "The scale: <strong>[team size / users / systems touched]</strong>",
+          "The result: <strong>[the metric — a lift, a reduction, a launch date hit]</strong>",
+          "Bridge to them: '[one sentence connecting this story to something specific about [the role you're targeting]]'"
+        ]
+      },
+      {
+        q: "How do you prioritize when everything feels urgent?",
+        a: [
+          "Anchor: <strong>[your prioritization framework or rule of thumb]</strong>, with a concrete example of when you used it",
+          "Inputs you actually weigh: [data source 1] + [data source 2]",
+          "For this role specifically: [what you'd protect first here, and why]",
+          "Show the underlying judgment, not just the process word"
+        ]
+      },
+      {
+        q: "Why this company, why this role?",
+        a: [
+          "The intersection: <strong>[the two or three things about this role that line up with what you actually want next]</strong>",
+          "Evidence you mean it: [something you did to prepare, e.g. used the product, read their eng blog, talked to a current employee]",
+          "The honest personal hook: [why this actually matters to you, in one sentence]",
+          "Avoid: sounding like this is a generic next-step — name the specific thing only this company offers"
+        ]
+      }
+    ]
+  },
+  b: {
+    i: 0,
+    cards: [
+      {
+        q: "PRIMARY — [Name the story: your strongest, most relevant win]",
+        a: [
+          "<strong>S:</strong> [Situation — one or two lines of context, quantified where possible]",
+          "<strong>T:</strong> [Task — what you were specifically on the hook for]",
+          "<strong>A:</strong> [Action — the 2-3 concrete things you did, in your own voice]",
+          "<strong>R:</strong> <strong>[Result — the number or outcome]</strong>",
+          "<strong>Why it wins here:</strong> [the direct line from this story to [the role you're targeting]]"
+        ]
+      },
+      {
+        q: "CONFLICT — [Name a story about disagreement, pushback, or a hard call]",
+        a: [
+          "<strong>S:</strong> [Situation]",
+          "<strong>T:</strong> [Task]",
+          "<strong>A:</strong> [Action — be honest about the disagreement and how you resolved it]",
+          "<strong>R:</strong> <strong>[Result]</strong>",
+          "<strong>Why it wins here:</strong> [what this proves about how you'll operate on their team]"
+        ]
+      },
+      {
+        q: "FAILURE — [Name a story about a real miss, and what changed after]",
+        a: [
+          "<strong>S:</strong> [Situation]",
+          "<strong>T:</strong> [Task]",
+          "<strong>A:</strong> [Action — including the mistake, stated plainly, not buried]",
+          "<strong>R:</strong> <strong>[Result — what you changed afterward, ideally with a follow-up metric]</strong>",
+          "<strong>Why it wins here:</strong> [why owning this candidly is more persuasive than a polished non-answer]"
+        ]
+      }
+    ]
+  }
+};
+
+function render(id) {
+  const d = DECKS[id];
+  const card = d.cards[d.i];
+  const cardEl = document.getElementById('card-' + id);
+
+  cardEl.classList.remove('flipped');
+  document.getElementById('flip-' + id).textContent = 'Flip';
+  document.getElementById('q-' + id).textContent = card.q;
+  document.getElementById('ans-' + id).innerHTML = card.a.map(p => `<li>${p}</li>`).join('');
+  document.getElementById('ctr-' + id).textContent = `Card ${d.i + 1} / ${d.cards.length}`;
+  document.getElementById('prev-' + id).disabled = d.i === 0;
+  document.getElementById('next-' + id).disabled = d.i === d.cards.length - 1;
+}
+
+function go(id, dir) {
+  const d = DECKS[id];
+  d.i = Math.max(0, Math.min(d.cards.length - 1, d.i + dir));
+  render(id);
+}
+
+function flip(id) {
+  const cardEl = document.getElementById('card-' + id);
+  cardEl.classList.toggle('flipped');
+  document.getElementById('flip-' + id).textContent =
+    cardEl.classList.contains('flipped') ? 'Flip Back' : 'Flip';
+}
+
+function togglePanel(header) {
+  const body = header.nextElementSibling;
+  const caret = header.querySelector('.panel-caret');
+  body.classList.toggle('open');
+  caret.classList.toggle('open');
+}
+
+['a','b'].forEach(render);
+</script>
+</body>
+</html>

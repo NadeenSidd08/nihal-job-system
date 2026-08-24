@@ -1,8 +1,9 @@
 # Job Scan Console
 
-A personal job-search system you run with Claude. It has three parts:
+A personal job-search system you run with Claude. It has four parts:
 
 - **`/scan-jobs`** — a Claude skill that searches Indeed against *your* criteria, scores every posting with a personalized rubric, and writes a curated markdown report.
+- **`/apply`** and **`/interview-prep`** — skills that take a job from "found" to "ready": `/apply` builds a per-job application package (tailored résumé, company research, honesty check), and `/interview-prep` turns a scheduled interview into deep research plus an interactive flip-card prep deck, built from that same package.
 - **`profile.md`** — your search profile (target titles, location, salary floor, dealbreakers, scoring rubric). Built for you during onboarding; never committed to git.
 - **The console** — a local web dashboard showing your profile and every scan report in a sortable results table.
 
@@ -62,6 +63,7 @@ Claude will then, with you in the loop:
 | A fresh scan | Ask Claude: `/scan-jobs` |
 | Build an application package for a job | Ask Claude: `/apply <company or role>` — or `/apply <url>` for a job you found yourself (one link at a time; it comes in `unscored` and won't appear in the console). Nothing is written until you approve the manifest it prints |
 | Change criteria | Ask Claude: *"raise my salary floor to $95K"* (edits `profile.md`; console updates on refresh) |
+| Prep for a scheduled interview | Ask Claude: `/interview-prep` — or just say *"I have a first round with Acme on Thursday"*. Reads the `/apply` package for that job and builds research plus a flip-card deck into the same folder |
 | Automatic daily scans | Ask Claude: *"schedule a daily morning job scan"* |
 | See results | http://localhost:8642/console/ → Refresh after a scan lands |
 | Console offline? | Ask Claude: *"start the job scan console server"* |
@@ -77,6 +79,7 @@ Claude will then, with you in the loop:
 | `spec.md` | Design spec — how scanning, scoring, and reports work |
 | `reports/` | Your scan reports land here (gitignored) |
 | `.claude/skills/apply/` | The `/apply` skill — builds a per-job application package |
+| `.claude/skills/interview-prep/` | The `/interview-prep` skill — round-aware interview research and a flip-card prep deck, with a worked example in `example/` |
 | `scripts/honesty_lint.py` | Passive checker `/apply` runs over tailored résumés — reports, never blocks |
 | `applications/` | Your `/apply` packages land here (gitignored) |
 
