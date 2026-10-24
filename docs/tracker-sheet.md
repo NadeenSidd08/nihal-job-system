@@ -1,8 +1,12 @@
 # Tracker Sheet spec
 
-The Google Sheet is the user's only dashboard and the source of truth. `/find-jobs` adds jobs to it, `/apply` updates it, and the user can edit it by hand at any time. This file is the contract all three follow.
+The Google Sheet is the user's only dashboard and the source of truth. `/find-jobs` adds jobs to it, `/apply` updates it, and the user can edit it by hand or by telling Claude in chat. This file is the contract all of them follow.
 
 Test Sheet built from this spec (dummy data only): https://docs.google.com/spreadsheets/d/1rABkXyB0sG4Dho64axx-gzngCgZf5_bakJimmQt7Hos/edit
+
+## Where the skills find the Sheet
+
+`profile.md` has a `## Tracker sheet` section that holds the full Sheet URL. Skills read that section and extract the spreadsheet ID, which is the part of the URL between `/d/` and the next `/`. Onboarding writes this section after it creates the Sheet.
 
 ## Tabs
 
@@ -12,99 +16,196 @@ One row per job. Row 1 is a bold, frozen header. Columns, in this order:
 
 | Col | Name | Allowed values |
 |---|---|---|
-| A | Status | Dropdown, exactly: New, Saved, Applied, Interviewing, Offer, Passed, Closed |
+| A | Status | Dropdown, exactly these 8 in this order: New, Saved, Ready to apply, Applied, Interviewing, Offer, Passed, Closed |
 | B | Fit | Whole number 1 to 10 |
 | C | Type | Dropdown, exactly: Staff, Fellowship, Freelance, Nearby field |
 | D | Job title | Text |
 | E | Org | Text |
-| F | Location | Text |
+| F | Location | Text. Several locations are joined with a semicolon, for example `Washington, DC; Arlington, VA` |
 | G | Why it fits | One or two plain sentences |
 | H | Source | Text. Examples: Axios, Semafor, NPR, CQ Roll Call, Washington Post, WAMU, JournalismJobs, Punchbowl, The Dispatch, The 19th, Mediabistro, Media Job Board, LinkedIn alert, Pasted link |
-| I | Posted | Date (yyyy-mm-dd) if the source gives one, blank otherwise |
+| I | Posted | Date (yyyy-mm-dd) if known, blank otherwise. See "The 14-day window" |
 | J | First seen | Date (yyyy-mm-dd) the scan first found the job |
 | K | Link | URL of the posting |
 | L | Folder | Link to the application folder. Written by `/apply`. Blank until then |
 | M | Notes | Free text. LinkedIn alert jobs carry "limited info" here (no description is available) |
 
+The user's own extra columns must go to the right of Notes (column N onward). Skills never write to them.
+
+Dropdowns, the Fit check, date formats and Status colours are applied to rows 2 to 1000, so new rows inherit them. Status colours are cosmetic only. Skills never read colour to learn a status.
+
 ### Scan log tab
 
-One row per `/find-jobs` run. Row 1 is a bold, frozen header.
+One row per `/find-jobs` run. Row 1 is a bold, frozen header. Columns: Date | Sources checked | Sources that failed | New jobs added.
 
-| Col | Name |
-|---|---|
-| A | Date |
-| B | Sources checked |
-| C | Sources that failed |
-| D | New jobs added |
+### Seen tab (hidden)
+
+Claude's memory of every job found that cleared the Fit floor, whether or not it reached the Jobs tab. Hidden from the user, but the connector reads and writes it normally. Row 1 is a bold, frozen header. Columns, in this order:
+
+| Col | Name | Notes |
+|---|---|---|
+| A | Link | URL |
+| B | Source ID | The source's own job ID if it has one, else blank |
+| C | Org | Text |
+| D | Job title | Text |
+| E | Location | Locations joined with a semicolon |
+| F | Fit | 1 to 10 |
+| G | First seen | Date (yyyy-mm-dd) |
+| H | On Jobs tab | Dropdown: yes, no |
+
+## Status meanings and who sets them
+
+| Status | Meaning | Set by |
+|---|---|---|
+| New | Found by a scan, not looked at yet | `/find-jobs` |
+| Saved | He wants to keep it | User |
+| Ready to apply | The application package is built and waiting for him | `/apply` |
+| Applied | He submitted the application | User only (dropdown, or telling Claude in chat) |
+| Interviewing | In a hiring process | User |
+| Offer | He has an offer | User |
+| Passed | He is not interested | User (dropdown, or chat) |
+| Closed | The posting is gone or the process ended | User, or Claude when he says so in chat |
+
+Skills never set Applied on their own.
+
+## Reading the Sheet: by header, never by position
+
+Every run, before anything else:
+
+1. Read row 1 of the Jobs tab (and of Seen when needed).
+2. Find the column index of each named column in this spec.
+3. Build every range and every write from those indexes.
+4. If a required header is missing or renamed, stop. Tell the user which header is missing and do not write anything.
+
+Reads return displayed text, and trailing blank cells in a row are dropped, so a short row means the missing cells are blank. Always read fresh. Never rely on data from an earlier run or earlier in the conversation.
 
 ## Dedupe: how /find-jobs decides a job is already known
 
-Before adding anything, read the whole Jobs tab fresh. A found job is **known** if either test matches an existing row, in any status:
+Dedupe reads **both** the Jobs tab and the Seen tab, in full, fresh.
 
-1. **Link or source job ID.** Same Link (compare after stripping tracking query strings like `utm_*`, and ignore a trailing slash), or the same source job ID when the source has one (for example the number in a LinkedIn or JournalismJobs URL).
-2. **Org + Job title + Location.** Same values after lowercasing, trimming spaces and ignoring punctuation. This catches two cases the first test misses: LinkedIn repeats one role once per location, and some sources mint a new ID or URL when a job is reposted.
+### Normalise before comparing
 
-Rules for known jobs:
+- **Title:** lowercase, strip parenthetical text, strip the words Remote, Hybrid and Onsite, strip punctuation, collapse spaces.
+- **Org:** lowercase, strip a leading "The", strip punctuation, collapse spaces.
+- **Link:** strip tracking query strings like `utm_*` and a trailing slash.
 
-- Never add a known job again. No second row.
-- If the known row has Status **Passed** or **Closed**, it stays hidden. Do not touch Status and do not resurface it.
-- If the posting changed (salary now shown, or it was reposted), do not add a row. Append a short dated note to that row's Notes, for example `Reposted 2026-10-24` or `Salary now listed: ...`. Keep the existing Notes text and add to the end. Leave Status alone.
+### Collapse within one run first
+
+LinkedIn repeats one role once per location. Before checking against the Sheet, collapse the found jobs on **Org + normalised Title**. Keep one job and join its locations into the Location value with semicolons, for example `Washington, DC; Arlington, VA`.
+
+### A job is known if any of these match a row on Jobs or Seen
+
+1. **Link or source ID.** Same normalised Link, or same Source ID.
+2. **Org + Title, with a location check.** Same normalised Org and normalised Title, and either the Locations overlap (any shared location), or either side is Remote, Hybrid, or DC metro. Some sources mint a new ID or link when they repost a job, which is why the first test alone is not enough.
+
+### Rules for known jobs
+
+- Never add a known job again. No second row on Jobs, no second row on Seen.
+- Never change the Status of a known job.
+- **Repost:** a repost is a job matched by the Org + Title rule but **not** by Link or Source ID. When that happens on a Jobs row, append `Reposted YYYY-MM-DD, new link: <url>` to the end of that row's Notes, keeping existing text.
+  - Status **Passed**: do nothing. The job stays hidden.
+  - Status **Closed**: add the note, and mention the repost in the chat reply so the user can reopen it if he wants.
+  - Any other Status: add the note.
+- Salary or other content changes are not tracked, because salary is not stored.
+- A repost matched against a Seen row that is not on Jobs just refreshes nothing. It is already known.
 
 ## The 14-day window
 
-A job is eligible only if it is 14 days old or less. Age counts from **Posted** when the source gives a date, otherwise from **First seen** (today, for a brand-new find, so it is always eligible on the day it is found and ages out later). Jobs older than 14 days are not added.
+The window only filters sources that publish a date. For a source with no date, there is nothing to filter on, so the job is eligible, and its age counts from First seen on later runs.
 
-## Up to 10 new jobs per run
+- **Posted** is the date the source gives.
+- Parse relative text such as "3 weeks ago" or "Posted 5 days ago" into a date when a source shows it.
+- For LinkedIn alert emails, use the email's received date as Posted.
+- If no date is available, leave Posted blank.
 
-`/find-jobs` adds at most 10 new rows per run, taking the highest Fit first. Extras beyond 10 are still added, with Notes `more`, so they are recorded and never re-found as "new" tomorrow.
+Age counts from Posted when known, otherwise from First seen. A job older than 14 days is not added to Jobs or Seen.
 
-Suggested better approach (the builders may adopt it): count only rows with Status New against the cap of 10, and sort the extras to the bottom with Notes `more`. The reason is that the dedupe test needs every found job in the Sheet, otherwise the same overflow jobs reappear each day and crowd out fresh ones. The user can then clear `more` or set Passed when he looks at them.
+Seen rows that are **not** on the Jobs tab age out of the pool 14 days after their First seen. Aged-out rows are skipped when choosing jobs to promote, but they stay in Seen so dedupe still recognises them.
+
+## Fit floor, the cap of 10, and the Seen tab
+
+Per run:
+
+1. Find, collapse and dedupe jobs, and keep only those with **Fit 6 or higher**. Jobs below 6 are dropped: not added to Jobs, not added to Seen.
+2. Write **every** job that cleared the floor to Seen, with `On Jobs tab` set to `yes` or `no`.
+3. Add only the **top 10 by Fit** to the Jobs tab, with `On Jobs tab` = `yes`. This is a hard cap. Ties break by newer Posted, then newer First seen.
+4. The rest go to Seen with `On Jobs tab` = `no`. No `more` text is ever written in Notes.
+
+### "Show me more"
+
+The chat summary of a run says: `N more matched below today's top 10. Say 'show me more' to add the next 10.` (N counts Seen rows with `On Jobs tab` = `no` that have not aged out.)
+
+When the user says "show me more", Claude:
+
+1. Reads Seen fresh and takes rows with `On Jobs tab` = `no`, skipping any whose First seen is more than 14 days ago.
+2. Sorts them by Fit, highest first, and takes the next 10.
+3. Appends those 10 to the Jobs tab as new rows (Status New, First seen from Seen, Folder blank, Notes blank), filling Why it fits, Type and the rest from the stored job data, and sets their Seen rows to `On Jobs tab` = `yes`.
+4. Does not write a Scan log row (no scan ran) and does not search sources again.
+5. Tells him how many it added and how many are still waiting.
 
 ## What /find-jobs writes per run
 
 Exactly this, and nothing else:
 
-1. **New rows** on the Jobs tab, appended below the last row. Each new row has: Status `New`, Fit, Type, Job title, Org, Location, Why it fits, Source, Posted (blank if unknown), First seen (today), Link, Folder blank, Notes (`limited info` for LinkedIn alert jobs, `more` for overflow, otherwise blank).
-2. **Notes additions** on existing rows only for the "posting changed" case above.
-3. **One row on the Scan log tab**: Date (today), Sources checked, Sources that failed (blank if none), New jobs added (count of rows added this run, including `more` rows).
+1. **Up to 10 new rows** on the Jobs tab (appended below the last row). Each has Status `New`, Fit, Type, Job title, Org, Location, Why it fits, Source, Posted (blank if unknown), First seen (today), Link, Folder blank, Notes (`limited info` for LinkedIn alert jobs, otherwise blank).
+2. **Seen rows** for every found job that cleared the Fit floor (see above).
+3. **Notes additions** on existing Jobs rows only for the repost case.
+4. **One Scan log row**: Date (today), Sources checked, Sources that failed (blank if none), New jobs added (rows added to Jobs this run, 0 to 10).
 
-It never edits Status, Fit, Type, Folder or any other cell of an existing row, and never deletes or reorders rows.
+It never edits Status, Fit, Type, Folder or any other cell of an existing Jobs row, and never deletes or reorders rows.
+
+### Chat summary
+
+Each run ends with a short summary in chat that includes:
+
+- Jobs found before dedupe (this is a number in the chat only, not a column).
+- New jobs added to the Jobs tab.
+- The line `N more matched below today's top 10. Say 'show me more' to add the next 10.` when N is above 0.
+- Sources that failed.
+- A one-line nudge for each row whose Status is still **Ready to apply**, for example `Still waiting on you: Politics editor at Sample Gazette is Ready to apply. Say "I applied" when you submit it.`
+- Any Closed-row repost, as described above.
 
 ## What /apply writes
 
 Only two cells on the one row for the job being applied to:
 
-- **Status** (column A): set to `Applied` once the package is ready or sent, as the skill defines. Never set it backwards on a row the user has moved further along (for example do not change Interviewing to Applied).
-- **Folder** (column L): the link to the application folder.
+- **Folder** (column L): the link to the application folder. Always written.
+- **Status** (column A): set to `Ready to apply`, but **only when the current Status is New or Saved**. For any other Status (for example Applied, Interviewing, Passed), leave Status alone, still write Folder, and say so in the reply.
 
-Find the row by Link (or Org + Job title + Location). Write only the cells above. Do not rewrite the whole row, because that would overwrite anything the user typed.
+`/apply` never sets Applied. Find the row by Link, or by the Org + Title rule, and write only those cells, not the whole row.
+
+## The user changes status in chat
+
+A request like "I applied to the Axios one" or "pass on Mock Policy Group" is handled by Claude:
+
+1. Read the Jobs tab fresh and match the row by Org, Title or Source words from the request.
+2. If more than one row matches, ask which one. Do not guess.
+3. Write only the Status cell. **Any of the 8 values is allowed, with no transition limits** (the user may move a job backwards or sideways).
+4. Read the row back and confirm to the user what the row now says.
 
 ## The user edits the Sheet too
 
-The user can change Status from the dropdown and edit Notes, Fit, or anything else at any time. Therefore:
+The user can change Status from the dropdown and edit Notes, Fit or anything else at any time. Therefore:
 
-- Every run of `/find-jobs` and `/apply` reads the Sheet **fresh** before deciding anything. Never rely on a copy from an earlier run or earlier in the conversation.
-- Never overwrite a Status the user set. If a skill wants a status change and the current Status is not what it expects, leave it and say so in the reply.
-- Write single cells, not whole rows, to existing rows.
-- Read by header name, not by fixed column letter, in case the user adds a column of his own. Add new data only in the columns defined here.
+- Every run reads fresh and never overwrites a Status the user set.
+- Existing rows are changed one cell at a time, never rewritten.
+- If a skill wants a Status change that the rules above do not allow, it leaves the cell and says so in the reply.
 
 ## How onboarding creates his Sheet
 
 **Recommendation: (a) Claude creates it from scratch through the connector.**
 
-It worked end to end in the test (three tool calls to build both tabs, dropdowns and colours), needs no template link to host or keep shared, and the Sheet lands in his own Drive owned by him. Option (b) would need a public or shared template link that can break or be edited by others, and adds a manual "Make a copy" step for a beginner.
+It worked end to end in the test, needs no template link to host or keep shared, and the Sheet lands in his own Drive owned by him. Option (b) needs a public or shared template that can break or be edited by others, and adds a manual "Make a copy" step for a beginner.
 
-Prerequisite: the Google Drive and Google Sheets connectors must both be turned on in his Claude. Drive creates the file, Sheets edits it. If Sheets is off, onboarding must stop and ask him to enable it.
+Prerequisite: the Google Drive and Google Sheets connectors must both be on. Drive creates the file, Sheets edits it. If Sheets is off, onboarding stops and asks him to enable it. After creating the Sheet, onboarding writes the `## Tracker sheet` section in `profile.md` with the full URL.
 
 ## Connector calls that worked
 
-Tool names below are for the Claude connectors used in the test. The long prefix differs per install, so match on the suffix.
+Tool names are for the Claude connectors used in the test. The long prefix differs per install, so match on the suffix.
 
 ### 1. Create the empty Sheet (Drive connector)
 
-`create_file` with `title` = `Job tracker` (the test used `TEST - Nihal job tracker (dummy data)`) and `contentMimeType` = `application/vnd.google-apps.spreadsheet`. No content. Returns `id` (the spreadsheet ID) and `viewUrl`. Keep the ID; skills should store the Sheet URL or ID in the repo's profile or config so they can find it again.
-
-New Sheet has one tab, `sheetId` 0, named `Sheet1`.
+`create_file` with `title` = `Job tracker` (the test used `TEST - Nihal job tracker (dummy data)`) and `contentMimeType` = `application/vnd.google-apps.spreadsheet`. No content. Returns `id` and `viewUrl`. The new Sheet has one tab, `sheetId` 0, named `Sheet1`.
 
 ### 2. Tabs and frozen headers (Sheets connector)
 
@@ -112,50 +213,49 @@ New Sheet has one tab, `sheetId` 0, named `Sheet1`.
 
 - `updateSheetProperties` on sheetId 0: `properties` `{sheetId:0, title:"Jobs", gridProperties:{frozenRowCount:1}}`, `fields` `"title,gridProperties.frozenRowCount"`.
 - `addSheet` with `properties` `{sheetId:1, title:"Scan log", gridProperties:{rowCount:500, columnCount:4, frozenRowCount:1}}`.
+- `addSheet` with `properties` `{sheetId:2, title:"Seen", gridProperties:{rowCount:2000, columnCount:8, frozenRowCount:1}}`.
 
 ### 3. Headers and data (Sheets connector)
 
-`update_values` with `range` `Jobs!A1:M9` and `values` as a 2D array. **The range must match the data size exactly.** A range of A1:M8 with 9 rows fails with "tried writing to row [9]". Scan log: `range` `'Scan log'!A1:D3` (quote tab names with spaces).
+`update_values` with `range` `Jobs!A1:M9` and `values` as a 2D array. The range must be **at least as large** as the data: a range smaller than the data fails (A1:M8 with 9 rows errored with "tried writing to row [9]"), while a larger range works (Seen!A1:H5 with 4 rows was fine). Quote tab names that have spaces: `'Scan log'!A1:D3`.
 
 ### 4. Formatting, dropdowns, colours (one `update_spreadsheet` call)
 
-All of this went in one batch and all of it worked:
+All worked in one batch:
 
 - Header: `repeatCell` on row 0, `fields` `"userEnteredFormat.textFormat.bold,userEnteredFormat.backgroundColor,userEnteredFormat.verticalAlignment"`.
 - Column widths: `updateDimensionProperties`, `dimension` `COLUMNS`, `properties.pixelSize`, `fields` `"pixelSize"`. Used: Status 100, Fit 50, Type 110, Job title 230, Org 180, Location 130, Why it fits 320, Source 130, Posted 90, First seen 90, Link 260, Folder 260, Notes 220.
-- Wrap text on Why it fits (`userEnteredFormat.wrapStrategy` `WRAP`).
-- Date format on Posted and First seen (and Scan log Date): `numberFormat` `{type:"DATE", pattern:"yyyy-mm-dd"}`.
-- Status dropdown: `setDataValidation`, range column A rows 2 to 1000 (`startRowIndex` 1, `endRowIndex` 1000, `startColumnIndex` 0, `endColumnIndex` 1), rule `{condition:{type:"ONE_OF_LIST", values:[{userEnteredValue:"New"}, ...]}, strict:true, showCustomUi:true}`.
+- Wrap text on Why it fits: `userEnteredFormat.wrapStrategy` `WRAP`.
+- Date format on Posted, First seen, Scan log Date and Seen First seen: `numberFormat` `{type:"DATE", pattern:"yyyy-mm-dd"}`.
+- Status dropdown: `setDataValidation`, column A with `startRowIndex` 1, `endRowIndex` 1000 (rows 2 to 1000), rule `{condition:{type:"ONE_OF_LIST", values:[{userEnteredValue:"New"}, ...8 values]}, strict:true, showCustomUi:true}`.
 - Type dropdown: same, column C.
 - Fit check: `setDataValidation` on column B with `NUMBER_BETWEEN` `1` and `10`, `strict:true`.
-- Status colours: one `addConditionalFormatRule` per status, `condition.type` `TEXT_EQ`, range column A rows 2 to 1000, `format.backgroundColor`. Colours: New light blue, Saved light yellow, Applied light green, Interviewing light purple, Offer stronger green, Passed and Closed grey.
+- Status colours: one `addConditionalFormatRule` per status, `condition.type` `TEXT_EQ`, same column A range, `format.backgroundColor`. Colours: New light blue, Saved light yellow, Ready to apply light orange, Applied light green, Interviewing light purple, Offer stronger green, Passed and Closed grey.
+- To change the Status list later: `deleteConditionalFormatRule` (`{sheetId, index:0}`, repeated once per rule), re-run `setDataValidation`, then `addConditionalFormatRule` again.
 
-### 5. Read (Sheets connector)
+### 5. Hide the Seen tab (Sheets connector)
 
-`get_values` with `range` `Jobs!A1:M1000`. Returns displayed strings, so Fit comes back as `"9"` and dates as `"2026-10-20"`. Trailing empty cells in a row are dropped, so rows are ragged: a row with no Folder and no Notes comes back with only 11 items. Rows read as `[]` when empty. Always map values to headers by position, and treat missing trailing cells as blank.
+`update_spreadsheet` with `updateSheetProperties` `{properties:{sheetId:2, hidden:true}, fields:"hidden"}`. This worked, and `get_values` and `update_values` still read and write the hidden tab normally. The user can unhide it from the Sheet's tab list if he is curious.
 
-### 6. Append a scan's new job (Sheets connector)
+### 6. Read (Sheets connector)
 
-`append_values` with `range` `Jobs!A1` and `values` `[[...13 cells...]]`. It found the table and wrote to the next empty row (`updatedRange` `Jobs!A10:M10`). Send all 13 cells in column order, using `""` for blank ones. Scan log works the same: `range` `'Scan log'!A1`.
+`get_values` with `range` `Jobs!A1:M1000` (or `Seen!A1:H2000`). Returns displayed strings, so Fit is `"9"` and dates are `"2026-10-20"`. Trailing blanks are dropped, so rows are ragged. Map by header, treat missing cells as blank.
 
-### 7. Change Status and Folder as /apply would (Sheets connector)
+### 7. Append rows (Sheets connector)
 
-Two single-cell `update_values` calls, so nothing else in the row is touched:
+`append_values` with `range` `Jobs!A1` and `values` `[[...13 cells...]]`. It writes to the next empty row. Send all 13 cells, `""` for blank ones. Seen and Scan log work the same: `Seen!A1`, `'Scan log'!A1`. Several rows can go in one call.
 
-- `range` `Jobs!A3`, `values` `[["Applied"]]`
-- `range` `Jobs!L3`, `values` `[["https://..."]]`
+### 8. Change one cell (Sheets connector)
 
-Find the row number first from a fresh `get_values` read (row index in the result plus 1 for the header).
+`update_values` with one cell, for example `range` `Jobs!A3`, `values` `[["Ready to apply"]]`, then `range` `Jobs!L3` for Folder. Find the row number from a fresh read (array index plus 1 for the header). Use the column letter found from the header, not a fixed letter.
 
-### 8. Verify (Sheets connector)
+### 9. Verify (Sheets connector)
 
-`get_values` on the changed range. To check dropdowns or date types on a row: `get_spreadsheet` with `includeGridData:true`, `ranges` for the cells, and `fields` such as `sheets.data.rowData.values.dataValidation` (full paths, no parentheses).
+`get_values` on the changed range. To check dropdowns or date types: `get_spreadsheet` with `includeGridData:true`, `ranges`, and `fields` such as `sheets.data.rowData.values.dataValidation` (full paths, no parentheses). `get_spreadsheet` with `fields` `["sheets.properties"]` shows `hidden` and the row count.
 
 ## Things that were awkward
 
-- **Appended rows inherit dropdowns and colours** because the validation and conditional format were applied to rows 2 to 1000 up front, not just to filled rows. Verified on the appended row: Status, Fit and Type validation present and the date format applied. After row 1000 they stop. If the Jobs tab ever passes 999 rows, extend the ranges (or archive old rows).
-- **Write calls parse like the Sheets UI.** `"2026-10-20"` becomes a real date, `"9"` becomes a number. Good for Posted, First seen and Fit. Text that looks like a number, date or formula must be sent with a leading apostrophe. Job titles like `"1/2 time editor"` or an Org like `"2026"` could become dates or numbers, so prefix risky text values with `'`.
-- **`update_values` range must match the data shape exactly.** Too small a range is an error.
-- **Reads drop trailing blanks**, see call 5.
-- **Link column** holds plain URLs, not formulas. Sheets makes them clickable on its own.
-- Conditional colours are cosmetic only. Skills must never read colour to learn a status.
+- **Appended rows inherit dropdowns and colours** because they were applied to rows 2 to 1000 up front. After row 1000 they stop. If the Jobs tab ever passes about 1000 rows, extend the ranges or archive old rows.
+- **Write calls parse like the Sheets UI.** `"2026-10-20"` becomes a real date and `"9"` a number, which is what we want. Text that looks like a number, date or formula (a title like `1/2 time editor`) needs a leading apostrophe.
+- **Reads drop trailing blanks**, see call 6.
+- **Link column** holds plain URLs. Sheets makes them clickable by itself.
