@@ -135,7 +135,7 @@ Say: "I'm making a short list of the facts about your career that I'm allowed to
    - "Any award, fellowship, or recognition that isn't on your résumé or LinkedIn?"
    - "Any numbers I should know, like stories broken, sources built, or audience reached?"
    For each answer, write the exact line you'd add and ask "Is that wording right?" Only after he says yes, add it tagged `(source: he said, <today's date>)`. If he says no or "not sure," do not add it.
-4. Write `facts.md` (from `templates/facts.md`, comment deleted) once he has skimmed and answered. Leave out any empty section's placeholder line.
+4. Write `facts.md` (from `templates/facts.md`, comment deleted) once he has skimmed and answered. Keep every section heading. If a section has nothing yet, write `- (none yet)` under it.
 
 Done when `facts.md` exists with no placeholder left. If there is no LinkedIn PDF, say so.
 
