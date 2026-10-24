@@ -1,6 +1,6 @@
 ---
 name: apply
-description: Build the full apply package (job post, company research, tailored résumé, honesty-checked claims ledger, gap analysis, tracker notes) for one or more jobs the user picked from a scan report, or for a job-post URL they paste. Gated by a manifest the user must approve before anything is written. Use when the user says "/apply", names a company or job to apply to, pastes a link to a job posting they found online, asks to build an application package, or wants to re-lint an existing package's claims.
+description: BEING REBUILT, do not run. Build the full apply package (job post, company research, tailored résumé, honesty-checked claims ledger, gap analysis, tracker notes) for one or more jobs the user picked from a scan report, or for a job-post URL they paste. Gated by a manifest the user must approve before anything is written. Use when the user says "/apply", names a company or job to apply to, pastes a link to a job posting they found online, asks to build an application package, or wants to re-lint an existing package's claims.
 ---
 
 > This skill is being rebuilt for the Nihal edition (see NAD-32 / NAD-34). It still references Indeed and the Python lint, which are no longer part of this repo. Don't run it.

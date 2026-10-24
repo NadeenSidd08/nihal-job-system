@@ -13,11 +13,14 @@ clips.md
 clips/
 # facts.md anywhere in the repo, not only at the root
 facts.md
-# LinkedIn profile export, in the common capitalizations
-linkedin*.pdf
-Linkedin*.pdf
-LinkedIn*.pdf
-# Any PDF at the repo root (résumé, LinkedIn export, cover letters). Root only, so PDFs elsewhere are unaffected.
-/*.pdf
+# Any PDF or Word file (résumé, LinkedIn export, cover letters). The repo tracks none.
+*.pdf
+*.docx
+# Résumé and cover letter files under any name
+*[Rr]esume*
+*[Rr]ésumé*
+cover-letter*
+# Tracker notes or exports kept as markdown
+*tracker*.md
 # Local copy or export of the Google Sheet tracker
 tracker.local.*

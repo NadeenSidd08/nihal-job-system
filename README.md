@@ -22,10 +22,11 @@ You start from the onboarding page Nadeen sends you (link to be added). Follow i
 | `/jobs` | A simple menu that points you to the right next step | Coming soon |
 | `/find-jobs` | Finds journalism jobs that fit you and adds them to your Google Sheet | Coming soon |
 | `/apply` | Tailors your résumé, writes a cover letter, and picks clips for one job | Coming soon |
+| `/interview-prep` | Prepares you for an interview. It gets adapted in Phase 2 | Coming later |
 
 ## Privacy
 
-Your files stay on your Mac and in your Google account. Personal files, like your profile, résumé, and clips, are never committed to this repo.
+Your files live on your Mac and in your Google account. Claude reads them only when you run a command. Nothing personal is ever committed to this repo.
 
 ## Credit
 

@@ -1,5 +1,7 @@
 > Onboarding is being rebuilt for the Nihal edition (NAD-31). Until then, don't run setup from this file.
 
+If the user asks to start, set up, or find jobs, tell them the system is still being built and to wait for Nadeen's onboarding page. Do not onboard and do not run any skill.
+
 # Job search system: project instructions
 
 A self-serve job-search system: the `/scan-jobs` skill (in `.claude/skills/`, being rebuilt as `/find-jobs`) searches for jobs against `profile.md`; `/apply` builds per-job application packages into `applications/`; `/interview-prep` builds interview research and a prep deck into those same package folders. Nothing in this repo executes scans. Claude runs them, in sessions like this one.

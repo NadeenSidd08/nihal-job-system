@@ -1,6 +1,6 @@
 ---
 name: scan-jobs
-description: Scan Indeed for jobs matching the user's job-search profile, score and filter them against their criteria, and save a curated report. Also evaluates any job postings/links pasted alongside the invocation. Use when the user asks to scan for jobs, run a job search, find openings, or says "/scan-jobs".
+description: BEING REBUILT, do not run. Scan Indeed for jobs matching the user's job-search profile, score and filter them against their criteria, and save a curated report. Also evaluates any job postings/links pasted alongside the invocation. Use when the user asks to scan for jobs, run a job search, find openings, or says "/scan-jobs".
 ---
 
 > This skill is being rebuilt for the Nihal edition (see NAD-32 / NAD-34). It still references Indeed and the Python lint, which are no longer part of this repo. Don't run it.

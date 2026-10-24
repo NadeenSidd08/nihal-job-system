@@ -1,7 +1,9 @@
 ---
 name: interview-prep
-description: Build round-aware interview prep for a scheduled interview — a company/interviewer research brief plus an interactive HTML flip-card deck — without ever overwriting an earlier round's materials. Use when someone has an upcoming interview and names a specific round to prep for (e.g. "I have an interview Thursday", "help me prep for the second round with Acme", "build my interview deck for the onsite"), or types "/interview-prep". Not for general job-search chatter, resume work, or applications with no interview scheduled.
+description: BEING REBUILT, do not run. Build round-aware interview prep for a scheduled interview — a company/interviewer research brief plus an interactive HTML flip-card deck — without ever overwriting an earlier round's materials. Use when someone has an upcoming interview and names a specific round to prep for (e.g. "I have an interview Thursday", "help me prep for the second round with Acme", "build my interview deck for the onsite"), or types "/interview-prep". Not for general job-search chatter, resume work, or applications with no interview scheduled.
 ---
+
+> Kept from the original repo and adapted in Phase 2. It expects the old /apply package, so don't run it yet.
 
 # Interview Prep
 
