@@ -13,6 +13,7 @@ his-folder/                      the folder he opens Claude in
     profile.md                   his search settings (below)
     facts.md                     light fact list (below)
     clips.md                     clips library (below)
+    clips/                       optional full text of clips, one file per clip, gitignored
     learnings.md                 what Claude has learned, each line approved by him (below)
     feedback.md                  notes for Nadeen (built in NAD-42)
     applications/<Org - Role>/   one folder per job /apply builds
@@ -103,8 +104,11 @@ Built in onboarding from resume.md, the LinkedIn PDF, and clips.md. There's no w
 ## Awards, fellowships, education
 - <item> (source: LinkedIn)
 
-## Numbers
+## Numbers and results
 - <for example "Broke 3 stories picked up by national outlets"> (source: he said, 2026-10-24)
+
+## Skills and other
+- <for example "Reports in Spanish"> (source: he said, 2026-10-24)
 ```
 
 Allowed sources: `résumé`, `LinkedIn`, `clips`, `he said, <date>`. Anything he says in chat that isn't on his materials is added only after he confirms it, tagged `he said`.
@@ -122,6 +126,8 @@ Status: approved <date>   (or "draft, not yet reviewed")
 |---|---|---|---|---|---|---|
 | * | <headline> | <outlet> | 2026-05-02 | <beat> | <url> | <one line> |
 ```
+
+Optional: `clips/` holds the full text of clips, one `.md` or `.txt` file per clip, named by slug. It is gitignored. `/apply` reads a clip from here first and fetches the link only if the file is missing.
 
 `/apply` picks 3 to 5 clips per job from this table, starred clips first when they fit.
 

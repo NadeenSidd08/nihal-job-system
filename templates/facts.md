@@ -11,5 +11,8 @@
 ## Awards, fellowships, education
 - <item> (source: LinkedIn)
 
-## Numbers
+## Numbers and results
+- <item> (source: he said, <date>)
+
+## Skills and other
 - <item> (source: he said, <date>)
