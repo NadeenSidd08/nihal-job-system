@@ -19,22 +19,28 @@ Hosts curl talks to:
 | www.journalismjobs.com | DC listing and per-job pages for dates | GET |
 | 19thnews.org | The 19th careers page | GET |
 
-Allow rules (a prefix rule cannot restrict the host, so this is broad on purpose):
+Allow rules, one prefix rule per host. Every curl in the skill starts `curl -s -A 'Mozilla/5.0' -m 30 <URL>` with the URL right after `-m 30`, and the POSTs put their `-X POST`, `-H` and `-d` flags after the URL. That keeps the host inside the matched prefix, so each rule only lets curl reach that host:
 
 ```
-Bash(curl:*)
+Bash(curl -s -A 'Mozilla/5.0' -m 30 https://boards-api.greenhouse.io/v1/boards/:*)
+Bash(curl -s -A 'Mozilla/5.0' -m 30 https://api.lever.co/v0/postings/fiscalnote:*)
+Bash(curl -s -A 'Mozilla/5.0' -m 30 https://washpost.wd5.myworkdayjobs.com/wday/cxs/washpost/washingtonpostcareers:*)
+Bash(curl -s -A 'Mozilla/5.0' -m 30 https://american.wd1.myworkdayjobs.com/wday/cxs/american/AU:*)
+Bash(curl -s -A 'Mozilla/5.0' -m 30 https://www.journalismjobs.com/:*)
+Bash(curl -s -A 'Mozilla/5.0' -m 30 https://19thnews.org/careers/:*)
+Bash(command -v jq)
 Bash(jq:*)
+Bash(grep:*)
 Bash(sed:*)
 Bash(tr:*)
-Bash(grep:*)
-Bash(wait)
 ```
 
 Notes for NAD-36:
-- Claude Code checks each command of a pipe or `&` list separately, so every piece has to be allowed.
-- If a tighter rule is wanted, the skill's curl calls all start with `curl -s -A 'Mozilla/5.0' -m 30`. Rules matching that prefix cover them all. The two POSTs add `-X POST`.
-- `jq` is optional. If it is not installed the skill reads the raw JSON instead.
+- Claude Code checks each command in a pipe separately, so the filters after the curl (`jq`, `grep`, `sed`, `tr`) need their own rules. Check how it treats `&` and `wait` when several curls run in parallel, and add rules if it prompts.
+- The Workday calls must keep the URL right after `-m 30`, as written in SKILL.md, or the host rules above will not match them.
+- `jq` is optional. If `command -v jq` fails the skill uses grep instead.
 - No Python, no file writes and no shell scripts are needed.
+- **The rule syntax above must be checked against the current Claude Code permissions docs in NAD-36** (exact prefix and wildcard matching, quoting of the single quotes, and how compound commands are matched) before it goes into a settings file.
 
 ## 2. WebFetch
 

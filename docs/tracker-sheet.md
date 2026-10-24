@@ -45,13 +45,17 @@ Claude's memory of every job found that cleared the Fit floor, whether or not it
 | Col | Name | Notes |
 |---|---|---|
 | A | Link | URL |
-| B | Source ID | The source's own job ID if it has one, else blank |
+| B | Source ID | The source's own job ID if it has one, else blank. When several jobs were collapsed into one (for example LinkedIn repeats), list every ID joined with `; `. Dedupe matches each one |
 | C | Org | Text |
 | D | Job title | Text |
 | E | Location | Locations joined with a semicolon |
 | F | Fit | 1 to 10 |
 | G | First seen | Date (yyyy-mm-dd) |
 | H | On Jobs tab | Dropdown: yes, no |
+| I | Type | Same four values as the Jobs Type column. Stored so "show me more" can fill the Jobs row |
+| J | Source | Same Source value as the Jobs tab |
+| K | Posted | Date (yyyy-mm-dd) if known, blank otherwise |
+| L | Why it fits | The one-line reason, stored for "show me more" |
 
 ## Status meanings and who sets them
 
@@ -95,19 +99,16 @@ LinkedIn repeats one role once per location. Before checking against the Sheet, 
 
 ### A job is known if any of these match a row on Jobs or Seen
 
-1. **Link or source ID.** Same normalised Link, or same Source ID.
+1. **Link or source ID.** Same normalised Link, or same Source ID. A Seen row may hold several IDs joined with `; `: match each one.
 2. **Org + Title, with a location check.** Same normalised Org and normalised Title, and either the Locations overlap (any shared location), or either side is Remote, Hybrid, or DC metro. Some sources mint a new ID or link when they repost a job, which is why the first test alone is not enough.
 
 ### Rules for known jobs
 
 - Never add a known job again. No second row on Jobs, no second row on Seen.
 - Never change the Status of a known job.
-- **Repost:** a repost is a job matched by the Org + Title rule but **not** by Link or Source ID. When that happens on a Jobs row, append `Reposted YYYY-MM-DD, new link: <url>` to the end of that row's Notes, keeping existing text.
-  - Status **Passed**: do nothing. The job stays hidden.
-  - Status **Closed**: add the note, and mention the repost in the chat reply so the user can reopen it if he wants.
-  - Any other Status: add the note.
+- **Repost:** a job that matches a Jobs or Seen row by the Org + Title rule, does **not** match it by Link or Source ID, and has the **same Source** as that row. When the matched row is on Jobs, append `Reposted YYYY-MM-DD, new link: <url>` to the end of that row's Notes, keeping existing text. Status Passed: do nothing. Status Closed: add the note and mention it in chat. Any other Status: add the note. A repost matched only to a Seen row: do nothing.
+- **Cross-source copy:** the same Org + Title match where the new job's Source differs from the row's (for example the Mediabistro copy of a job already added from JournalismJobs). It's the same job seen on another board, not a repost. Do nothing: no row, no note, no mention in chat.
 - Salary or other content changes are not tracked, because salary is not stored.
-- A repost matched against a Seen row that is not on Jobs just refreshes nothing. It is already known.
 
 ## The 14-day window
 
@@ -131,6 +132,8 @@ Per run:
 3. Add only the **top 10 by Fit** to the Jobs tab, with `On Jobs tab` = `yes`. This is a hard cap. Ties break by newer Posted, then newer First seen.
 4. The rest go to Seen with `On Jobs tab` = `no`. No `more` text is ever written in Notes.
 
+The cap applies to this run's new jobs only: jobs that cleared the floor this run and aren't already known. Seen rows from earlier runs never compete for today's 10; they wait for "show me more". A run with 3 new jobs adds 3 even if 30 rows are waiting in Seen, and the "N more matched" line counts all waiting rows, old and new.
+
 ### "Show me more"
 
 The chat summary of a run says: `N more matched below today's top 10. Say 'show me more' to add the next 10.` (N counts Seen rows with `On Jobs tab` = `no` that have not aged out.)
@@ -139,7 +142,7 @@ When the user says "show me more", Claude:
 
 1. Reads Seen fresh and takes rows with `On Jobs tab` = `no`, skipping any whose First seen is more than 14 days ago.
 2. Sorts them by Fit, highest first, and takes the next 10.
-3. Appends those 10 to the Jobs tab as new rows (Status New, First seen from Seen, Folder blank, Notes blank), filling Why it fits, Type and the rest from the stored job data, and sets their Seen rows to `On Jobs tab` = `yes`.
+3. Appends those 10 to the Jobs tab as new rows (Status New, First seen from Seen, Folder blank, Notes blank), filling Type, Source, Posted and Why it fits from the Seen row and the rest from the stored job data, and sets their Seen rows to `On Jobs tab` = `yes`.
 4. Does not write a Scan log row (no scan ran) and does not search sources again.
 5. Tells him how many it added and how many are still waiting.
 
@@ -158,7 +161,7 @@ It never edits Status, Fit, Type, Folder or any other cell of an existing Jobs r
 
 Each run ends with a short summary in chat that includes:
 
-- Jobs found before dedupe (this is a number in the chat only, not a column).
+- Found: the number of distinct jobs that passed the relevance filter, the 14-day window and the Fit floor, after copies of the same job within this run were collapsed, and before the Sheet check. It shows as "found N that fit" in chat. It is a number in the chat only, not a column.
 - New jobs added to the Jobs tab.
 - The line `N more matched below today's top 10. Say 'show me more' to add the next 10.` when N is above 0.
 - Sources that failed.
@@ -213,11 +216,11 @@ Tool names are for the Claude connectors used in the test. The long prefix diffe
 
 - `updateSheetProperties` on sheetId 0: `properties` `{sheetId:0, title:"Jobs", gridProperties:{frozenRowCount:1}}`, `fields` `"title,gridProperties.frozenRowCount"`.
 - `addSheet` with `properties` `{sheetId:1, title:"Scan log", gridProperties:{rowCount:500, columnCount:4, frozenRowCount:1}}`.
-- `addSheet` with `properties` `{sheetId:2, title:"Seen", gridProperties:{rowCount:2000, columnCount:8, frozenRowCount:1}}`.
+- `addSheet` with `properties` `{sheetId:2, title:"Seen", gridProperties:{rowCount:2000, columnCount:12, frozenRowCount:1}}`.
 
 ### 3. Headers and data (Sheets connector)
 
-`update_values` with `range` `Jobs!A1:M9` and `values` as a 2D array. The range must be **at least as large** as the data: a range smaller than the data fails (A1:M8 with 9 rows errored with "tried writing to row [9]"), while a larger range works (Seen!A1:H5 with 4 rows was fine). Quote tab names that have spaces: `'Scan log'!A1:D3`.
+`update_values` with `range` `Jobs!A1:M9` and `values` as a 2D array. The range must be **at least as large** as the data: a range smaller than the data fails (A1:M8 with 9 rows errored with "tried writing to row [9]"), while a larger range works (Seen!A1:L5 with 4 rows was fine). Quote tab names that have spaces: `'Scan log'!A1:D3`.
 
 ### 4. Formatting, dropdowns, colours (one `update_spreadsheet` call)
 
@@ -226,9 +229,9 @@ All worked in one batch:
 - Header: `repeatCell` on row 0, `fields` `"userEnteredFormat.textFormat.bold,userEnteredFormat.backgroundColor,userEnteredFormat.verticalAlignment"`.
 - Column widths: `updateDimensionProperties`, `dimension` `COLUMNS`, `properties.pixelSize`, `fields` `"pixelSize"`. Used: Status 100, Fit 50, Type 110, Job title 230, Org 180, Location 130, Why it fits 320, Source 130, Posted 90, First seen 90, Link 260, Folder 260, Notes 220.
 - Wrap text on Why it fits: `userEnteredFormat.wrapStrategy` `WRAP`.
-- Date format on Posted, First seen, Scan log Date and Seen First seen: `numberFormat` `{type:"DATE", pattern:"yyyy-mm-dd"}`.
+- Date format on Posted, First seen, Scan log Date, Seen First seen and Seen Posted: `numberFormat` `{type:"DATE", pattern:"yyyy-mm-dd"}`.
 - Status dropdown: `setDataValidation`, column A with `startRowIndex` 1, `endRowIndex` 1000 (rows 2 to 1000), rule `{condition:{type:"ONE_OF_LIST", values:[{userEnteredValue:"New"}, ...8 values]}, strict:true, showCustomUi:true}`.
-- Type dropdown: same, column C.
+- Type dropdown: same, column C of Jobs and column I of Seen.
 - Fit check: `setDataValidation` on column B with `NUMBER_BETWEEN` `1` and `10`, `strict:true`.
 - Status colours: one `addConditionalFormatRule` per status, `condition.type` `TEXT_EQ`, same column A range, `format.backgroundColor`. Colours: New light blue, Saved light yellow, Ready to apply light orange, Applied light green, Interviewing light purple, Offer stronger green, Passed and Closed grey.
 - To change the Status list later: `deleteConditionalFormatRule` (`{sheetId, index:0}`, repeated once per rule), re-run `setDataValidation`, then `addConditionalFormatRule` again.
@@ -239,11 +242,11 @@ All worked in one batch:
 
 ### 6. Read (Sheets connector)
 
-`get_values` with `range` `Jobs!A1:M1000` (or `Seen!A1:H2000`). Returns displayed strings, so Fit is `"9"` and dates are `"2026-10-20"`. Trailing blanks are dropped, so rows are ragged. Map by header, treat missing cells as blank.
+`get_values` with `range` `Jobs!A1:M1000` (or `Seen!A1:L2000`). Returns displayed strings, so Fit is `"9"` and dates are `"2026-10-20"`. Trailing blanks are dropped, so rows are ragged. Map by header, treat missing cells as blank.
 
 ### 7. Append rows (Sheets connector)
 
-`append_values` with `range` `Jobs!A1` and `values` `[[...13 cells...]]`. It writes to the next empty row. Send all 13 cells, `""` for blank ones. Seen and Scan log work the same: `Seen!A1`, `'Scan log'!A1`. Several rows can go in one call.
+`append_values` with `range` `Jobs!A1` and `values` `[[...13 cells...]]`. It writes to the next empty row. Send all 13 cells, `""` for blank ones. Seen and Scan log work the same: `Seen!A1` (send all 12 cells), `'Scan log'!A1`. Several rows can go in one call.
 
 ### 8. Change one cell (Sheets connector)
 

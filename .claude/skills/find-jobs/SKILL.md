@@ -30,31 +30,33 @@ Track the time. The whole run should take a couple of minutes at most. Run sourc
 3. From profile.md take: Beats and expertise, Target roles (and the `Excluded:` line), Opportunity types, Location, Salary floor, Dealbreakers, the ticked sources under `## Sources`, the Sheet URL under `## Tracker sheet`, and the rubric under `## Scoring rubric`.
 4. The spreadsheet ID is the part of the Sheet URL between `/d/` and the next `/`.
 5. Load the Google Sheets tools with ToolSearch if they are not loaded (match on suffix: `get_values`, `append_values`, `update_values`, `get_spreadsheet`). If Sheets is not connected, tell him to turn on the Google Sheets connector and stop.
-6. Read the Sheet fresh, per the spec: `Jobs!A1:Z1000`, `Seen!A1:H2000`, `'Scan log'!A1:D500`. Build a map from header name to column index from row 1. Required Jobs headers: Status, Fit, Type, Job title, Org, Location, Why it fits, Source, Posted, First seen, Link, Folder, Notes. Required Seen headers: Link, Source ID, Org, Job title, Location, Fit, First seen, On Jobs tab. If any is missing or renamed, stop, name the header, write nothing. Rows are ragged: a short row means blank trailing cells.
+6. Read the Sheet fresh, per the spec: `Jobs!A1:Z1000`, `Seen!A1:L2000`, `'Scan log'!A1:D500`. Build a map from header name to column index from row 1. Required Jobs headers: Status, Fit, Type, Job title, Org, Location, Why it fits, Source, Posted, First seen, Link, Folder, Notes. Required Seen headers: Link, Source ID, Org, Job title, Location, Fit, First seen, On Jobs tab, Type, Source, Posted, Why it fits. If any is missing or renamed, stop, name the header, write nothing. Rows are ragged: a short row means blank trailing cells.
 7. Today's date is the run date. The window cutoff is today minus 14 days.
 
 ## Step 2. Fetch the sources
 
-Check only sources ticked in profile.md. Fetch them in parallel (one Bash call with `&` and `wait`, plus WebFetch and Gmail calls in the same turn). Use a browser-like user agent on curl: `-A 'Mozilla/5.0' -m 30`. Do not require Python. `jq` may or may not be installed: use it if `command -v jq` succeeds, otherwise read the raw JSON.
+Check only sources ticked in profile.md. Fetch them in parallel (one Bash call with `&` and `wait`, plus WebFetch and Gmail calls in the same turn). Use a browser-like user agent on curl: `-A 'Mozilla/5.0' -m 30`. Do not require Python. Pipe every JSON source through the filter shown below so raw JSON never lands in your context. Check `command -v jq` once. If jq is installed, use the jq filter. If not, use the grep fallback in the last column of the notes under the table. Date math is done by you, not by a command: work out the 14-day cutoff (today minus 14), and turn "Posted 5 Days Ago" or "3 days ago" into a date yourself.
 
 If a source errors, returns the wrong thing, or times out, skip it, carry on, and record its name for "Sources that failed". A source that works but has zero fitting jobs is not a failure.
 
 | Source (profile name) | Sheet "Source" value | How |
 |---|---|---|
-| Axios | Axios | `curl -s -A 'Mozilla/5.0' -m 30 https://boards-api.greenhouse.io/v1/boards/axios/jobs` (no `content=true`: the plain list is small and has `title`, `location.name`, `first_published`, `absolute_url`, `id`). Posted = `first_published` date (not `updated_at`). |
+| Axios | Axios | `curl -s -A 'Mozilla/5.0' -m 30 https://boards-api.greenhouse.io/v1/boards/axios/jobs \| jq -c '.jobs[] \| {id, title, loc: .location.name, posted: .first_published[:10], url: .absolute_url}'` (no `content=true`: the plain list is small). Posted = `first_published` (not `updated_at`). |
 | Semafor | Semafor | Same, board `semafor`. |
 | NPR | NPR | Same, board `nationalpublicradioinc`. |
-| CQ Roll Call | CQ Roll Call | `curl -s -A 'Mozilla/5.0' -m 30 'https://api.lever.co/v0/postings/fiscalnote?mode=json'`. FiscalNote is CQ Roll Call's parent, so this covers it. Fields: `text`, `categories.location`, `hostedUrl`, `id`, `createdAt` (epoch milliseconds, convert to a date). Keep only editorial roles. |
-| Washington Post | Washington Post | `curl -s -A 'Mozilla/5.0' -m 30 -X POST -H 'Content-Type: application/json' -d '{"appliedFacets":{},"limit":20,"offset":0,"searchText":""}' https://washpost.wd5.myworkdayjobs.com/wday/cxs/washpost/washingtonpostcareers/jobs`. Newest first, 20 per page. Fetch the next page (`offset` 20, 40) only while the last job on the page is still inside the 14 days. List dates are relative ("Posted 5 Days Ago", capped at "30+"). For a job you keep, get the exact date and link from `https://washpost.wd5.myworkdayjobs.com/wday/cxs/washpost/washingtonpostcareers{externalPath}`: `jobPostingInfo.startDate` and `jobPostingInfo.externalUrl`. Source ID = the `JR-` number in the path. |
-| WAMU | WAMU | Same POST to `https://american.wd1.myworkdayjobs.com/wday/cxs/american/AU/jobs` with `"searchText":"WAMU"`. Detail: `https://american.wd1.myworkdayjobs.com/wday/cxs/american/AU{externalPath}`. The public link is the detail's `externalUrl`. The keyword search can miss a WAMU role that never says "WAMU". |
-| JournalismJobs (DC) | JournalismJobs | `curl -s -A 'Mozilla/5.0' -m 30 'https://www.journalismjobs.com/job-listings?location=7' \| sed 's/<[^>]*>/ /g' \| tr -s ' \n\t' ' '` (7 = District of Columbia). **Only use the listings above the "Featured Jobs" heading.** Featured Jobs are sponsored and are not DC-filtered. The list shows "Posted October 20" with no year, so for each job you keep fetch its page `https://www.journalismjobs.com/{path}` and read `"datePosted"` from the JSON-LD (`grep -o '"datePosted"[^,]*'`). Source ID = the number at the start of the path. Add `&jobType=4` as a second request for freelance if freelance is a ticked type. |
+| CQ Roll Call | CQ Roll Call | `curl -s -A 'Mozilla/5.0' -m 30 'https://api.lever.co/v0/postings/fiscalnote?mode=json'`. FiscalNote is CQ Roll Call's parent, so this covers it. Pipe through `jq -c '.[] \| {id, title: .text, loc: .categories.location, posted: (.createdAt/1000\|strftime("%Y-%m-%d")), url: .hostedUrl}'`. Keep only editorial roles. |
+| Washington Post | Washington Post | `curl -s -A 'Mozilla/5.0' -m 30 https://washpost.wd5.myworkdayjobs.com/wday/cxs/washpost/washingtonpostcareers/jobs -X POST -H 'Content-Type: application/json' -d '{"appliedFacets":{},"limit":20,"offset":0,"searchText":""}' \| jq -c '.jobPostings[] \| {title, loc: .locationsText, postedOn, path: .externalPath}'`. Newest first, 20 per page. Fetch the next page (`offset` 20, 40) only while the last job on the page is still inside the 14 days. List dates are relative ("Posted 5 Days Ago", capped at "30+"). For a job you keep, get the exact date and link from `https://washpost.wd5.myworkdayjobs.com/wday/cxs/washpost/washingtonpostcareers{externalPath}`: `jobPostingInfo.startDate` and `jobPostingInfo.externalUrl`. Source ID = the `JR-` number in the path. |
+| WAMU | WAMU | Same call to `https://american.wd1.myworkdayjobs.com/wday/cxs/american/AU/jobs` (URL right after `-m 30`, same jq filter) with `"searchText":"WAMU"`. Detail: `https://american.wd1.myworkdayjobs.com/wday/cxs/american/AU{externalPath}`. The public link is the detail's `externalUrl`. The keyword search can miss a WAMU role that never says "WAMU". |
+| JournalismJobs (DC) | JournalismJobs | `curl -s -A 'Mozilla/5.0' -m 30 'https://www.journalismjobs.com/job-listings?location=7' \| grep -o 'href="/[0-9]\{6,\}-[^"]*"\|Posted [A-Z][a-z]* [0-9]*\|Featured Jobs'` (7 = District of Columbia). The output alternates a path (the slug holds the title and org) and a "Posted" date. **Stop reading at the "Featured Jobs" line.** Everything after it is sponsored and not DC-filtered. The list shows "Posted October 20" with no year, so for each job you keep fetch its page `https://www.journalismjobs.com/{path}` and read `"datePosted"` from the JSON-LD (`grep -o '"datePosted"[^,]*'`). Source ID = the number at the start of the path. Add `&jobType=4` as a second request for freelance if freelance is a ticked type. |
 | Punchbowl News | Punchbowl | **WebFetch** `https://punchbowl.news/careers/` (curl gets a 403). No dates. Ask for each posting's title, location, apply link or email. |
 | The Dispatch | The Dispatch | WebFetch `https://thedispatch.com/careers/`. No dates. |
-| The 19th | The 19th | **curl** `https://19thnews.org/careers/` piped through the same `sed` as above (WebFetch gets a 402). Deadline only, no posted date. Also lists contract openings. |
-| Mediabistro (national) | Mediabistro | WebFetch `https://www.mediabistro.com/jobs`. Latest ~20 jobs nationally, search parameters are ignored. Keep only DC area or remote or "USA" roles. Dates are relative ("3 days ago"). Source ID = the number in the link. |
-| Media Job Board (national) | Media Job Board | WebFetch `https://mediajobboard.com/search` (the old `jobs.mediajobboard.com/jobs` address redirects there). Latest ~24 nationally. Keep only DC area or remote. Source ID = the code in the link. |
+| The 19th | The 19th | **curl** `https://19thnews.org/careers/ \| sed 's/<[^>]*>/ /g' \| tr -s ' \n\t' ' '` (WebFetch gets a 402). Deadline only, no posted date. Also lists contract openings. |
+| Mediabistro (national) | Mediabistro | WebFetch `https://www.mediabistro.com/jobs`. Latest ~20 jobs nationally, search parameters are ignored. Keep only roles located in the DC metro area or remote. Drop roles located only "USA" or in another city. Dates are relative ("3 days ago"). Source ID = the number in the link. |
+| Media Job Board (national) | Media Job Board | WebFetch `https://mediajobboard.com/search` (the old `jobs.mediajobboard.com/jobs` address redirects there). Latest ~24 nationally. Keep only roles located in the DC metro area or remote. Drop any other city. Source ID = the code in the link. |
 | LinkedIn job alerts (Gmail) | LinkedIn alert | See "LinkedIn alerts" below. |
 | Pasted links | Pasted link | Any job link in the same message. WebFetch it and evaluate like any other job. Use whatever date the page shows, else leave Posted blank. A link you cannot read: say so (unattended: skip and mention). |
+
+No jq fallbacks (each still keeps output small): Greenhouse `grep -o '"absolute_url":"[^"]*"\|"title":"[^"]*"\|"first_published":"[^"]\{10\}\|"location":{"name":"[^"]*"'`. Lever `grep -o '"text":"[^"]*"\|"createdAt":[0-9]*\|"hostedUrl":"[^"]*"'` (ignore `text` lines that are not job titles, and convert the millisecond `createdAt` yourself). Workday `grep -o '"title":"[^"]*"\|"postedOn":"[^"]*"\|"externalPath":"[^"]*"'`.
 
 For the static pages (Punchbowl, The Dispatch, The 19th) the Link is the job's own apply link if it has one. If the only way to apply is email, use the careers page URL as Link and put `Apply by email: <address>` in Notes. Some apply links go to a form, that is fine.
 
@@ -62,9 +64,9 @@ Cross-source copies are common (the same job on the company site, JournalismJobs
 
 ### LinkedIn alerts
 
-Load the Gmail tools with ToolSearch (suffixes `search_threads`, `get_thread`). Search: `from:jobalerts-noreply@linkedin.com newer_than:3d`. Read each thread with `messageFormat` `PLAIN_TEXT`. If Gmail is not connected, record "LinkedIn alert" as failed.
+Load the Gmail tools with ToolSearch (suffixes `search_threads`, `get_thread`). Search: `from:jobalerts-noreply@linkedin.com newer_than:3d`. Read each thread with `messageFormat` `PLAIN_TEXT`. If Gmail is not connected or the search errors, record "LinkedIn alert" as failed. If the search works but finds no alert emails, that is not a failure: say `No LinkedIn alert emails yet` in the chat summary and still list LinkedIn alert as checked.
 
-An alert looks like this: a header line "Your job alert for {search} in {location}", then about 6 job cards separated by lines of dashes. Each card is: title line, company line, location line, an optional badge line ("Top applicant", "3 connections", "This company is actively hiring"), then `View job: https://www.linkedin.com/comm/jobs/view/{id}/?...`. Blank lines may appear inside a card. There is no salary, date or description.
+Nadeen's session verified this card format on a real alert email on 2026-10-24. An alert looks like this: a header line "Your job alert for {search} in {location}", then about 6 job cards separated by lines of dashes. Each card is: title line, company line, location line, an optional badge line ("Top applicant", "3 connections", "This company is actively hiring"), then `View job: https://www.linkedin.com/comm/jobs/view/{id}/?...`. Blank lines may appear inside a card. There is no salary, date or description.
 
 For each card:
 - Title = first line, Org = second, Location = third. Ignore badge lines.
@@ -77,7 +79,7 @@ Use the same cards in every alert thread from the last 3 days. Repeats across em
 ## Step 3. Relevance filter
 
 Most newsroom feeds are mostly sales, ops, finance, HR and engineering. Keep a job only if:
-- Its title matches a Target role, or fits his Beats, or is a plausible Opportunity type (Staff, Fellowship, Freelance, Nearby field as he ticked them). Nearby field means roles like comms, policy writing, think tank editing.
+- Its title is a journalism role (reporter, correspondent, editor, producer, writer, columnist, fellow, host, anchor, photojournalist, data or audio or video journalist) that matches a Target role or one of his Beats, or it is a Nearby field role (comms, policy writing, think tank editing) and he ticked Nearby field. Drop sales, account, revenue, partnerships, marketing, audience growth, finance, HR, legal, product, engineering, design and admin titles, even at a newsroom.
 - It is not an Excluded title and not a Dealbreaker. Internships are skipped unless profile.md lists them.
 - Its location fits (the Location section). Treat "Washington DC", "Washington D.C.", "Washington, District of Columbia", "DC-Washington-...", Arlington, Alexandria and Bethesda as DC metro. A location that says "Remote" counts as remote.
 - It is inside the 14-day window when the source gives a date. A source with no date makes the job eligible.
@@ -88,11 +90,12 @@ Axios "Talent Pool" and Politico "Future Talent Pool" postings are pipeline post
 
 When a title alone is not enough, read the posting (Greenhouse single job `https://boards-api.greenhouse.io/v1/boards/{board}/jobs/{id}`, the Lever list item, the Workday detail, or the JournalismJobs page). Do this only for close calls, to keep the run fast.
 
-The number of distinct jobs left at this point (after relevance, the window, and collapsing copies of the same job within this run, but before checking the Sheet) is **found** for the chat summary.
 
 ## Step 4. Score
 
-For each survivor use profile.md's rubric: role match 0 to 4, beat and substance 0 to 4, logistics 0 to 2. Add them for Fit (1 to 10, whole number). Apply learnings. Do not inflate to reach 6. Drop anything below **6** (not added anywhere). LinkedIn jobs have no description: score from title, company and location only, and do not claim details you do not have.
+For each survivor use profile.md's rubric: role match 0 to 4, beat and substance 0 to 4, logistics 0 to 2. Add them for Fit (1 to 10, whole number). Apply learnings. Do not inflate to reach 6. Drop anything below **6** (not added anywhere).
+
+The number of distinct jobs left after scoring (they passed the relevance filter, the 14-day window and the Fit floor, after copies of the same job within this run were collapsed, and before the Sheet check) is **found** for the chat summary. LinkedIn jobs have no description: score from title, company and location only, and do not claim details you do not have.
 
 For each job also set:
 - **Type**: Staff, Fellowship, Freelance or Nearby field. Contract roles are Freelance. Fellowships are Fellowship. A non-reporting role at a policy or communications employer is Nearby field.
@@ -107,14 +110,14 @@ Follow the spec exactly (normalise, collapse, known-job rules).
 1. **Collapse this run's jobs** on normalised Org + normalised Title. One job survives, with all its locations joined by semicolons (`Washington, DC; Arlington, VA`). Keep the best link per the preference order above. Keep the highest Fit. If sources disagree on Posted, use the earliest.
 2. **Check each against Jobs and Seen** (both read fresh in Step 1):
    - Known by Link or Source ID: skip it entirely. A Seen row can hold several IDs joined by `; ` (a collapsed LinkedIn job keeps every ID it merged), so match against each one.
-   - Known by Org + Title with a location check (locations overlap, or either side is Remote, Hybrid or DC metro) but not by Link or Source ID, **and the matched row's Source is the same source as the new job**: it is a **repost**. Skip it as a new job.
-   - Same Org + Title match but the matched row came from a **different** source (for example the Mediabistro copy of a job already added from JournalismJobs): it is the same job seen twice, not a repost. Skip it silently, no note. If the match is a Jobs row, append `Reposted YYYY-MM-DD, new link: <url>` to that row's Notes (keep the existing text, add a space or `; ` first). Status Passed: do nothing. Status Closed: add the note and mention it in chat. If the match is only a Seen row: do nothing.
-3. What is left is the new set. Sort by Fit (highest first), then newer Posted, then newer First seen. The top 10 go to Jobs. All of them go to Seen.
+   - Known by Org + Title with a location check (locations overlap, or either side is Remote, Hybrid or DC metro) but not by Link or Source ID, **and the matched row has the same Source as the new job**: it is a **repost**. Skip it as a new job. If the match is a Jobs row, append `Reposted YYYY-MM-DD, new link: <url>` to that row's Notes (keep the existing text, add a space or `; ` first). Status Passed: do nothing. Status Closed: add the note and mention it in chat. Any other Status: add the note. If the match is only a Seen row: do nothing.
+   - Same Org + Title match but the matched row has a **different** Source (for example the Mediabistro copy of a job already added from JournalismJobs): it is the same job seen on another board, not a repost. Do nothing: no row, no note, no mention in chat.
+3. What is left is the new set. Sort by Fit (highest first), then newer Posted, then newer First seen. The top 10 go to Jobs. All of them go to Seen. The cap applies to this run's new jobs only. Seen rows from earlier runs never compete for today's 10: a run with 3 new jobs adds 3 even if 30 rows are waiting in Seen.
 4. **Write, in this order** (Jobs first, so a failure can never hide a job):
    - `append_values` to `Jobs!A1` with up to 10 rows. Build every row from the header map, all 13 cells, `""` for blank: Status `New`, Fit, Type, Job title, Org, Location, Why it fits, Source, Posted, First seen, Link, Folder blank, Notes (`limited info` for LinkedIn, plus any talent pool or email-apply note, else blank). Put the cells in the order the header map gives, even if the Sheet columns were rearranged. If a title could be read as a number, date or formula, start it with an apostrophe.
-   - `append_values` to `Seen!A1` with a row for **every** new job that cleared the floor: Link, Source ID (when jobs were collapsed, list every ID, joined with `; `), Org, Job title, Location, Fit, First seen, `On Jobs tab` = `yes` for the top 10 and `no` for the rest. Do not add `more` text anywhere.
+   - `append_values` to `Seen!A1` with a row for **every** new job that cleared the floor: Link, Source ID (when jobs were collapsed, list every ID, joined with `; `), Org, Job title, Location, Fit, First seen, `On Jobs tab` (`yes` for the top 10, `no` for the rest), Type, Source, Posted, Why it fits. Send all 12 cells, `""` for blank ones. Do not add `more` text anywhere.
    - Repost notes: `update_values` on the single Notes cell of the matched row (row number = array index + 1; column letter from the header map).
-   - `append_values` to `'Scan log'!A1` with one row: Date (today), Sources checked (names of ticked sources that were tried, comma separated), Sources that failed (blank if none), New jobs added (rows added to Jobs, 0 to 10). Write this row even when nothing was added.
+   - `append_values` to `'Scan log'!A1` with one row: Date (today), Sources checked (the Sheet's Source value from the table above for each ticked source that was tried, for example `Punchbowl` not `Punchbowl News`, comma separated), Sources that failed (blank if none), New jobs added (rows added to Jobs, 0 to 10). Write this row even when nothing was added.
 5. **Verify**: `get_values` on the appended Jobs range and confirm the rows are there. If a write fails, say which one, and do not claim success.
 
 ## Show me more
@@ -122,11 +125,10 @@ Follow the spec exactly (normalise, collapse, known-job rules).
 When he says "show me more" (no sources are searched, no Scan log row):
 
 1. Read Seen fresh by header. Take rows with `On Jobs tab` = `no` whose First seen is not more than 14 days ago.
-2. Sort by Fit, highest first. Take the next 10.
-3. Read Jobs fresh too and skip any that are already on it (same Link or Org + Title).
-4. Append them to Jobs as new rows: Status `New`, Fit, Type, Job title, Org, Location from Seen, Source, Posted and Link as stored, First seen from Seen, Folder blank, Notes blank. Seen does not hold Type, Source, Posted or Why it fits, so work them out from the title, org and the Link's site (Source), and write Why it fits with the same rules as Step 4. Leave Posted blank if you cannot tell. Do not guess.
-5. Set those Seen rows to `On Jobs tab` = `yes`, one `update_values` per row on that cell.
-6. Tell him how many were added and how many are still waiting. If none are waiting, say so.
+2. Sort by Fit, highest first. Read Jobs fresh too. Any of these rows already on Jobs (same Link or Org + Title) is not added again: set its Seen row to `On Jobs tab` = `yes` and leave it out of the count. Take the next 10 of the rest.
+3. Append them to Jobs as new rows: Status `New`, Fit, Type (Seen column Type), Job title, Org, Location, Source (Seen Source), Posted (Seen Posted), Link, Why it fits (Seen Why it fits), First seen from Seen, Folder blank, Notes blank (`limited info` if the Source is LinkedIn alert). Everything comes from the Seen row. Do not search or guess. If a cell is blank in Seen, leave it blank.
+4. Set those Seen rows to `On Jobs tab` = `yes`, one `update_values` per row on that cell.
+5. Tell him how many were added and how many are still waiting. If none are waiting, say so.
 
 ## Chat summary
 
@@ -145,8 +147,9 @@ Sheet: <link>
 ```
 
 Rules:
-- Found = count from Step 3. New = rows added to Jobs. Name the top 3 by Fit with title, org and place.
+- Found = the count from Step 4 (distinct jobs that passed the filter, the window and the floor). New = rows added to Jobs. Name the top 3 by Fit with title, org and place.
 - The "N more matched" line appears only when N is above 0. N = Seen rows with `On Jobs tab` = `no` that have not aged out (more than 14 days since First seen), counted after this run's writes. Use the exact wording from the spec.
+- If the LinkedIn search found no alert emails, add `No LinkedIn alert emails yet.` It is not a failure.
 - Always name failed sources plainly, with a short reason. A quiet day must never hide a broken source. If nothing failed, one line saying all sources worked is enough.
 - One nudge line for every Jobs row whose Status is still `Ready to apply`.
 - For a repost matched to a Closed row, say: `Reposted: <title> at <org> was marked Closed and is listed again. Say "reopen" if you want it back.`
