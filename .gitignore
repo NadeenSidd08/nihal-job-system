@@ -24,3 +24,7 @@ cover-letter*
 *tracker*.md
 # Local copy or export of the Google Sheet tracker
 tracker.local.*
+
+# Learning loop and feedback notes (personal, NAD-42)
+learnings.md
+feedback.md
