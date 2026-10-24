@@ -28,3 +28,7 @@ tracker.local.*
 # Learning loop and feedback notes (personal, NAD-42)
 learnings.md
 feedback.md
+
+# Blank templates are tracked (they hold no personal data)
+!templates/
+!templates/*.md

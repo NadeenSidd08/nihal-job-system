@@ -1,75 +1,59 @@
-# Job Search Profile — ⟨Your Name⟩
+# Job search profile: ⟨first name⟩
 
-Used by `/scan-jobs`. Edit by asking Claude in a session — the skill re-reads this file fresh on every run.
+<!-- Claude: fill every ⟨placeholder⟩ from the interview, resume.md, the LinkedIn PDF, and clips.md. Never keep example values he did not choose. Keep every "##" and "###" heading exactly as written, because skills find sections by name. Write only the opportunity types he wants, and never mention a type he excluded. Leave the Calibration anchors empty. Delete this comment from the finished profile.md. -->
 
-<!-- ONBOARDING NOTES (Claude: read these, then delete this comment block from the finished profile.md):
-     - Fill every ⟨placeholder⟩ from the user's resume.md + their interview answers. Never keep example values the user didn't choose.
-     - DO NOT rename the "## " section headings — the skills read them by exact name.
-     - "### " subsection names inside the Scoring rubric MAY be renamed to fit the user. -->
+## Background
+⟨2 to 4 sentences from resume.md, the LinkedIn PDF, and clips.md: current role, beats, outlets, standout skills.⟩
 
-## Background (from resume)
+## Beats and expertise
+- ⟨beat or subject area, strongest first⟩
 
-⟨2–4 sentences drafted from resume.md: current role and career arc, industries, standout skills and tools, certifications.⟩
+## Target roles
+- ⟨role title, 2 to 5 lines⟩
+Excluded: ⟨titles he never wants to see, or "none"⟩
 
-## Target titles
-
-- ⟨Title 1⟩
-- ⟨Title 2⟩
-- ⟨Title 3 — optional⟩
-
-(Explicitly excludes: ⟨any titles the user does NOT want surfaced — optional; delete this line if none⟩)
+## Opportunity types
+In priority order. Only the types he wants:
+1. ⟨Staff / Fellowship / Freelance / Nearby field⟩
 
 ## Location
-
-⟨e.g. "Open to remote OR ⟨City⟩ metro." · "Remote only." · "⟨City⟩ only."⟩
+⟨for example "Washington, DC metro or remote"⟩
 
 ## Salary floor
-
-⟨e.g. $85,000 — the minimum the user would accept⟩
-
-## Job type
-
-⟨Full-time / part-time / contract / internship — whichever combination applies⟩
+⟨for example "$70,000", or "none"⟩
 
 ## Dealbreakers
+- ⟨one per line, or "none"⟩
 
-- ⟨e.g. No unpaid / equity-only roles⟩
-- ⟨more from the interview — optional⟩
+## Sources
+The sources /find-jobs checks. On by default, he can turn any off.
+- [x] Axios
+- [x] Semafor
+- [x] NPR
+- [x] CQ Roll Call
+- [x] Washington Post
+- [x] WAMU
+- [x] JournalismJobs (DC)
+- [x] Punchbowl News
+- [x] The Dispatch
+- [x] The 19th
+- [x] Mediabistro (national)
+- [x] Media Job Board (national)
+- [x] LinkedIn job alerts (Gmail)
 
-## Freshness rule
-
-Reject postings older than ⟨48⟩ hours at scan time.
+## Tracker sheet
+⟨full Google Sheet URL⟩
 
 ## Scoring rubric
-
-Fit score = title match (0–4) + substance (0–4) + logistics (0–2), integer sum out of 10. Survival threshold: ≥6/10. In each report entry, keep the `**Fit:** N/10` line format unchanged; the component breakdown goes in its own `**Score:**` block (three bullets — Title/Substance/Logistics, each with its points and a one-line reason), per `/scan-jobs` SKILL.md step 8 — not appended to the "Why" line.
-
-### Title match (0–4)
-
-- 4 — Exact or near-exact match to a target title, including close blends
-- 3 — Same-family title with an off-list qualifier
-- 2 — Adjacent role in the same family
-- 1 — Related but distant
-- 0 — Not the target role family
-
-⟨If the user excludes titles, add: "(Excluded titles are rejected before scoring — they never get scored.)"⟩
-
-### ⟨Domain & skills⟩ substance (0–4)
-
-Measured against ⟨the user⟩'s background: ⟨their standout skills, domains, and tools, from resume.md⟩.
-
-- 4 — Role centers on ⟨their strongest, most differentiated skill area⟩
-- 3 — ⟨core mandate points the same direction, but less hands-on / less central⟩
-- 2 — ⟨partial overlap: one meaningful component matches, or strong industry-background overlap⟩
-- 1 — Generic role in the family with minor overlap
-- 0 — No relevance to their background
-
-### Logistics & practical fit (0–2)
-
-- 2 — Clean: location and salary comfortably fit, no frictions
-- 1 — Workable frictions: hybrid requirement, salary band straddling the floor, extra gates to confirm
-- 0 — Serious frictions short of a hard dealbreaker
-
+Fit = role match (0 to 4) + beat and substance (0 to 4) + logistics (0 to 2). Floor: 6.
+### Role match (0 to 4)
+⟨anchors written for his target roles⟩
+### Beat and substance (0 to 4)
+⟨anchors written against his beats and clips⟩
+### Logistics (0 to 2)
+⟨anchors for location, salary, and type⟩
 ### Calibration anchors
+⟨leave empty at onboarding⟩
 
-⟨Leave empty at onboarding. After the first scan, record 2–4 real scored examples — "Company Role: 4+3+2 = 9" — so future scans stay consistent.⟩
+## Morning scan
+⟨"On, weekdays at 7:30" or "Off"⟩

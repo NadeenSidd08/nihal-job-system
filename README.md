@@ -4,7 +4,7 @@ This helps you find journalism jobs, track them in a Google Sheet, and tailor yo
 
 ## How to start
 
-You start from the onboarding page Nadeen sends you (link to be added). Follow it step by step. You don't need to set anything up from this page.
+You start from the onboarding page Nadeen sends you (link to be added). It tells you to make a new folder, put your résumé and LinkedIn PDF in it, open Claude in that folder, and paste a setup message. Claude downloads this system and then walks you through setup one question at a time. It takes about 20 minutes. If you stop halfway, open Claude in the `nihal-job-system` folder and it picks up where you left off.
 
 ## What you need
 
