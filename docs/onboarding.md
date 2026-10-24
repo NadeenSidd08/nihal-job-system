@@ -181,13 +181,18 @@ Done when `learnings.md` exists.
 
 Say: "I can look for new jobs every weekday morning on my own, so the Sheet is fresh when you wake up."
 
-Say: "I'll explain how it runs when we switch it on."
+Say: "It runs while the Claude app is open and your Mac is awake, and it uses your normal Claude plan, with no extra charge."
 
 Ask: "A. Turn it on, weekdays around 7:30 (recommended). B. Leave it off for now. You can turn it on anytime by asking."
 
-Scheduling itself: Set up per docs/morning-scan.md (written in NAD-36). If that file does not exist yet, do not try to schedule. Say "The morning scan setup isn't ready yet. I've noted your choice and we'll switch it on when it is."
+If he says B: record `Off` and move on.
 
-Record his choice only, under `## Morning scan` in `profile.md`: `On, weekdays at 7:30` or `Off`. Replace `(not decided yet)`. (If he said On but scheduling is not ready, record `On, weekdays at 7:30` and tell him the schedule itself is still to be switched on.)
+If he says A (or names another time):
+1. Create the scheduled task using the prompt in `docs/morning-scan.md`, with his real path in place of `<his folder>` and the time from his answer (default weekdays 7:30).
+2. Walk him through the rest of `docs/morning-scan.md` one step at a time, waiting for him after each: first Edit (Working folder to his `nihal-job-system` folder, model Sonnet, permission mode default), then "Run now" and clicking "Always allow" on each prompt, then waiting for "succeeded".
+3. If he wants to skip the test run now, tell him the first scheduled run will stop at the prompts until he does it once, and record On anyway.
+
+Record his choice under `## Morning scan` in `profile.md`: `On, weekdays at 7:30` (or his time) or `Off`. Replace `(not decided yet)`.
 
 Done when `## Morning scan` says On or Off.
 
