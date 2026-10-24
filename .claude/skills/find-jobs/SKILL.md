@@ -88,7 +88,7 @@ Axios "Talent Pool" and Politico "Future Talent Pool" postings are pipeline post
 
 When a title alone is not enough, read the posting (Greenhouse single job `https://boards-api.greenhouse.io/v1/boards/{board}/jobs/{id}`, the Lever list item, the Workday detail, or the JournalismJobs page). Do this only for close calls, to keep the run fast.
 
-The number of jobs left at this point (after relevance and window, before any Sheet dedupe) is **found** for the chat summary.
+The number of distinct jobs left at this point (after relevance, the window, and collapsing copies of the same job within this run, but before checking the Sheet) is **found** for the chat summary.
 
 ## Step 4. Score
 
@@ -106,12 +106,13 @@ Follow the spec exactly (normalise, collapse, known-job rules).
 
 1. **Collapse this run's jobs** on normalised Org + normalised Title. One job survives, with all its locations joined by semicolons (`Washington, DC; Arlington, VA`). Keep the best link per the preference order above. Keep the highest Fit. If sources disagree on Posted, use the earliest.
 2. **Check each against Jobs and Seen** (both read fresh in Step 1):
-   - Known by Link or Source ID: skip it entirely.
-   - Known by Org + Title with a location check (locations overlap, or either side is Remote, Hybrid or DC metro) but not by Link or Source ID: it is a **repost**. Skip it as a new job. If the match is a Jobs row, append `Reposted YYYY-MM-DD, new link: <url>` to that row's Notes (keep the existing text, add a space or `; ` first). Status Passed: do nothing. Status Closed: add the note and mention it in chat. If the match is only a Seen row: do nothing.
+   - Known by Link or Source ID: skip it entirely. A Seen row can hold several IDs joined by `; ` (a collapsed LinkedIn job keeps every ID it merged), so match against each one.
+   - Known by Org + Title with a location check (locations overlap, or either side is Remote, Hybrid or DC metro) but not by Link or Source ID, **and the matched row's Source is the same source as the new job**: it is a **repost**. Skip it as a new job.
+   - Same Org + Title match but the matched row came from a **different** source (for example the Mediabistro copy of a job already added from JournalismJobs): it is the same job seen twice, not a repost. Skip it silently, no note. If the match is a Jobs row, append `Reposted YYYY-MM-DD, new link: <url>` to that row's Notes (keep the existing text, add a space or `; ` first). Status Passed: do nothing. Status Closed: add the note and mention it in chat. If the match is only a Seen row: do nothing.
 3. What is left is the new set. Sort by Fit (highest first), then newer Posted, then newer First seen. The top 10 go to Jobs. All of them go to Seen.
 4. **Write, in this order** (Jobs first, so a failure can never hide a job):
    - `append_values` to `Jobs!A1` with up to 10 rows. Build every row from the header map, all 13 cells, `""` for blank: Status `New`, Fit, Type, Job title, Org, Location, Why it fits, Source, Posted, First seen, Link, Folder blank, Notes (`limited info` for LinkedIn, plus any talent pool or email-apply note, else blank). Put the cells in the order the header map gives, even if the Sheet columns were rearranged. If a title could be read as a number, date or formula, start it with an apostrophe.
-   - `append_values` to `Seen!A1` with a row for **every** new job that cleared the floor: Link, Source ID, Org, Job title, Location, Fit, First seen, `On Jobs tab` = `yes` for the top 10 and `no` for the rest. Do not add `more` text anywhere.
+   - `append_values` to `Seen!A1` with a row for **every** new job that cleared the floor: Link, Source ID (when jobs were collapsed, list every ID, joined with `; `), Org, Job title, Location, Fit, First seen, `On Jobs tab` = `yes` for the top 10 and `no` for the rest. Do not add `more` text anywhere.
    - Repost notes: `update_values` on the single Notes cell of the matched row (row number = array index + 1; column letter from the header map).
    - `append_values` to `'Scan log'!A1` with one row: Date (today), Sources checked (names of ticked sources that were tried, comma separated), Sources that failed (blank if none), New jobs added (rows added to Jobs, 0 to 10). Write this row even when nothing was added.
 5. **Verify**: `get_values` on the appended Jobs range and confirm the rows are there. If a write fails, say which one, and do not claim success.
