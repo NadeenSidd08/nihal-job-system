@@ -28,7 +28,7 @@ The task only runs while the Claude desktop app is open and your Mac is awake. I
    - **Permission mode** to the default (ask).
    Save.
 
-3. **Do one supervised run.** Click **Run now**. Claude will stop and ask permission as it goes. Click **Always allow** on each prompt as it appears. Expect prompts for: reading files, curl to the job sites, WebFetch, Gmail search, and Google Sheets. "Always allow" is saved on this task, so later runs do not ask again.
+3. **Do one supervised run.** Click **Run now**. Claude will stop and ask permission as it goes. Click **Always allow** on each prompt as it appears. Expect prompts for: reading files, each fixed curl line, each of the four WebFetch sites, Gmail search and read, and Google Sheets read and write. "Always allow" is saved on this task, so later runs do not ask again.
 
 4. **Wait for "succeeded".** The first run takes about 10 minutes. When the task says succeeded, you are done.
 
@@ -49,6 +49,8 @@ You can also ask Claude to do any of these.
 ## If something goes wrong
 
 - **It stalled.** A prompt is waiting for an answer. Open the task, find the run in its History list, open it, and answer the prompt with "Always allow". Later runs will not stop there. You can see and undo what you approved in the task's "Always allowed" panel.
+- **Scans stopped and the app shows a yellow "sign in again" banner.** Sign in again, then click Run now once.
+- **A run stalls on a prompt after day one.** Tell Nadeen which site or tool it named.
 - **It did not run.** The app was closed or the Mac was asleep at that time. Open the app and wake the Mac. One catch-up run happens on its own. See "Keep computer awake" above.
 - **The summary says "no LinkedIn alert emails".** There were no job alert emails from LinkedIn in the last 3 days. Set up job alerts on LinkedIn for journalism roles in Washington, DC, with email delivery, and they will be picked up on the next run.
 - **A source did not work.** The summary says which one. The other sources still ran. Tell Claude and it will check.

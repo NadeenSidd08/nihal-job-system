@@ -21,7 +21,24 @@ Rules that never bend:
 - **Unattended** (the scheduled morning task, nobody to answer): never ask a question. If something needs an answer (a missing header, an ambiguous row, a pasted link you cannot read), skip it and say so in the summary. Never stop to wait.
 - **"Show me more"**: skip to the section "Show me more". Do not search sources.
 
-Track the time. The whole run should take a couple of minutes at most. Run source fetches in parallel.
+Track the time. The whole run should take a couple of minutes at most.
+
+## Unattended mode: tools used
+
+An unattended run uses exactly these tools and nothing else. Each one needs a saved approval, and an approval only matches the same thing again. So nothing here may vary between runs.
+
+- **Bash**: only the 11 fixed `curl` lines in Step 2 (C1 to C11). `curl`, `jq`, `grep`, `sed` and `tr` appear only inside those lines.
+- **WebFetch**: only the 4 URLs in the WebFetch table in Step 2.
+- **ToolSearch**: only the two queries in Step 1 item 5.
+- **Read**: `profile.md` and `learnings.md` only.
+- **Gmail**: `search_threads` (one fixed call) and `get_thread` (the follow-up). No other Gmail tool.
+- **Google Sheets**: `get_values`, `append_values`, `update_values`. No other Sheets tool. Never `get_spreadsheet`.
+
+Rules for unattended runs:
+- Copy each command exactly, character for character. Never change quoting, flags, filters, or order. Never combine commands with `&`, `wait`, or `;`. Run them one at a time.
+- Never fetch a page on a domain that is not in the WebFetch table. Never open a job's detail page. Never follow a link from a result. If a job's details would need another page, keep what the list already gives and add `details not checked` to Notes.
+- If a fixed call fails, do not try a different command, site or tool. Record the source as failed and go on.
+- Pasted links are for attended runs only. Unattended, skip them and say so.
 
 ## Step 1. Load
 
@@ -29,34 +46,67 @@ Track the time. The whole run should take a couple of minutes at most. Run sourc
 2. Read `learnings.md` if it exists. Apply every line under `## Job matching` (scoring and filtering) and `## Sources` (which sources to trust, skip or favor).
 3. From profile.md take: Beats and expertise, Target roles (and the `Excluded:` line), Opportunity types, Location, Salary floor, Dealbreakers, the ticked sources under `## Sources`, the Sheet URL under `## Tracker sheet`, and the rubric under `## Scoring rubric`.
 4. The spreadsheet ID is the part of the Sheet URL between `/d/` and the next `/`.
-5. Load the Google Sheets tools with ToolSearch if they are not loaded (match on suffix: `get_values`, `append_values`, `update_values`, `get_spreadsheet`). If Sheets is not connected, tell him to turn on the Google Sheets connector and stop.
-6. Read the Sheet fresh, per the spec: `Jobs!A1:Z1000`, `Seen!A1:L2000`, `'Scan log'!A1:D500`. Build a map from header name to column index from row 1. Required Jobs headers: Status, Fit, Type, Job title, Org, Location, Why it fits, Source, Posted, First seen, Link, Folder, Notes. Required Seen headers: Link, Source ID, Org, Job title, Location, Fit, First seen, On Jobs tab, Type, Source, Posted, Why it fits. If any is missing or renamed, stop, name the header, write nothing. Rows are ragged: a short row means blank trailing cells.
+5. Load the Google Sheets tools with ToolSearch if they are not loaded, using the query `get_values append_values update_values`. Unattended, use only these three tools and never call `get_spreadsheet`. If Sheets is not connected, tell him to turn on the Google Sheets connector and stop. Load the Gmail tools the same way, with the query `search_threads get_thread`.
+6. Read the Sheet fresh with `get_values`, one call per range, per the spec: `Jobs!A1:Z1000`, `Seen!A1:L2000`, `'Scan log'!A1:D500`. Build a map from header name to column index from row 1. Required Jobs headers: Status, Fit, Type, Job title, Org, Location, Why it fits, Source, Posted, First seen, Link, Folder, Notes. Required Seen headers: Link, Source ID, Org, Job title, Location, Fit, First seen, On Jobs tab, Type, Source, Posted, Why it fits. If any is missing or renamed, stop, name the header, write nothing. Rows are ragged: a short row means blank trailing cells.
 7. Today's date is the run date. The window cutoff is today minus 14 days.
 
 ## Step 2. Fetch the sources
 
-Check only sources ticked in profile.md. Fetch them in parallel (one Bash call with `&` and `wait`, plus WebFetch and Gmail calls in the same turn). Use a browser-like user agent on curl: `-A 'Mozilla/5.0' -m 30`. Do not require Python. Pipe every JSON source through the filter shown below so raw JSON never lands in your context. Check `command -v jq` once. If jq is installed, use the jq filter. If not, use the grep fallback in the last column of the notes under the table. Date math is done by you, not by a command: work out the 14-day cutoff (today minus 14), and turn "Posted 5 Days Ago" or "3 days ago" into a date yourself.
+Check only sources ticked in profile.md. Run the commands below one at a time, in this order, skipping the ones for sources that are not ticked. Do not run anything in parallel. Date math is done by you, not by a command: work out the 14-day cutoff (today minus 14), and turn "Posted 5 Days Ago" or "3 days ago" into a date yourself. `jq` is required. If it is missing, every JSON source fails and is reported as failed.
 
 If a source errors, returns the wrong thing, or times out, skip it, carry on, and record its name for "Sources that failed". A source that works but has zero fitting jobs is not a failure.
 
+### Fixed commands (curl)
+
+Copy each command exactly, character for character. Never change quoting, flags, filters, or order. Never combine commands with `&`, `wait`, or `;`. Run them one at a time. Each line is one whole pipeline. The lines are numbered by position for reference: C1 is the first line, C2 the second, and so on. Do not type the label.
+
+```
+curl -s -A 'Mozilla/5.0' -m 30 https://boards-api.greenhouse.io/v1/boards/axios/jobs | jq -c '.jobs[] | {id, title, loc: .location.name, posted: .first_published[:10], url: .absolute_url}'
+curl -s -A 'Mozilla/5.0' -m 30 https://boards-api.greenhouse.io/v1/boards/semafor/jobs | jq -c '.jobs[] | {id, title, loc: .location.name, posted: .first_published[:10], url: .absolute_url}'
+curl -s -A 'Mozilla/5.0' -m 30 https://boards-api.greenhouse.io/v1/boards/nationalpublicradioinc/jobs | jq -c '.jobs[] | {id, title, loc: .location.name, posted: .first_published[:10], url: .absolute_url}'
+curl -s -A 'Mozilla/5.0' -m 30 https://api.lever.co/v0/postings/fiscalnote | jq -c '.[] | {id, title: .text, loc: .categories.location, posted: (.createdAt/1000|strftime("%Y-%m-%d")), url: .hostedUrl}'
+curl -s -A 'Mozilla/5.0' -m 30 https://washpost.wd5.myworkdayjobs.com/wday/cxs/washpost/washingtonpostcareers/jobs -X POST -H 'Content-Type: application/json' -d '{"appliedFacets":{},"limit":20,"offset":0,"searchText":""}' | jq -c '.jobPostings[] | {title, loc: .locationsText, postedOn, path: .externalPath}'
+curl -s -A 'Mozilla/5.0' -m 30 https://washpost.wd5.myworkdayjobs.com/wday/cxs/washpost/washingtonpostcareers/jobs -X POST -H 'Content-Type: application/json' -d '{"appliedFacets":{},"limit":20,"offset":20,"searchText":""}' | jq -c '.jobPostings[] | {title, loc: .locationsText, postedOn, path: .externalPath}'
+curl -s -A 'Mozilla/5.0' -m 30 https://american.wd1.myworkdayjobs.com/wday/cxs/american/AU/jobs -X POST -H 'Content-Type: application/json' -d '{"appliedFacets":{},"limit":20,"offset":0,"searchText":"WAMU"}' | jq -c '.jobPostings[] | {title, loc: .locationsText, postedOn, path: .externalPath}'
+curl -s -A 'Mozilla/5.0' -m 30 https://american.wd1.myworkdayjobs.com/wday/cxs/american/AU/jobs -X POST -H 'Content-Type: application/json' -d '{"appliedFacets":{},"limit":20,"offset":20,"searchText":"WAMU"}' | jq -c '.jobPostings[] | {title, loc: .locationsText, postedOn, path: .externalPath}'
+curl -s -A 'Mozilla/5.0' -m 30 'https://www.journalismjobs.com/job-listings?location=7' | grep -o 'href="/[0-9]\{6,\}-[^"]*"\|Posted [A-Z][a-z]* [0-9]*\|Featured Jobs'
+curl -s -A 'Mozilla/5.0' -m 30 'https://www.journalismjobs.com/job-listings?location=7&jobType=4' | grep -o 'href="/[0-9]\{6,\}-[^"]*"\|Posted [A-Z][a-z]* [0-9]*\|Featured Jobs'
+curl -s -A 'Mozilla/5.0' -m 30 https://19thnews.org/careers/ | sed 's/<[^>]*>/ /g' | tr -s ' \n\t' ' '
+```
+
+| Command | Source (profile name) | Sheet "Source" value | Notes |
+|---|---|---|---|
+| C1 | Axios | Axios | Posted = `first_published`. Pipeline postings: see Step 3. |
+| C2 | Semafor | Semafor | Same shape as C1. |
+| C3 | NPR | NPR | Same shape as C1. |
+| C4 | CQ Roll Call | CQ Roll Call | FiscalNote is CQ Roll Call's parent, so this covers it. Keep only editorial roles. |
+| C5, C6 | Washington Post | Washington Post | C5 is page 1 (offset 0). Run C6 (page 2, offset 20) only if the last job on page 1 is still inside the 14 days. Never run a third page. Dates are relative ("Posted 5 Days Ago"), so turn them into dates yourself. "30+" is outside the window. Source ID = the `JR-` number in the path. Link = `https://washpost.wd5.myworkdayjobs.com/washingtonpostcareers` followed by the path. |
+| C7, C8 | WAMU | WAMU | C7 is page 1 (offset 0). Run C8 (page 2, offset 20) only if page 1 returned 20 jobs and the last one is still inside the 14 days. Never run a third page. Source ID = the number after the last `_` in the path. Link = `https://american.wd1.myworkdayjobs.com/AU` followed by the path. The keyword search can miss a WAMU role that never says "WAMU". |
+| C9 | JournalismJobs (DC) | JournalismJobs | The output alternates a path (the slug holds the title and org) and a "Posted" date. **Stop reading at the "Featured Jobs" line.** Everything after it is sponsored and not DC-filtered. Source ID = the number at the start of the path. Link = `https://www.journalismjobs.com` followed by the path. The list shows "Posted October 20" with no year: use the current year, or last year if that would put the date in the future. Do not open the job pages. |
+| C10 | JournalismJobs (DC), freelance | JournalismJobs | Run only if Freelance is a ticked opportunity type. Same reading as C9. |
+| C11 | The 19th | The 19th | Deadline only, no posted date. Also lists contract openings. |
+
+The Workday lists give only a short summary. Judge a Workday job from its title and location. Unattended, do not open its detail page; if the title alone is not enough to judge it, keep it only when the title clearly fits, and add `details not checked` to its Notes. Attended runs may open a detail page (Washington Post: `https://washpost.wd5.myworkdayjobs.com/wday/cxs/washpost/washingtonpostcareers{externalPath}`, WAMU: `https://american.wd1.myworkdayjobs.com/wday/cxs/american/AU{externalPath}`; read `jobPostingInfo.startDate` and `jobPostingInfo.externalUrl`).
+
+### Fixed WebFetch pages
+
+Unattended, WebFetch only these four URLs and no other domain. Use this exact prompt for each: `List every job posting on this page. For each give the title, the location, the apply link or email, and the posted date if shown. Return nothing else.` If a fetch is redirected to a different domain, do not follow it: record the source as failed.
+
+| Source (profile name) | Sheet "Source" value | URL | Notes |
+|---|---|---|---|
+| Punchbowl News | Punchbowl | `https://punchbowl.news/careers/` | curl gets a 403, so WebFetch. No dates. |
+| The Dispatch | The Dispatch | `https://thedispatch.com/careers/` | No dates. |
+| Mediabistro (national) | Mediabistro | `https://www.mediabistro.com/jobs` | Latest ~20 nationally, search parameters are ignored. Keep only roles in the DC metro area or remote. Drop roles located only "USA" or in another city. Dates are relative ("3 days ago"). Source ID = the number in the link. |
+| Media Job Board (national) | Media Job Board | `https://mediajobboard.com/search` | Latest ~24 nationally. Keep only roles in the DC metro area or remote. Source ID = the code in the link. |
+
+Allowed WebFetch domains, unattended: `punchbowl.news`, `thedispatch.com`, `www.mediabistro.com`, `mediajobboard.com`. A job's own detail page or apply link is on another domain, so never fetch it. Keep what the list gives and add `details not checked` to Notes.
+
+Attended runs may WebFetch anything the user asks about, including pasted links. He is there to approve each new site.
+
 | Source (profile name) | Sheet "Source" value | How |
 |---|---|---|
-| Axios | Axios | `curl -s -A 'Mozilla/5.0' -m 30 https://boards-api.greenhouse.io/v1/boards/axios/jobs \| jq -c '.jobs[] \| {id, title, loc: .location.name, posted: .first_published[:10], url: .absolute_url}'` (no `content=true`: the plain list is small). Posted = `first_published` (not `updated_at`). |
-| Semafor | Semafor | Same, board `semafor`. |
-| NPR | NPR | Same, board `nationalpublicradioinc`. |
-| CQ Roll Call | CQ Roll Call | `curl -s -A 'Mozilla/5.0' -m 30 'https://api.lever.co/v0/postings/fiscalnote?mode=json'`. FiscalNote is CQ Roll Call's parent, so this covers it. Pipe through `jq -c '.[] \| {id, title: .text, loc: .categories.location, posted: (.createdAt/1000\|strftime("%Y-%m-%d")), url: .hostedUrl}'`. Keep only editorial roles. |
-| Washington Post | Washington Post | `curl -s -A 'Mozilla/5.0' -m 30 https://washpost.wd5.myworkdayjobs.com/wday/cxs/washpost/washingtonpostcareers/jobs -X POST -H 'Content-Type: application/json' -d '{"appliedFacets":{},"limit":20,"offset":0,"searchText":""}' \| jq -c '.jobPostings[] \| {title, loc: .locationsText, postedOn, path: .externalPath}'`. Newest first, 20 per page. Fetch the next page (`offset` 20, 40) only while the last job on the page is still inside the 14 days. List dates are relative ("Posted 5 Days Ago", capped at "30+"). For a job you keep, get the exact date and link from `https://washpost.wd5.myworkdayjobs.com/wday/cxs/washpost/washingtonpostcareers{externalPath}`: `jobPostingInfo.startDate` and `jobPostingInfo.externalUrl`. Source ID = the `JR-` number in the path. |
-| WAMU | WAMU | Same call to `https://american.wd1.myworkdayjobs.com/wday/cxs/american/AU/jobs` (URL right after `-m 30`, same jq filter) with `"searchText":"WAMU"`. Detail: `https://american.wd1.myworkdayjobs.com/wday/cxs/american/AU{externalPath}`. The public link is the detail's `externalUrl`. The keyword search can miss a WAMU role that never says "WAMU". |
-| JournalismJobs (DC) | JournalismJobs | `curl -s -A 'Mozilla/5.0' -m 30 'https://www.journalismjobs.com/job-listings?location=7' \| grep -o 'href="/[0-9]\{6,\}-[^"]*"\|Posted [A-Z][a-z]* [0-9]*\|Featured Jobs'` (7 = District of Columbia). The output alternates a path (the slug holds the title and org) and a "Posted" date. **Stop reading at the "Featured Jobs" line.** Everything after it is sponsored and not DC-filtered. The list shows "Posted October 20" with no year, so for each job you keep fetch its page `https://www.journalismjobs.com/{path}` and read `"datePosted"` from the JSON-LD (`grep -o '"datePosted"[^,]*'`). Source ID = the number at the start of the path. Add `&jobType=4` as a second request for freelance if freelance is a ticked type. |
-| Punchbowl News | Punchbowl | **WebFetch** `https://punchbowl.news/careers/` (curl gets a 403). No dates. Ask for each posting's title, location, apply link or email. |
-| The Dispatch | The Dispatch | WebFetch `https://thedispatch.com/careers/`. No dates. |
-| The 19th | The 19th | **curl** `https://19thnews.org/careers/ \| sed 's/<[^>]*>/ /g' \| tr -s ' \n\t' ' '` (WebFetch gets a 402). Deadline only, no posted date. Also lists contract openings. |
-| Mediabistro (national) | Mediabistro | WebFetch `https://www.mediabistro.com/jobs`. Latest ~20 jobs nationally, search parameters are ignored. Keep only roles located in the DC metro area or remote. Drop roles located only "USA" or in another city. Dates are relative ("3 days ago"). Source ID = the number in the link. |
-| Media Job Board (national) | Media Job Board | WebFetch `https://mediajobboard.com/search` (the old `jobs.mediajobboard.com/jobs` address redirects there). Latest ~24 nationally. Keep only roles located in the DC metro area or remote. Drop any other city. Source ID = the code in the link. |
 | LinkedIn job alerts (Gmail) | LinkedIn alert | See "LinkedIn alerts" below. |
-| Pasted links | Pasted link | Any job link in the same message. WebFetch it and evaluate like any other job. Use whatever date the page shows, else leave Posted blank. A link you cannot read: say so (unattended: skip and mention). |
-
-No jq fallbacks (each still keeps output small): Greenhouse `grep -o '"absolute_url":"[^"]*"\|"title":"[^"]*"\|"first_published":"[^"]\{10\}\|"location":{"name":"[^"]*"'`. Lever `grep -o '"text":"[^"]*"\|"createdAt":[0-9]*\|"hostedUrl":"[^"]*"'` (ignore `text` lines that are not job titles, and convert the millisecond `createdAt` yourself). Workday `grep -o '"title":"[^"]*"\|"postedOn":"[^"]*"\|"externalPath":"[^"]*"'`.
+| Pasted links | Pasted link | Attended only. Any job link in the same message. WebFetch it and evaluate like any other job. Use whatever date the page shows, else leave Posted blank. A link you cannot read: say so. Unattended: skip and mention. |
 
 For the static pages (Punchbowl, The Dispatch, The 19th) the Link is the job's own apply link if it has one. If the only way to apply is email, use the careers page URL as Link and put `Apply by email: <address>` in Notes. Some apply links go to a form, that is fine.
 
@@ -64,7 +114,7 @@ Cross-source copies are common (the same job on the company site, JournalismJobs
 
 ### LinkedIn alerts
 
-Load the Gmail tools with ToolSearch (suffixes `search_threads`, `get_thread`). Search: `from:jobalerts-noreply@linkedin.com newer_than:3d`. Read each thread with `messageFormat` `PLAIN_TEXT`. If Gmail is not connected or the search errors, record "LinkedIn alert" as failed. If the search works but finds no alert emails, that is not a failure: say `No LinkedIn alert emails yet` in the chat summary and still list LinkedIn alert as checked.
+The Gmail tools are already loaded from Step 1. Make this one search call, with these exact parameters every time: `search_threads` with `query` = `from:jobalerts-noreply@linkedin.com newer_than:3d`, `pageSize` = `20`, `view` = `THREAD_VIEW_MINIMAL`. Then read each thread it returns with `get_thread`, passing the thread id and `messageFormat` = `PLAIN_TEXT`. Always `get_thread`, never `get_message`. If Gmail is not connected or the search errors, record "LinkedIn alert" as failed. If the search works but finds no alert emails, that is not a failure: say `No LinkedIn alert emails yet` in the chat summary and still list LinkedIn alert as checked.
 
 Nadeen's session verified this card format on a real alert email on 2026-10-24. An alert looks like this: a header line "Your job alert for {search} in {location}", then about 6 job cards separated by lines of dashes. Each card is: title line, company line, location line, an optional badge line ("Top applicant", "3 connections", "This company is actively hiring"), then `View job: https://www.linkedin.com/comm/jobs/view/{id}/?...`. Blank lines may appear inside a card. There is no salary, date or description.
 
@@ -88,7 +138,7 @@ Most newsroom feeds are mostly sales, ops, finance, HR and engineering. Keep a j
 
 Axios "Talent Pool" and Politico "Future Talent Pool" postings are pipeline postings, not real vacancies. If one is otherwise relevant, keep it and put `Talent pool posting, not a live vacancy` in Notes.
 
-When a title alone is not enough, read the posting (Greenhouse single job `https://boards-api.greenhouse.io/v1/boards/{board}/jobs/{id}`, the Lever list item, the Workday detail, or the JournalismJobs page). Do this only for close calls, to keep the run fast.
+When a title alone is not enough (attended runs only), read the posting (Greenhouse single job `https://boards-api.greenhouse.io/v1/boards/{board}/jobs/{id}`, the Lever list item, the Workday detail, or the JournalismJobs page). Do this only for close calls, to keep the run fast. Unattended, never open a detail page: judge from the list, and add `details not checked` to Notes for a job you keep on thin information.
 
 
 ## Step 4. Score

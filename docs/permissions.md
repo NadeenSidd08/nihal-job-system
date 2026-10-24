@@ -11,53 +11,49 @@ Docs: https://code.claude.com/docs/en/permissions.md and https://code.claude.com
 
 ## How rules match (facts that matter here)
 
-- The current Bash form is space-star: `Bash(curl -s https://host/path *)`. The older `:*` form is equivalent but only valid at the end.
 - Rules match the command text as written. Quoting is not normalized. A single-quoted URL is a different string from an unquoted one.
-- A space-star rule does not match a query string attached with no space, for example `...fiscalnote?mode=json`.
-- Compound commands are split on `&&`, `||`, `;`, `|`, `|&`, `&` and newlines. Every part must match its own rule. So the filters after a pipe (`jq`, `grep`, `sed`, `tr`) need rules, and so does `wait` (not documented, so it may prompt).
-- WebFetch rules look like `WebFetch(domain:host)`.
-- MCP allow rules are `mcp__<server>`, `mcp__<server>__*` or `mcp__<server>__<tool>`. The server part cannot be wildcarded.
-- A run in Manual (ask) mode stalls at each prompt until someone answers. Choosing "Always allow" stores the approval on that task. Approvals can be revoked in the task's "Always allowed" panel. MCP tools marked requiresUserInteraction prompt every time.
+- Compound commands are split on `&&`, `||`, `;`, `|`, `|&`, `&` and newlines. Every part must match its own rule. So each filter after a pipe (`jq`, `grep`, `sed`, `tr`) is checked too, and `wait` is not documented, so the skill never uses it.
+- WebFetch is approved per domain.
+- MCP tools are approved per tool. The server part of the name cannot be wildcarded.
+- "Always allow" saves the exact command text or domain that was used. Any change between runs (a new domain, different quoting, a different filter, a different offset) prompts again. That is why the skill's unattended mode uses fixed text and never varies it.
+- A run in Manual (ask) mode stalls at each prompt until someone answers. Approvals can be revoked in the task's "Always allowed" panel. MCP tools marked requiresUserInteraction prompt every time.
+
+## Unattended mode: tools used
+
+This list matches the "Unattended mode: tools used" section of `.claude/skills/find-jobs/SKILL.md`. If one changes, change the other.
+
+- Bash: the 11 fixed `curl` lines below. Nothing else.
+- WebFetch: 4 domains (`punchbowl.news`, `thedispatch.com`, `www.mediabistro.com`, `mediajobboard.com`). Nothing else.
+- ToolSearch: two fixed queries, `get_values append_values update_values` and `search_threads get_thread`.
+- Read: `profile.md` and `learnings.md`.
+- Gmail: `search_threads` and `get_thread`.
+- Google Sheets: `get_values`, `append_values`, `update_values`. Never `get_spreadsheet`.
 
 ## 1. Bash (curl and filters)
 
-The skill runs `curl` on the network and pipes the output through `jq`, `grep`, `sed` and `tr`. It runs several curls at once with `&` and `wait`.
-
-| Host | Used for | Method |
-|---|---|---|
-| boards-api.greenhouse.io | Axios, Semafor, NPR job lists and single jobs | GET |
-| api.lever.co | FiscalNote (CQ Roll Call) | GET |
-| washpost.wd5.myworkdayjobs.com | Washington Post list and detail | POST (list), GET (detail) |
-| american.wd1.myworkdayjobs.com | WAMU list and detail | POST (list), GET (detail) |
-| www.journalismjobs.com | DC listing and per-job pages for dates | GET |
-| 19thnews.org | The 19th careers page | GET |
-
-Example rules in space-star form. They match only if the command is written exactly this way, including the quotes around the user agent:
+The skill runs these 11 lines one at a time, copied character for character. No `&`, no `wait`, no `;`, no detail-page fetches, no `command -v jq`. `jq` must be installed. On this Mac it is at `/usr/bin/jq`.
 
 ```
-Bash(curl -s -A 'Mozilla/5.0' -m 30 https://boards-api.greenhouse.io/v1/boards/ *)
-Bash(curl -s -A 'Mozilla/5.0' -m 30 https://washpost.wd5.myworkdayjobs.com/wday/cxs/washpost/washingtonpostcareers/ *)
-Bash(curl -s -A 'Mozilla/5.0' -m 30 https://american.wd1.myworkdayjobs.com/wday/cxs/american/AU/ *)
-Bash(curl -s -A 'Mozilla/5.0' -m 30 https://19thnews.org/careers/ *)
-Bash(jq *)
-Bash(grep *)
-Bash(sed *)
-Bash(tr *)
-Bash(command -v jq)
-Bash(wait)
+curl -s -A 'Mozilla/5.0' -m 30 https://boards-api.greenhouse.io/v1/boards/axios/jobs | jq -c '.jobs[] | {id, title, loc: .location.name, posted: .first_published[:10], url: .absolute_url}'
+curl -s -A 'Mozilla/5.0' -m 30 https://boards-api.greenhouse.io/v1/boards/semafor/jobs | jq -c '.jobs[] | {id, title, loc: .location.name, posted: .first_published[:10], url: .absolute_url}'
+curl -s -A 'Mozilla/5.0' -m 30 https://boards-api.greenhouse.io/v1/boards/nationalpublicradioinc/jobs | jq -c '.jobs[] | {id, title, loc: .location.name, posted: .first_published[:10], url: .absolute_url}'
+curl -s -A 'Mozilla/5.0' -m 30 https://api.lever.co/v0/postings/fiscalnote | jq -c '.[] | {id, title: .text, loc: .categories.location, posted: (.createdAt/1000|strftime("%Y-%m-%d")), url: .hostedUrl}'
+curl -s -A 'Mozilla/5.0' -m 30 https://washpost.wd5.myworkdayjobs.com/wday/cxs/washpost/washingtonpostcareers/jobs -X POST -H 'Content-Type: application/json' -d '{"appliedFacets":{},"limit":20,"offset":0,"searchText":""}' | jq -c '.jobPostings[] | {title, loc: .locationsText, postedOn, path: .externalPath}'
+curl -s -A 'Mozilla/5.0' -m 30 https://washpost.wd5.myworkdayjobs.com/wday/cxs/washpost/washingtonpostcareers/jobs -X POST -H 'Content-Type: application/json' -d '{"appliedFacets":{},"limit":20,"offset":20,"searchText":""}' | jq -c '.jobPostings[] | {title, loc: .locationsText, postedOn, path: .externalPath}'
+curl -s -A 'Mozilla/5.0' -m 30 https://american.wd1.myworkdayjobs.com/wday/cxs/american/AU/jobs -X POST -H 'Content-Type: application/json' -d '{"appliedFacets":{},"limit":20,"offset":0,"searchText":"WAMU"}' | jq -c '.jobPostings[] | {title, loc: .locationsText, postedOn, path: .externalPath}'
+curl -s -A 'Mozilla/5.0' -m 30 https://american.wd1.myworkdayjobs.com/wday/cxs/american/AU/jobs -X POST -H 'Content-Type: application/json' -d '{"appliedFacets":{},"limit":20,"offset":20,"searchText":"WAMU"}' | jq -c '.jobPostings[] | {title, loc: .locationsText, postedOn, path: .externalPath}'
+curl -s -A 'Mozilla/5.0' -m 30 'https://www.journalismjobs.com/job-listings?location=7' | grep -o 'href="/[0-9]\{6,\}-[^"]*"\|Posted [A-Z][a-z]* [0-9]*\|Featured Jobs'
+curl -s -A 'Mozilla/5.0' -m 30 'https://www.journalismjobs.com/job-listings?location=7&jobType=4' | grep -o 'href="/[0-9]\{6,\}-[^"]*"\|Posted [A-Z][a-z]* [0-9]*\|Featured Jobs'
+curl -s -A 'Mozilla/5.0' -m 30 https://19thnews.org/careers/ | sed 's/<[^>]*>/ /g' | tr -s ' \n\t' ' '
 ```
 
-Two sources will not match a rule like the ones above as the skill writes them today:
-- FiscalNote: `'https://api.lever.co/v0/postings/fiscalnote?mode=json'` is single-quoted and has a query string with no space.
-- JournalismJobs: `'https://www.journalismjobs.com/job-listings?location=7'` is single-quoted and has a query string. The per-job page fetches (`https://www.journalismjobs.com/{path}`) are fine.
+Line by line: 1 Axios, 2 Semafor, 3 NPR, 4 CQ Roll Call (FiscalNote), 5 and 6 Washington Post pages 1 and 2, 7 and 8 WAMU pages 1 and 2, 9 JournalismJobs DC, 10 JournalismJobs DC freelance, 11 The 19th. Lines 6 and 8 run only when page 1 shows more recent jobs may be waiting. The skill never runs a third page.
 
-That is why the supervised "Always allow" run is the setup method: the approval is stored for the exact command the first run used. Other notes:
-- `jq` is optional. If `command -v jq` fails the skill uses grep instead.
-- No Python, no file writes and no shell scripts are needed.
+Hosts used: boards-api.greenhouse.io, api.lever.co, washpost.wd5.myworkdayjobs.com, american.wd1.myworkdayjobs.com, www.journalismjobs.com, 19thnews.org.
+
+Because the first supervised run approves these exact lines, later runs find them already approved.
 
 ## 2. WebFetch
-
-Pages where curl is blocked or the page is too messy to read raw:
 
 ```
 WebFetch(domain:punchbowl.news)
@@ -66,11 +62,11 @@ WebFetch(domain:www.mediabistro.com)
 WebFetch(domain:mediajobboard.com)
 ```
 
-Pasted job links can be on any site, so an unattended run cannot allow them in advance. The skill skips (and reports) a pasted link it is not allowed to open. The morning task has no pasted links anyway.
+Unattended, the skill fetches only these four pages and never opens a job's own page or apply link. Where details would need another site it keeps what the list gives and writes "details not checked" in Notes. Pasted links work in attended runs only, where you can approve a new site.
 
 ## 3. Gmail connector (LinkedIn job alerts)
 
-Read only. The skill searches for `from:jobalerts-noreply@linkedin.com newer_than:3d` and reads the matching threads. It never labels, drafts, sends or deletes.
+Read only. The skill makes one `search_threads` call with `query` `from:jobalerts-noreply@linkedin.com newer_than:3d`, `pageSize` 20, `view` `THREAD_VIEW_MINIMAL`. Then it calls `get_thread` with `messageFormat` `PLAIN_TEXT` for each thread. It never labels, drafts, sends or deletes.
 
 ```
 mcp__<gmail-server-id>__search_threads
@@ -79,18 +75,17 @@ mcp__<gmail-server-id>__get_thread
 
 ## 4. Google Sheets connector
 
-Read and write, on his tracker Sheet only.
+Read and write, on the tracker Sheet only.
 
 ```
 mcp__<sheets-server-id>__get_values       reads Jobs, Seen, Scan log
 mcp__<sheets-server-id>__append_values    adds rows to Jobs, Seen, Scan log
 mcp__<sheets-server-id>__update_values    one-cell edits: repost Notes, Seen "On Jobs tab", Status changes he asks for
-mcp__<sheets-server-id>__get_spreadsheet  optional, only to check tab names or hidden state
 ```
 
 The `<server-id>` is a long ID that is different on each install. Do not copy these lines into a settings file as they are.
 
-Not needed by `/find-jobs`: `update_spreadsheet`, `batch_clear_values`, Drive tools. Onboarding uses those. Do not click "Always allow" on them for the morning task.
+Not used by the morning scan: `get_spreadsheet`, `update_spreadsheet`, `batch_clear_values`, Drive tools. Onboarding uses some of those. Do not click "Always allow" on them for the morning task.
 
 ## 5. Built-in tools
 
