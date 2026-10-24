@@ -6,3 +6,18 @@ applications/
 resume*
 /facts.md
 .DS_Store
+
+# Added for the Nihal edition: more personal files that must stay local
+# Writing clips (full text of his published work)
+clips.md
+clips/
+# facts.md anywhere in the repo, not only at the root
+facts.md
+# LinkedIn profile export, in the common capitalizations
+linkedin*.pdf
+Linkedin*.pdf
+LinkedIn*.pdf
+# Any PDF at the repo root (résumé, LinkedIn export, cover letters). Root only, so PDFs elsewhere are unaffected.
+/*.pdf
+# Local copy or export of the Google Sheet tracker
+tracker.local.*
