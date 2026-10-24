@@ -21,7 +21,7 @@ You start from the onboarding page Nadeen sends you (link to be added). It tells
 |---|---|---|
 | `/jobs` | A simple menu that points you to the right next step | Coming soon |
 | `/find-jobs` | Finds journalism jobs that fit you and adds them to your Google Sheet | Available |
-| `/apply` | Tailors your résumé, writes a cover letter, and picks clips for one job | Coming soon |
+| `/apply` | Tailors your résumé, writes a cover letter, and picks clips for one job | Available |
 | `/interview-prep` | Prepares you for an interview. It gets adapted in Phase 2 | Coming later |
 
 ## Privacy
