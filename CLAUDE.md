@@ -1,6 +1,8 @@
-# Job Scan Console — project instructions
+> Onboarding is being rebuilt for the Nihal edition (NAD-31). Until then, don't run setup from this file.
 
-A self-serve job-search system: the `/scan-jobs` skill (in `.claude/skills/`) scans Indeed against `profile.md` and writes timestamped reports to `reports/`; `/apply` builds per-job application packages into `applications/`; `/interview-prep` builds interview research and a prep deck into those same package folders; the static console in `console/` displays the profile and reports. Nothing in this repo executes scans — Claude runs them, in sessions like this one.
+# Job search system: project instructions
+
+A self-serve job-search system: the `/scan-jobs` skill (in `.claude/skills/`, being rebuilt as `/find-jobs`) searches for jobs against `profile.md`; `/apply` builds per-job application packages into `applications/`; `/interview-prep` builds interview research and a prep deck into those same package folders. Nothing in this repo executes scans. Claude runs them, in sessions like this one.
 
 ## If `profile.md` does not exist yet → onboard the user
 
@@ -26,15 +28,15 @@ Run setup conversationally, one step at a time. Never invent answers, and never 
 
    Also tell the user they can say **"finish my registry"** any time to come back and run this step later. When that happens, run step 3 as written above, then offer to re-lint every existing package whose `notes.md` header carries `registry: deferred` — that's the moment those packages' banners come off.
 4. **Interview for preferences.** A resume says what they've done, not what they want — ask, with brief examples: target titles (2–3, plus any explicit exclusions), location (remote / a city / both), salary floor, job type (full-time / contract / both), dealbreakers (e.g. unpaid roles, mandatory relocation), freshness window (default 48 hours).
-5. **Write `profile.md`** at this repo's root, from `profile.template.md`: Background drafted from resume.md; criteria from the interview; the Scoring rubric **personalized** — name the substance dimension after their focus and write its 0–4 anchors against their actual skills/domains from resume.md. Keep every `##` heading name exactly as the template has it (the console parses them). In `## Job type`, name **only the types they want** — never mention an excluded type, even to rule it out: the console matches type names literally, so "Full-time roles are out" renders Full-time as an *active* filter. Exclusions belong in `## Dealbreakers`. Leave Calibration anchors empty until after their first scan. Delete the template's HTML comment block.
-6. **Start the console.** From this folder, run `python3 -m http.server 8642 --bind 127.0.0.1` as a background task — bind to localhost only, since the served folder now holds `applications/` (tailored résumés) and `facts.md`, and the default binds every interface, making them readable across the user's LAN. Then have the user open http://localhost:8642/console/ and confirm their profile fields appear.
-7. **Offer next steps:** run `/scan-jobs` now for a first report, and optionally create a scheduled task for automatic daily morning scans.
+5. **Write `profile.md`** at this repo's root, from `profile.template.md`: Background drafted from resume.md; criteria from the interview; the Scoring rubric **personalized** — name the substance dimension after their focus and write its 0–4 anchors against their actual skills/domains from resume.md. Keep every `##` heading name exactly as the template has it. In `## Job type`, name **only the types they want** — never mention an excluded type, even to rule it out: type names are matched literally, so "Full-time roles are out" would read as Full-time being wanted. Exclusions belong in `## Dealbreakers`. Leave Calibration anchors empty until after their first scan. Delete the template's HTML comment block.
+6. **(Removed.)** This step is no longer used. Skip to the next step.
+7. **Offer next steps** once the rebuilt skills exist. Until then, stop after writing `profile.md`.
 
 ## Ongoing rules (once `profile.md` exists)
 
-- **Profile edits happen here in sessions** ("raise my salary floor to $110K") by editing `profile.md` — the console is read-only and reflects the file on next refresh.
-- **Reports:** `/scan-jobs` writes `reports/{YYYY-MM-DD-HHmm}.md`. Keep the `**Fit:** N/10` line format — the console parses it.
-- **Never fabricate scan results.** If the Indeed connector's tools (`search_jobs` / `get_job_details`) are unavailable, say so and point the user to add the Indeed connector to their Claude account.
+- **Profile edits happen here in sessions** ("raise my salary floor to $110K") by editing `profile.md`.
+- **Reports:** being replaced by a Google Sheet tracker in the Nihal edition.
+- **Never fabricate scan results.** If a job-search tool is unavailable, say so rather than inventing listings.
 - **After the first scan**, offer to record Calibration anchors in profile.md's rubric from the real scored results.
 - **If `resume.md` changes, re-run the registry step (onboarding step 3) for the affected rows.** Each `facts.md` row quotes `resume.md` verbatim in `source_text`; when a quoted line is edited, the row silently stops matching its own source and the "confirmed against the résumé" guarantee expires with nothing announcing it. Re-extract and re-confirm rather than leaving a stale quote.
 - `profile.md`, `facts.md`, `reports/*`, `applications/`, and `resume*` are gitignored — personal data never gets committed. Keep it that way.

@@ -1,11 +1,11 @@
 # Job Search Profile — ⟨Your Name⟩
 
-Used by `/scan-jobs` and displayed by the console. Edit by asking Claude in a session — the skill re-reads this file fresh on every run.
+Used by `/scan-jobs`. Edit by asking Claude in a session — the skill re-reads this file fresh on every run.
 
 <!-- ONBOARDING NOTES (Claude: read these, then delete this comment block from the finished profile.md):
      - Fill every ⟨placeholder⟩ from the user's resume.md + their interview answers. Never keep example values the user didn't choose.
-     - DO NOT rename the "## " section headings — the console UI parses them by exact name.
-     - "### " subsection names inside the Scoring rubric MAY be renamed to fit the user (the console renders any). -->
+     - DO NOT rename the "## " section headings — the skills read them by exact name.
+     - "### " subsection names inside the Scoring rubric MAY be renamed to fit the user. -->
 
 ## Background (from resume)
 
