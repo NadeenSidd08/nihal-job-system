@@ -63,7 +63,7 @@ The posting as fetched or pasted, cleaned into readable text. First lines:
 Source: <url, or "pasted by him">
 Fetched: <yyyy-mm-dd>
 ```
-Do not add anything the posting does not say.
+Do not add anything the posting does not say. Formatting only: replace any em dash in the posting with ` - ` so the no em dash rule holds for every file.
 
 ### company-context.md
 Short, under one page. Headings: What they do, Recent coverage relevant to this role, Who might read this (editor or hiring manager, only if public), Why it fits you. Use the posting plus a quick WebSearch or WebFetch of the outlet's own pages. Mark anything you could not confirm as `Unconfirmed:`. No guessing at names, numbers or news. "Why it fits you" uses only profile.md, facts.md and clips.md.
