@@ -79,6 +79,8 @@ Sources, in order: the posting; `curl -s -A 'Mozilla/5.0'` on the outlet's page;
 ### tailored-resume.md
 Start from `resume.md`. Reorder sections and bullets so what matters most for this job comes first, and reword toward the posting's own terms. Allowed: reorder, trim, reword, change emphasis. Not allowed: any role, title, outlet, date, number, award or skill that is not a line in `facts.md`. If the posting wants something he does not have, do not stretch. Leave it out.
 
+Before finishing, check every factual statement against facts.md. If a statement contradicts facts.md, rewrite it to match. Do not just flag it. The claims list is only for statements facts.md neither confirms nor contradicts.
+
 End with:
 ```
 ## New claims to confirm
@@ -96,7 +98,8 @@ A full draft in his voice, about 250 to 350 words, no em dashes.
 5. **Salutation.** If the posting names the hiring manager, copy the name character for character from job-post.md and re-check it. If it names only a contact for questions, or nobody, write "Dear hiring editor,". Never write "Dear <Org> team".
 6. **Content.** Open with something specific, not with who he is. Name 1 or 2 clips that fit the job, with their links, and connect them to what the posting asks for. Only facts from `facts.md` and `clips.md`. Close plainly. No clichés, no flattery of the outlet. 250 to 350 words.
    - **Lead on what he has. Never list requirements he lacks.** At most one plain pivot sentence, in positive form, when a gap is the obvious first question ("I have covered budgets and public institutions since 2019; higher education would be new"). Never write a statement about experience that facts.md does not contain, including statements that he has not done something. Never write "this may not be the match".
-7. End the file with the same `## New claims to confirm` section as the résumé. Include any specific claim the letter makes that you are not sure traces to facts.md or a clip's summary. **Any person's name in the letter is a claim. Check it against job-post.md.** If none: `None. Every claim comes from your facts list.`
+7. Before finishing, check every factual statement against facts.md. If a statement contradicts facts.md, rewrite it to match. Do not just flag it. The claims list is only for statements facts.md neither confirms nor contradicts.
+8. End the file with the same `## New claims to confirm` section as the résumé. Include any specific claim the letter makes that you are not sure traces to facts.md or a clip's summary. **Any person's name in the letter is a claim. Check it against job-post.md.** If none: `None. Every claim comes from your facts list.`
 
 ### clip-picks.md
 The best 3 to 5 clips from `clips.md` for this job. Starred first when they fit, then others, plus any `learnings.md` Clips line. Each: headline, outlet, date, link, and a one-line reason for this job. Only clips that are in the table.
