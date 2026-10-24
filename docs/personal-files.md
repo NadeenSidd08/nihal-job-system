@@ -73,6 +73,9 @@ The sources /find-jobs checks. On by default, he can turn any off.
 ## Tracker sheet
 <full Google Sheet URL>
 
+## Applications folder
+(set on first /apply)
+
 ## Scoring rubric
 Fit = role match (0 to 4) + beat and substance (0 to 4) + logistics (0 to 2). Floor: 6.
 ### Role match (0 to 4)

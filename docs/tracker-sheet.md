@@ -27,7 +27,7 @@ One row per job. Row 1 is a bold, frozen header. Columns, in this order:
 | I | Posted | Date (yyyy-mm-dd) if known, blank otherwise. See "The 14-day window" |
 | J | First seen | Date (yyyy-mm-dd) the scan first found the job |
 | K | Link | URL of the posting |
-| L | Folder | Path to the application folder on his Mac (may become a Drive link once the export format is chosen). Written by `/apply`. Blank until then |
+| L | Folder | Link to the job's Google Drive folder (the résumé and cover letter Docs). Written by `/apply`. Blank until then |
 | M | Notes | Free text. LinkedIn alert jobs carry "limited info" here (no description is available) |
 
 The user's own extra columns must go to the right of Notes (column N onward). Skills never write to them.
@@ -172,7 +172,7 @@ Each run ends with a short summary in chat that includes:
 
 Only these cells on the one row for the job being applied to:
 
-- **Folder** (column L): the path to the application folder. Always written.
+- **Folder** (column L): the link to the job's Google Drive folder. Always written. If the Drive connector is off, the local folder path instead.
 - **Status** (column A): set to `Ready to apply`, but **only when the current Status is New or Saved**. For any other Status (for example Applied, Interviewing, Passed), leave Status alone, still write Folder, and say so in the reply.
 - **Notes** (column M): append `Apply by yyyy-mm-dd` when the posting gives a deadline, keeping existing text.
 
