@@ -5,7 +5,7 @@ This is a reference list of what the morning scan needs. It is not a settings fi
 - Whether the Claude desktop app's scheduled tasks honour a project's `.claude/settings.json` is not documented, and project rules need folder trust.
 - The Gmail and Google Sheets connector names contain an ID that is different on every install, and MCP allow rules cannot wildcard that part. A repo cannot ship rules that work.
 
-So setup is one supervised "Run now" where Nihal clicks "Always allow" on each prompt (see `docs/morning-scan.md`). The approvals are stored on that task. Use this page to know what to expect, to recognise a prompt, or to write your own rules.
+So the morning task runs in **Auto** permission mode (see `docs/morning-scan.md`). Tested 2026-10-25: in Manual mode, "Always allow" did not carry over between runs for these commands, and every curl line asked again. In Auto mode, a full run finished with no prompts. Use this page to know what the scan touches, to recognise a prompt, or to write your own rules.
 
 Docs: https://code.claude.com/docs/en/permissions.md and https://code.claude.com/docs/en/desktop-scheduled-tasks.md
 
@@ -51,7 +51,7 @@ Line by line: 1 Axios, 2 Semafor, 3 NPR, 4 CQ Roll Call (FiscalNote), 5 and 6 Wa
 
 Hosts used: boards-api.greenhouse.io, api.lever.co, washpost.wd5.myworkdayjobs.com, american.wd1.myworkdayjobs.com, www.journalismjobs.com, 19thnews.org.
 
-Because the first supervised run approves these exact lines, later runs find them already approved.
+Keeping these lines fixed still matters: it keeps the scan predictable and easy for Auto mode's safety check to approve.
 
 ## 2. WebFetch
 

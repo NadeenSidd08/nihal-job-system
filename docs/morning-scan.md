@@ -25,12 +25,12 @@ The task only runs while the Claude desktop app is open and your Mac is awake. I
 2. **Check the task's settings.** In the Claude desktop app, open **Scheduled** in the sidebar, click the task, then **Edit**. Set:
    - **Working folder** to your `nihal-job-system` folder. A task that Claude creates starts with the folder of the chat it was made in, which is wrong, so do not skip this.
    - **Model** to Sonnet.
-   - **Permission mode** to the default (ask).
+   - **Permission mode** to **Auto**. In Auto mode, Claude's safety check approves the routine steps (fetching job pages, reading Gmail alerts, writing to your Sheet), so the scan never stops to ask you. If Auto is not in the list, your Claude plan may not include it. Stop here and tell Nadeen, because the other modes stop at permission prompts every morning.
    Save.
 
-3. **Do one supervised run.** Click **Run now**. Claude will stop and ask permission as it goes. Click **Always allow** on each prompt as it appears. Expect prompts for: reading files, each fixed curl line, each of the four WebFetch sites, Gmail search and read, and Google Sheets read and write. "Always allow" is saved on this task, so later runs do not ask again.
+3. **Keep the Mac awake.** In the Claude desktop app, go to Settings > This computer > System and turn on **Keep computer awake**. Otherwise a scan that starts while the Mac sleeps waits until you wake it. Closing the laptop lid still puts it to sleep.
 
-4. **Wait for "succeeded".** The first run takes about 10 minutes. When the task says succeeded, you are done.
+4. **Do one test run.** Click **Run now** and leave it alone. It should finish in about 10 minutes and say **succeeded** without asking you anything. If it stops to ask something, tell Nadeen what it named.
 
 ## What you will see each morning
 
@@ -48,7 +48,7 @@ You can also ask Claude to do any of these.
 
 ## If something goes wrong
 
-- **It stalled.** A prompt is waiting for an answer. Open the task, find the run in its History list, open it, and answer the prompt with "Always allow". Later runs will not stop there. You can see and undo what you approved in the task's "Always allowed" panel.
+- **It stalled.** A prompt is waiting for an answer. First check that the task's Permission mode is still **Auto** (Edit). Then open the run from the task's History list and answer the prompt. "Always allow" is not enough on its own for these scans, so if it keeps stopping, tell Nadeen.
 - **Scans stopped and the app shows a yellow "sign in again" banner.** Sign in again, then click Run now once.
 - **A run stalls on a prompt after day one.** Tell Nadeen which site or tool it named.
 - **It did not run.** The app was closed or the Mac was asleep at that time. Open the app and wake the Mac. One catch-up run happens on its own. See "Keep computer awake" above.

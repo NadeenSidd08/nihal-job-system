@@ -189,8 +189,9 @@ If he says B: record `Off` and move on.
 
 If he says A (or names another time):
 1. Create the scheduled task using the prompt in `docs/morning-scan.md`, with his real path in place of `<his folder>` and the time from his answer (default weekdays 7:30).
-2. Walk him through the rest of `docs/morning-scan.md` one step at a time, waiting for him after each: first Edit (Working folder to his `nihal-job-system` folder, model Sonnet, permission mode default), then "Run now" and clicking "Always allow" on each prompt, then waiting for "succeeded".
-3. If he wants to skip the test run now, tell him the first scheduled run will stop at the prompts until he does it once, and record On anyway.
+2. Walk him through the rest of `docs/morning-scan.md` one step at a time, waiting for him after each: first Edit (Working folder to his `nihal-job-system` folder, model Sonnet, permission mode **Auto**), then "Keep computer awake" in Settings > This computer > System, then one "Run now" that he leaves alone until it says "succeeded".
+3. If Auto is not offered in the permission mode list, his plan may not include it. Record `On, weekdays at 7:30 (needs Auto mode)`, switch the task off, and tell him Nadeen will help set it up another way.
+4. If he wants to skip the test run now, record On anyway and tell him to click Run now once when he has 10 minutes.
 
 Record his choice under `## Morning scan` in `profile.md`: `On, weekdays at 7:30` (or his time) or `Off`. Replace `(not decided yet)`.
 
