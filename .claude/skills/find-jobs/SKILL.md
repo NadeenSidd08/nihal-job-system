@@ -27,16 +27,17 @@ Track the time. The whole run should take a couple of minutes at most.
 
 An unattended run uses exactly these tools and nothing else. Each one needs a saved approval, and an approval only matches the same thing again. So nothing here may vary between runs.
 
-- **Bash**: only the 11 fixed `curl` lines in Step 2 (C1 to C11). `curl`, `jq`, `grep`, `sed` and `tr` appear only inside those lines.
-- **WebFetch**: only the 4 URLs in the WebFetch table in Step 2.
-- **ToolSearch**: only the two queries in Step 1 item 5.
+- **Bash**: only the 12 fixed `curl` lines in Step 2 (C1 to C12). `curl`, `jq`, `grep` and `sed` appear only inside those lines.
+- **WebFetch**: only the one URL in the WebFetch table in Step 2 (Mediabistro).
+- **ToolSearch**: only the three queries in Step 1 item 5.
 - **Read**: `profile.md` and `learnings.md` only.
+- **Indeed connector**: `search_jobs` (fixed parameters, see "Indeed") and `get_job_details` (only for jobs that cleared the Fit floor). No other Indeed tool.
 - **Gmail**: `search_threads` (one fixed call) and `get_thread` (the follow-up). No other Gmail tool.
 - **Google Sheets**: `get_values`, `append_values`, `update_values`. No other Sheets tool. Never `get_spreadsheet`.
 
 Rules for unattended runs:
 - Copy each command exactly, character for character. Never change quoting, flags, filters, or order. Never combine commands with `&`, `wait`, or `;`. Run them one at a time.
-- Never fetch a page on a domain that is not in the WebFetch table. Never open a job's detail page. Never follow a link from a result. If a job's details would need another page, keep what the list already gives and add `details not checked` to Notes.
+- Never fetch a page on a domain that is not in the WebFetch table. Never open a job's detail page. Never follow a link from a result. The one exception is the Indeed `get_job_details` tool, which is a connector call and not a page fetch. If a job's details would need another page, keep what the list already gives and add `details not checked` to Notes.
 - If a fixed call fails, do not try a different command, site or tool. Record the source as failed and go on.
 - Pasted links are for attended runs only. Unattended, skip them and say so.
 
@@ -46,60 +47,66 @@ Rules for unattended runs:
 2. Read `learnings.md` if it exists. Apply every line under `## Job matching` (scoring and filtering) and `## Sources` (which sources to trust, skip or favor).
 3. From profile.md take: Beats and expertise, Target roles (and the `Excluded:` line), Opportunity types, Location, Salary floor, Dealbreakers, the ticked sources under `## Sources`, the Sheet URL under `## Tracker sheet`, and the rubric under `## Scoring rubric`.
 4. The spreadsheet ID is the part of the Sheet URL between `/d/` and the next `/`.
-5. Load the Google Sheets tools with ToolSearch if they are not loaded, using the query `get_values append_values update_values`. Unattended, use only these three tools and never call `get_spreadsheet`. If Sheets is not connected, tell him to turn on the Google Sheets connector and stop. Load the Gmail tools the same way, with the query `search_threads get_thread`.
+5. Load the Google Sheets tools with ToolSearch if they are not loaded, using the query `get_values append_values update_values`. Unattended, use only these three tools and never call `get_spreadsheet`. If Sheets is not connected, tell him to turn on the Google Sheets connector and stop. Load the Gmail tools the same way, with the query `search_threads get_thread`. If Indeed is ticked, load the Indeed tools with the query `Indeed job search`. If that finds no Indeed tools, record `Indeed` as failed with the reason `Indeed connector not connected` and go on.
 6. Read the Sheet fresh with `get_values`, one call per range, per the spec: `Jobs!A1:Z1000`, `Seen!A1:L2000`, `'Scan log'!A1:D500`. Build a map from header name to column index from row 1. Required Jobs headers: Status, Fit, Type, Job title, Org, Location, Why it fits, Source, Posted, First seen, Link, Folder, Notes. Required Seen headers: Link, Source ID, Org, Job title, Location, Fit, First seen, On Jobs tab, Type, Source, Posted, Why it fits. If any is missing or renamed, stop, name the header, write nothing. Rows are ragged: a short row means blank trailing cells.
 7. Today's date is the run date. The window cutoff is today minus 14 days.
 
 ## Step 2. Fetch the sources
 
-Check only sources ticked in profile.md. Run the commands below one at a time, in this order, skipping the ones for sources that are not ticked. Do not run anything in parallel. Date math is done by you, not by a command: work out the 14-day cutoff (today minus 14), and turn "Posted 5 Days Ago" or "3 days ago" into a date yourself. `jq` is required. If it is missing, every JSON source fails and is reported as failed.
+Check only sources ticked in profile.md. Run them one at a time, in this order, skipping the ones that are not ticked: Indeed, JournalismJobs, Mediabistro, Daybook, LinkedIn alerts (then pasted links, attended only). Do not run anything in parallel. Date math is done by you, not by a command: work out the 14-day cutoff (today minus 14), and turn "3 days ago" or "October 20, 2026" into a `yyyy-mm-dd` date yourself. `jq` is required for Daybook. If it is missing, Daybook fails and is reported as failed.
 
 If a source errors, returns the wrong thing, or times out, skip it, carry on, and record its name for "Sources that failed". A source that works but has zero fitting jobs is not a failure.
+
+### Indeed (connector)
+
+Tools: `search_jobs` and `get_job_details`, loaded in Step 1. Make one `search_jobs` call per Target role in profile.md, for each of two locations. Parameters, every time: `search` = the role title exactly as written in profile.md, `location` = `Washington, DC` for the first call and `remote` for the second, `country_code` = `US`. Leave `job_type` unset. Do roles in the order they appear in profile.md. A profile with 3 roles means 6 calls.
+
+Each call returns about 10 results as text blocks with Job Title, Job Id, Company, Location, Posted on, Job Type, Compensation, View Job URL. Map them:
+- Title, Org (Company), Location as given. Posted = the "Posted on" date as `yyyy-mm-dd`. Source = `Indeed`.
+- Source ID = the Job Id (for example `JOBSEARCH_100084`). Link = the View Job URL from the search result, kept intact.
+- Salary: use Compensation against the floor. Hourly rates: multiply by 2,080 to compare.
+- "No job results found" is a normal empty result, not a failure. If the tool errors, record `Indeed` as failed and stop calling it.
+
+Indeed is thin and noisy for journalism. It mixes in technical editors, video editors, marketing, comms, analysts and jobs in other states, and the same search for a role can return nothing while a neighbouring search returns ten loose matches. The relevance filter in Step 3 does the real work. Do not relax it for Indeed.
+
+Call `get_job_details` only for a job that has already passed the relevance filter and cleared the Fit floor of 6 from the list information alone, and only to confirm and rescore it from the description. Never call it for a job that was dropped. If the description changes the picture (not journalism, wrong location, below the salary floor), drop the job. Source ID and Link stay as the search result gave them.
 
 ### Fixed commands (curl)
 
 Copy each command exactly, character for character. Never change quoting, flags, filters, or order. Never combine commands with `&`, `wait`, or `;`. Run them one at a time. Each line is one whole pipeline. The lines are numbered by position for reference: C1 is the first line, C2 the second, and so on. Do not type the label.
 
 ```
-curl -s -A 'Mozilla/5.0' -m 30 https://boards-api.greenhouse.io/v1/boards/axios/jobs | jq -c '.jobs[] | {id, title, loc: .location.name, posted: .first_published[:10], url: .absolute_url}'
-curl -s -A 'Mozilla/5.0' -m 30 https://boards-api.greenhouse.io/v1/boards/semafor/jobs | jq -c '.jobs[] | {id, title, loc: .location.name, posted: .first_published[:10], url: .absolute_url}'
-curl -s -A 'Mozilla/5.0' -m 30 https://boards-api.greenhouse.io/v1/boards/nationalpublicradioinc/jobs | jq -c '.jobs[] | {id, title, loc: .location.name, posted: .first_published[:10], url: .absolute_url}'
-curl -s -A 'Mozilla/5.0' -m 30 https://api.lever.co/v0/postings/fiscalnote | jq -c '.[] | {id, title: .text, loc: .categories.location, posted: (.createdAt/1000|strftime("%Y-%m-%d")), url: .hostedUrl}'
-curl -s -A 'Mozilla/5.0' -m 30 https://washpost.wd5.myworkdayjobs.com/wday/cxs/washpost/washingtonpostcareers/jobs -X POST -H 'Content-Type: application/json' -d '{"appliedFacets":{},"limit":20,"offset":0,"searchText":""}' | jq -c '.jobPostings[] | {title, loc: .locationsText, postedOn, path: .externalPath}'
-curl -s -A 'Mozilla/5.0' -m 30 https://washpost.wd5.myworkdayjobs.com/wday/cxs/washpost/washingtonpostcareers/jobs -X POST -H 'Content-Type: application/json' -d '{"appliedFacets":{},"limit":20,"offset":20,"searchText":""}' | jq -c '.jobPostings[] | {title, loc: .locationsText, postedOn, path: .externalPath}'
-curl -s -A 'Mozilla/5.0' -m 30 https://american.wd1.myworkdayjobs.com/wday/cxs/american/AU/jobs -X POST -H 'Content-Type: application/json' -d '{"appliedFacets":{},"limit":20,"offset":0,"searchText":"WAMU"}' | jq -c '.jobPostings[] | {title, loc: .locationsText, postedOn, path: .externalPath}'
-curl -s -A 'Mozilla/5.0' -m 30 https://american.wd1.myworkdayjobs.com/wday/cxs/american/AU/jobs -X POST -H 'Content-Type: application/json' -d '{"appliedFacets":{},"limit":20,"offset":20,"searchText":"WAMU"}' | jq -c '.jobPostings[] | {title, loc: .locationsText, postedOn, path: .externalPath}'
 curl -s -A 'Mozilla/5.0' -m 30 'https://www.journalismjobs.com/job-listings?location=7' | grep -o 'href="/[0-9]\{6,\}-[^"]*"\|Posted [A-Z][a-z]* [0-9]*\|Featured Jobs'
 curl -s -A 'Mozilla/5.0' -m 30 'https://www.journalismjobs.com/job-listings?location=7&jobType=4' | grep -o 'href="/[0-9]\{6,\}-[^"]*"\|Posted [A-Z][a-z]* [0-9]*\|Featured Jobs'
-curl -s -A 'Mozilla/5.0' -m 30 https://19thnews.org/careers/ | sed 's/<[^>]*>/ /g' | tr -s ' \n\t' ' '
+curl -s -A 'Mozilla/5.0' -m 30 'https://www.daybook.com/jobs/in/washington-dc?q=reporter' | grep -o '__APOLLO_STATE__={.*}</script>' | sed 's/^__APOLLO_STATE__=//; s/<\/script>$//' | jq -c '. as $d | .ROOT_QUERY | to_entries[] | select(.key | startswith("getJobs")) | .value.jobs[].__ref as $r | $d[$r] | {id: ._id, title, org: .organization, paywalled: .organizationPaywalled, loc: .location.name, posted: .dateAdded[:10], url: .slugUrl}'
+curl -s -A 'Mozilla/5.0' -m 30 'https://www.daybook.com/jobs/in/washington-dc?q=editor' | grep -o '__APOLLO_STATE__={.*}</script>' | sed 's/^__APOLLO_STATE__=//; s/<\/script>$//' | jq -c '. as $d | .ROOT_QUERY | to_entries[] | select(.key | startswith("getJobs")) | .value.jobs[].__ref as $r | $d[$r] | {id: ._id, title, org: .organization, paywalled: .organizationPaywalled, loc: .location.name, posted: .dateAdded[:10], url: .slugUrl}'
+curl -s -A 'Mozilla/5.0' -m 30 'https://www.daybook.com/jobs/in/washington-dc?q=journalist' | grep -o '__APOLLO_STATE__={.*}</script>' | sed 's/^__APOLLO_STATE__=//; s/<\/script>$//' | jq -c '. as $d | .ROOT_QUERY | to_entries[] | select(.key | startswith("getJobs")) | .value.jobs[].__ref as $r | $d[$r] | {id: ._id, title, org: .organization, paywalled: .organizationPaywalled, loc: .location.name, posted: .dateAdded[:10], url: .slugUrl}'
+curl -s -A 'Mozilla/5.0' -m 30 'https://www.daybook.com/jobs/in/washington-dc?q=writer' | grep -o '__APOLLO_STATE__={.*}</script>' | sed 's/^__APOLLO_STATE__=//; s/<\/script>$//' | jq -c '. as $d | .ROOT_QUERY | to_entries[] | select(.key | startswith("getJobs")) | .value.jobs[].__ref as $r | $d[$r] | {id: ._id, title, org: .organization, paywalled: .organizationPaywalled, loc: .location.name, posted: .dateAdded[:10], url: .slugUrl}'
+curl -s -A 'Mozilla/5.0' -m 30 'https://www.daybook.com/jobs/remote?q=reporter' | grep -o '__APOLLO_STATE__={.*}</script>' | sed 's/^__APOLLO_STATE__=//; s/<\/script>$//' | jq -c '. as $d | .ROOT_QUERY | to_entries[] | select(.key | startswith("getJobs")) | .value.jobs[].__ref as $r | $d[$r] | {id: ._id, title, org: .organization, paywalled: .organizationPaywalled, loc: .location.name, posted: .dateAdded[:10], url: .slugUrl}'
+curl -s -A 'Mozilla/5.0' -m 30 'https://www.daybook.com/jobs/remote?q=editor' | grep -o '__APOLLO_STATE__={.*}</script>' | sed 's/^__APOLLO_STATE__=//; s/<\/script>$//' | jq -c '. as $d | .ROOT_QUERY | to_entries[] | select(.key | startswith("getJobs")) | .value.jobs[].__ref as $r | $d[$r] | {id: ._id, title, org: .organization, paywalled: .organizationPaywalled, loc: .location.name, posted: .dateAdded[:10], url: .slugUrl}'
+curl -s -A 'Mozilla/5.0' -m 30 'https://www.daybook.com/jobs/remote?q=journalist' | grep -o '__APOLLO_STATE__={.*}</script>' | sed 's/^__APOLLO_STATE__=//; s/<\/script>$//' | jq -c '. as $d | .ROOT_QUERY | to_entries[] | select(.key | startswith("getJobs")) | .value.jobs[].__ref as $r | $d[$r] | {id: ._id, title, org: .organization, paywalled: .organizationPaywalled, loc: .location.name, posted: .dateAdded[:10], url: .slugUrl}'
+curl -s -A 'Mozilla/5.0' -m 30 'https://www.daybook.com/jobs/remote?q=writer' | grep -o '__APOLLO_STATE__={.*}</script>' | sed 's/^__APOLLO_STATE__=//; s/<\/script>$//' | jq -c '. as $d | .ROOT_QUERY | to_entries[] | select(.key | startswith("getJobs")) | .value.jobs[].__ref as $r | $d[$r] | {id: ._id, title, org: .organization, paywalled: .organizationPaywalled, loc: .location.name, posted: .dateAdded[:10], url: .slugUrl}'
+curl -s -A 'Mozilla/5.0' -m 30 'https://www.daybook.com/jobs/communications/in/washington-dc' | grep -o '__APOLLO_STATE__={.*}</script>' | sed 's/^__APOLLO_STATE__=//; s/<\/script>$//' | jq -c '. as $d | .ROOT_QUERY | to_entries[] | select(.key | startswith("getJobs")) | .value.jobs[].__ref as $r | $d[$r] | {id: ._id, title, org: .organization, paywalled: .organizationPaywalled, loc: .location.name, posted: .dateAdded[:10], url: .slugUrl}'
+curl -s -A 'Mozilla/5.0' -m 30 'https://www.daybook.com/jobs/public-policy/in/washington-dc' | grep -o '__APOLLO_STATE__={.*}</script>' | sed 's/^__APOLLO_STATE__=//; s/<\/script>$//' | jq -c '. as $d | .ROOT_QUERY | to_entries[] | select(.key | startswith("getJobs")) | .value.jobs[].__ref as $r | $d[$r] | {id: ._id, title, org: .organization, paywalled: .organizationPaywalled, loc: .location.name, posted: .dateAdded[:10], url: .slugUrl}'
 ```
 
 | Command | Source (profile name) | Sheet "Source" value | Notes |
 |---|---|---|---|
-| C1 | Axios | Axios | Posted = `first_published`. Pipeline postings: see Step 3. |
-| C2 | Semafor | Semafor | Same shape as C1. |
-| C3 | NPR | NPR | Same shape as C1. |
-| C4 | CQ Roll Call | CQ Roll Call | FiscalNote is CQ Roll Call's parent, so this covers it. Keep only editorial roles. |
-| C5, C6 | Washington Post | Washington Post | C5 is page 1 (offset 0). Run C6 (page 2, offset 20) only if the last job on page 1 is still inside the 14 days. Never run a third page. Dates are relative ("Posted 5 Days Ago"), so turn them into dates yourself. "30+" is outside the window. Source ID = the `JR-` number in the path. Link = `https://washpost.wd5.myworkdayjobs.com/washingtonpostcareers` followed by the path. |
-| C7, C8 | WAMU | WAMU | C7 is page 1 (offset 0). Run C8 (page 2, offset 20) only if page 1 returned 20 jobs and the last one is still inside the 14 days. Never run a third page. Source ID = the number after the last `_` in the path. Link = `https://american.wd1.myworkdayjobs.com/AU` followed by the path. The keyword search can miss a WAMU role that never says "WAMU". |
-| C9 | JournalismJobs (DC) | JournalismJobs | The output alternates a path (the slug holds the title and org) and a "Posted" date. **Stop reading at the "Featured Jobs" line.** Everything after it is sponsored and not DC-filtered. Source ID = the number at the start of the path. Link = `https://www.journalismjobs.com` followed by the path. The list shows "Posted October 20" with no year: use the current year, or last year if that would put the date in the future. Do not open the job pages. |
-| C10 | JournalismJobs (DC), freelance | JournalismJobs | Run only if Freelance is a ticked opportunity type. Same reading as C9. |
-| C11 | The 19th | The 19th | Deadline only, no posted date. Also lists contract openings. |
+| C1 | JournalismJobs (DC) | JournalismJobs | The output alternates a path (the slug holds the title and org) and a "Posted" date. **Stop reading at the "Featured Jobs" line.** Everything after it is sponsored and not DC-filtered. Source ID = the number at the start of the path. Link = `https://www.journalismjobs.com` followed by the path. The list shows "Posted October 20" with no year: use the current year, or last year if that would put the date in the future. Do not open the job pages. |
+| C2 | JournalismJobs (DC), freelance | JournalismJobs | Run only if Freelance is a ticked opportunity type. Same reading as C1. |
+| C3 to C6 | Daybook, Washington DC | Daybook | Search terms reporter, editor, journalist, writer, for Washington, DC. See "Daybook" below. |
+| C7 to C10 | Daybook, remote | Daybook | The same four terms, for remote jobs. |
+| C11, C12 | Daybook, Communications and Public Policy | Daybook | Run only if Nearby field is a ticked opportunity type. Category pages for Washington, DC. |
 
-The Workday lists give only a short summary. Judge a Workday job from its title and location. Unattended, do not open its detail page; if the title alone is not enough to judge it, keep it only when the title clearly fits, and add `details not checked` to its Notes. Attended runs may open a detail page (Washington Post: `https://washpost.wd5.myworkdayjobs.com/wday/cxs/washpost/washingtonpostcareers{externalPath}`, WAMU: `https://american.wd1.myworkdayjobs.com/wday/cxs/american/AU{externalPath}`; read `jobPostingInfo.startDate` and `jobPostingInfo.externalUrl`).
+### Fixed WebFetch page
 
-### Fixed WebFetch pages
-
-Unattended, WebFetch only these four URLs and no other domain. Use this exact prompt for each: `List every job posting on this page. For each give the title, the location, the apply link or email, and the posted date if shown. Return nothing else.` If a fetch is redirected to a different domain, do not follow it: record the source as failed.
+Unattended, WebFetch only this URL and no other domain. Use this exact prompt: `List every job posting on this page. For each give the title, the location, the apply link or email, and the posted date if shown. Return nothing else.` If a fetch is redirected to a different domain, do not follow it: record the source as failed.
 
 | Source (profile name) | Sheet "Source" value | URL | Notes |
 |---|---|---|---|
-| Punchbowl News | Punchbowl | `https://punchbowl.news/careers/` | curl gets a 403, so WebFetch. No dates. |
-| The Dispatch | The Dispatch | `https://thedispatch.com/careers/` | No dates. |
 | Mediabistro (national) | Mediabistro | `https://www.mediabistro.com/jobs` | Latest ~20 nationally, search parameters are ignored. Keep only roles in the DC metro area or remote. Drop roles located only "USA" or in another city. Dates are relative ("3 days ago"). Source ID = the number in the link. |
-| Media Job Board (national) | Media Job Board | `https://mediajobboard.com/search` | Latest ~24 nationally. Keep only roles in the DC metro area or remote. Source ID = the code in the link. |
 
-Allowed WebFetch domains, unattended: `punchbowl.news`, `thedispatch.com`, `www.mediabistro.com`, `mediajobboard.com`. A job's own detail page or apply link is on another domain, so never fetch it. Keep what the list gives and add `details not checked` to Notes.
+Allowed WebFetch domain, unattended: `www.mediabistro.com`. A job's own detail page or apply link is on another domain, so never fetch it. Keep what the list gives and add `details not checked` to Notes.
 
 Attended runs may WebFetch anything the user asks about, including pasted links. He is there to approve each new site.
 
@@ -108,9 +115,19 @@ Attended runs may WebFetch anything the user asks about, including pasted links.
 | LinkedIn job alerts (Gmail) | LinkedIn alert | See "LinkedIn alerts" below. |
 | Pasted links | Pasted link | Attended only. Any job link in the same message. WebFetch it and evaluate like any other job. Use whatever date the page shows, else leave Posted blank. A link you cannot read: say so. Unattended: skip and mention. |
 
-For the static pages (Punchbowl, The Dispatch, The 19th) the Link is the job's own apply link if it has one. If the only way to apply is email, use the careers page URL as Link and put `Apply by email: <address>` in Notes. Some apply links go to a form, that is fine.
+Cross-source copies are common (the same job on the company site, JournalismJobs, Mediabistro, Daybook and Indeed). They collapse in Step 5. Prefer the link in this order: company site or ATS, JournalismJobs, Mediabistro, Daybook, Indeed, LinkedIn.
 
-Cross-source copies are common (the same job on the company site, JournalismJobs and Mediabistro). They collapse in Step 5. Prefer the link in this order: company site or ATS, JournalismJobs, Mediabistro or Media Job Board, LinkedIn.
+### Daybook
+
+Each Daybook line prints one JSON object per job: `id`, `title`, `org`, `paywalled`, `loc`, `posted` (`yyyy-mm-dd`) and `url`. The page lists up to 20 jobs for that search. The pipeline reads only the real search results list. The "sponsored" block on the page is not read.
+
+- Source ID = `id`. Link = `https://www.daybook.com/jobs/` followed by `url`. Posted = `posted`. Source = `Daybook`.
+- Location = `loc` as given. On C7 to C10 (the remote searches), a `loc` such as `United States` means a remote job: write Location as `Remote`.
+- The same job appears under several search terms. They collapse on `id`.
+- **Paywalled listings** (`paywalled` is true, `org` is null): set Org to `Employer hidden (Daybook)` and keep everything else. Score from title and location only. Add `Employer hidden, open the Daybook link` to Notes. Dedupe these on the Daybook `id` or Link, because Org + Title cannot match a hidden employer. Count them for the chat summary.
+- A Daybook line that returns nothing is not necessarily a failure (for example the remote searches are often empty). If every Daybook line you ran returned nothing, record `Daybook` as failed.
+- If Daybook changes its markup, the lines return nothing. That shows up as a failure. Do not try to fix it in an unattended run.
+
 
 ### LinkedIn alerts
 
@@ -128,7 +145,7 @@ Use the same cards in every alert thread from the last 3 days. Repeats across em
 
 ## Step 3. Relevance filter
 
-Most newsroom feeds are mostly sales, ops, finance, HR and engineering. Keep a job only if:
+Job boards are full of comms, policy, marketing, sales, technical editing, finance, HR and engineering roles. Indeed and Daybook are the noisiest. Keep a job only if:
 - Its title is a journalism role (reporter, correspondent, editor, producer, writer, columnist, fellow, host, anchor, photojournalist, data or audio or video journalist) that matches a Target role or one of his Beats, or it is a Nearby field role (comms, policy writing, think tank editing) and he ticked Nearby field. Drop sales, account, revenue, partnerships, marketing, audience growth, finance, HR, legal, product, engineering, design and admin titles, even at a newsroom.
 - It is not an Excluded title and not a Dealbreaker. Internships are skipped unless profile.md lists them.
 - Its location fits (the Location section). Treat "Washington DC", "Washington D.C.", "Washington, District of Columbia", "DC-Washington-...", Arlington, Alexandria and Bethesda as DC metro. A location that says "Remote" counts as remote.
@@ -136,9 +153,9 @@ Most newsroom feeds are mostly sales, ops, finance, HR and engineering. Keep a j
 - Salary, if the posting states one, is at or above the floor.
 - Apply every `## Job matching` line from learnings.md.
 
-Axios "Talent Pool" and Politico "Future Talent Pool" postings are pipeline postings, not real vacancies. If one is otherwise relevant, keep it and put `Talent pool posting, not a live vacancy` in Notes.
+A "Talent Pool" or "Future Talent Pool" posting is a pipeline posting, not a real vacancy. If one is otherwise relevant, keep it and put `Talent pool posting, not a live vacancy` in Notes.
 
-When a title alone is not enough (attended runs only), read the posting (Greenhouse single job `https://boards-api.greenhouse.io/v1/boards/{board}/jobs/{id}`, the Lever list item, the Workday detail, or the JournalismJobs page). Do this only for close calls, to keep the run fast. Unattended, never open a detail page: judge from the list, and add `details not checked` to Notes for a job you keep on thin information.
+When a title alone is not enough (attended runs only), read the posting (the JournalismJobs page or the Daybook job page; for Indeed, `get_job_details`). Do this only for close calls, to keep the run fast. Unattended, never open a detail page: judge from the list, and add `details not checked` to Notes for a job you keep on thin information.
 
 
 ## Step 4. Score
@@ -164,10 +181,10 @@ Follow the spec exactly (normalise, collapse, known-job rules).
    - Same Org + Title match but the matched row has a **different** Source (for example the Mediabistro copy of a job already added from JournalismJobs): it is the same job seen on another board, not a repost. Do nothing: no row, no note, no mention in chat.
 3. What is left is the new set. Sort by Fit (highest first), then newer Posted, then newer First seen. The top 10 go to Jobs. All of them go to Seen. The cap applies to this run's new jobs only. Seen rows from earlier runs never compete for today's 10: a run with 3 new jobs adds 3 even if 30 rows are waiting in Seen.
 4. **Write, in this order** (Jobs first, so a failure can never hide a job):
-   - `append_values` to `Jobs!A1` with up to 10 rows. Build every row from the header map, all 13 cells, `""` for blank: Status `New`, Fit, Type, Job title, Org, Location, Why it fits, Source, Posted, First seen, Link, Folder blank, Notes (`limited info` for LinkedIn, plus any talent pool or email-apply note, else blank). Put the cells in the order the header map gives, even if the Sheet columns were rearranged. If a title could be read as a number, date or formula, start it with an apostrophe.
+   - `append_values` to `Jobs!A1` with up to 10 rows. Build every row from the header map, all 13 cells, `""` for blank: Status `New`, Fit, Type, Job title, Org, Location, Why it fits, Source, Posted, First seen, Link, Folder blank, Notes (`limited info` for LinkedIn, plus any talent pool, email-apply or `Employer hidden, open the Daybook link` note, else blank). Put the cells in the order the header map gives, even if the Sheet columns were rearranged. If a title could be read as a number, date or formula, start it with an apostrophe.
    - `append_values` to `Seen!A1` with a row for **every** new job that cleared the floor: Link, Source ID (when jobs were collapsed, list every ID, joined with `; `), Org, Job title, Location, Fit, First seen, `On Jobs tab` (`yes` for the top 10, `no` for the rest), Type, Source, Posted, Why it fits. Send all 12 cells, `""` for blank ones. Do not add `more` text anywhere.
    - Repost notes: `update_values` on the single Notes cell of the matched row (row number = array index + 1; column letter from the header map).
-   - `append_values` to `'Scan log'!A1` with one row: Date (today), Sources checked (the Sheet's Source value from the table above for each ticked source that was tried, for example `Punchbowl` not `Punchbowl News`, comma separated), Sources that failed (blank if none), New jobs added (rows added to Jobs, 0 to 10). Write this row even when nothing was added.
+   - `append_values` to `'Scan log'!A1` with one row: Date (today), Sources checked (the Sheet's Source value from the table above for each ticked source that was tried, for example `Mediabistro` not `Mediabistro (national)`, comma separated), Sources that failed (blank if none), New jobs added (rows added to Jobs, 0 to 10). Write this row even when nothing was added.
 5. **Verify**: `get_values` on the appended Jobs range and confirm the rows are there. If a write fails, say which one, and do not claim success.
 
 ## Show me more
@@ -185,13 +202,14 @@ When he says "show me more" (no sources are searched, no Scan log row):
 Short and calm. Lead with the Sheet, not a wall of text. Include:
 
 ```
-Checked 11 sources. Found 14 that fit, 5 are new.
+Checked 5 sources. Found 14 that fit, 5 are new.
 Added 5 to your Sheet. Top 3:
   9  Congressional Reporter, Example Daily (Washington, DC)
   8  Policy Editor, Sample Policy Weekly (Remote)
   7  Senior News Reporter, U.S. News & World Report (Washington, DC)
 N more matched below today's top 10. Say 'show me more' to add the next 10.
-Could not check: Punchbowl News (the page did not load).
+Could not check: Mediabistro (the page did not load).
+Daybook: 3 of the matches hide the employer. Open the Daybook link to see who it is.
 Still waiting on you: Politics editor at Sample Gazette is Ready to apply. Say "I applied" when you submit it.
 Sheet: <link>
 ```
@@ -199,6 +217,7 @@ Sheet: <link>
 Rules:
 - Found = the count from Step 4 (distinct jobs that passed the filter, the window and the floor). New = rows added to Jobs. Name the top 3 by Fit with title, org and place.
 - The "N more matched" line appears only when N is above 0. N = Seen rows with `On Jobs tab` = `no` that have not aged out (more than 14 days since First seen), counted after this run's writes. Use the exact wording from the spec.
+- If any Daybook job was added with `Employer hidden (Daybook)`, add one line saying how many and that he needs to open the link to see the employer.
 - If the LinkedIn search found no alert emails, add `No LinkedIn alert emails yet.` It is not a failure.
 - Always name failed sources plainly, with a short reason. A quiet day must never hide a broken source. If nothing failed, one line saying all sources worked is enough.
 - One nudge line for every Jobs row whose Status is still `Ready to apply`.
@@ -211,7 +230,7 @@ If he says "reopen" for a Closed row, change only its Status cell (to New, or wh
 
 ## In-the-moment learning
 
-If he reacts to results in the same conversation ("that one's not my beat", "pass on the Semafor job", "I applied to the Axios one"):
+If he reacts to results in the same conversation ("that one's not my beat", "pass on the Bulwark job", "I applied to the Indeed one"):
 
 1. Find the row by reading Jobs fresh and matching Org, Title or Source words. More than one match: ask which. Never guess.
 2. Write only the Status cell (`update_values` on that one cell, column from the header map). Any of the 8 values is allowed. Read the row back and confirm what it now says. Never set Applied unless he says he applied.
