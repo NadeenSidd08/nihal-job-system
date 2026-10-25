@@ -1,5 +1,7 @@
 # Job source spike: what Claude can read automatically
 
+> Historical. On 2026-10-25 (NAD-43) `/find-jobs` moved to a new source list: Indeed, JournalismJobs, Mediabistro, Daybook and LinkedIn job alerts. The newsroom sources below were removed from the scan. Their tested commands are archived in `archive/docs/newsroom-sources.md`.
+
 Tested 2026-10-24. Read-only. No logins, forms, or sign-ups. Tools: curl with a browser user agent, plus WebFetch and WebSearch for sites that rejected curl. No page contained text addressed to an AI.
 
 ## 1. Summary

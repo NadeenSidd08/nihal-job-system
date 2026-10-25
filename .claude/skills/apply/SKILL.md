@@ -36,6 +36,8 @@ Rules that never bend:
   5. If the Fit is below 6, give the score and a one-line reason and ask "Build anyway?". Use the true Fit. Never inflate it.
 - **A "limited info" row (Notes says it, usually LinkedIn alert), or any posting you cannot fetch or that returns almost nothing** (login wall, 403, 404, empty page): say why, and ask him to paste the job description. If it looks gone (404), ask if he has another link or a saved copy. Never guess the description. If he has nothing to give, stop and build nothing for that job.
 
+- **A row whose Org is "Employer hidden (Daybook)"**: Daybook hides the employer on its public page. Before building anything, ask him to open the Daybook link, then paste the job details including the employer's name. Wait for the answer. Use the pasted details as the posting, and use the employer he names as the Org in the package. Do not guess the employer. If he has nothing to give, stop and build nothing for that job.
+
 Skip rows whose Status is Passed or Closed unless he names them on purpose. Then say the Status will stay as it is.
 
 ## Step 3. One short confirm

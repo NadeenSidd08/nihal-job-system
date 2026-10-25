@@ -125,10 +125,10 @@ Ask one question at a time. Use examples drawn from his résumé and clips (name
 5. Salary floor: "Is there a minimum salary you won't go below? It's fine to say none."
 6. Dealbreakers: "Anything that rules a job out? For example unpaid work, a long commute, a shift schedule."
 7. Sources: explain in one line each, then ask "Keep them all on? (A. Yes, recommended. B. Turn some off.)"
-   - Axios, Semafor, NPR, CQ Roll Call, Washington Post, WAMU: the newsroom's own job listings, checked directly.
-   - Punchbowl News, The Dispatch, The 19th: their careers pages, small but relevant.
+   - Indeed: Indeed's job search, run for each of your target roles in Washington, DC and remote. It is broad and noisy, so I filter hard. Needs the Indeed connector (optional, recommended).
    - JournalismJobs (DC): a journalism job board filtered to DC.
-   - Mediabistro and Media Job Board: national media boards, filtered by me for DC and remote.
+   - Mediabistro: a national media job board. I keep only the DC and remote jobs.
+   - Daybook: a news and communications job board. I search it for reporter, editor, journalist and writer jobs in DC and remote. Some listings hide the employer.
    - LinkedIn job alerts (Gmail): emails from LinkedIn that I read. This is how I see Politico, The Atlantic, The Hill and others I can't read directly.
 
 Then write `profile.md` from `profile.template.md`, following `docs/personal-files.md` exactly:
@@ -146,10 +146,10 @@ Done when `profile.md` exists with no `⟨` left.
 
 ## Step 7. Connect Google and create the Sheet
 
-Say: "Now I'm checking that Claude can reach your Google Drive and Google Sheets. Gmail too, if you can, for LinkedIn alerts."
+Say: "Now I'm checking that Claude can reach your Google Drive and Google Sheets. Gmail too, if you can, for LinkedIn alerts. And Indeed, which is optional but recommended."
 
-1. Use ToolSearch to look for each connector's tools: search `gmail`, `google drive` (or `create_file`), and `sheets` (or `update_spreadsheet`). Tool name prefixes differ per install, so match on the end of the name.
-2. If any is missing, tell him exactly: "In the Claude desktop app, open Settings, then Connectors. Find <Gmail / Google Drive / Google Sheets>, click Connect, and sign in with your Google account. Tell me when it's done." Wait. Check again. Don't go on without Drive and Sheets. Gmail is only needed for LinkedIn alerts; if he can't connect it yet, continue and tell him the LinkedIn source stays quiet until he does.
+1. Use ToolSearch to look for each connector's tools: search `gmail`, `google drive` (or `create_file`), `sheets` (or `update_spreadsheet`), and `Indeed job search` (the tools are `search_jobs` and `get_job_details`). Tool name prefixes differ per install, so match on the end of the name.
+2. If any is missing, tell him exactly: "In the Claude desktop app, open Settings, then Connectors. Find <Gmail / Google Drive / Google Sheets / Indeed>, click Connect, and sign in (with your Google account for the Google ones, with your Indeed account or the prompt for Indeed). Tell me when it's done." Wait. Check again. Don't go on without Drive and Sheets. Gmail is only needed for LinkedIn alerts; if he can't connect it yet, continue and tell him the LinkedIn source stays quiet until he does. Indeed is optional but recommended: if he can't or won't connect it, change the `Indeed` line in `## Sources` to `[ ]`, tell him the scan will use the other sources, and continue. He can connect it later and ask you to turn it back on.
 3. Look in Drive for a file named `Job tracker`. If one exists, ask whether to reuse it or make a new one. If reusing, check each tab, header, dropdown and the hidden tab against the list below (an older Seen tab with 8 columns needs extending to 12) and fix what is missing.
 4. Create the Sheet from scratch, exactly as `docs/tracker-sheet.md` says in "How onboarding creates his Sheet" and "Connector calls that worked" (calls 1 to 5). Read those sections now. In short:
    - Create an empty Google Sheet named `Job tracker` with the Drive connector (`create_file`, mime type `application/vnd.google-apps.spreadsheet`). Keep its `id` and URL.
@@ -202,9 +202,10 @@ Done when `## Morning scan` says On or Off.
 Give a summary of at most 5 lines of what is set up (résumé copy, clips, fact list, profile, Sheet with its link, morning scan choice). Then:
 
 - The three things to say next: "find me jobs," "/apply <a job or a link>," and "/jobs" for a simple menu. Say which of these exist yet (see `README.md`). Do not tell him a command works if it isn't built yet.
-- How the Sheet works: jobs arrive as New. "Ready to apply" means I have built the application for you and it is waiting on you. "Applied" is only set by you, in the Sheet dropdown or by telling me ("I applied to the Axios one"). I never mark anything Applied myself.
+- How the Sheet works: jobs arrive as New. "Ready to apply" means I have built the application for you and it is waiting on you. "Applied" is only set by you, in the Sheet dropdown or by telling me ("I applied to the Bulwark one"). I never mark anything Applied myself.
 - What "show me more" does: each search adds the 10 best new matches to the Sheet and keeps the rest in memory. Say "show me more" and I'll add the next 10 without searching again.
 - "Next time, open Claude in the `nihal-job-system` folder, not the folder above it."
+- Daybook: some jobs hide the employer. Those rows show `Employer hidden (Daybook)` in the Org column. Open the link to see who it is, and paste the details if you want me to build an application for it.
 - Last, offer the optional LinkedIn alerts: "Want to set up the LinkedIn job alerts now, or tomorrow? Either is fine." If now, go to step 11.
 
 ## Step 11. LinkedIn job alerts (optional, now or tomorrow)

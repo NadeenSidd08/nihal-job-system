@@ -20,10 +20,10 @@ One row per job. Row 1 is a bold, frozen header. Columns, in this order:
 | B | Fit | Whole number 1 to 10 |
 | C | Type | Dropdown, exactly: Staff, Fellowship, Freelance, Nearby field |
 | D | Job title | Text |
-| E | Org | Text |
+| E | Org | Text. Daybook jobs whose employer is paywalled carry `Employer hidden (Daybook)` here. The employer is only visible on the Daybook page, so he opens the link. `/apply` asks him to paste the details before building |
 | F | Location | Text. Several locations are joined with a semicolon, for example `Washington, DC; Arlington, VA` |
 | G | Why it fits | One or two plain sentences |
-| H | Source | Text. Examples: Axios, Semafor, NPR, CQ Roll Call, Washington Post, WAMU, JournalismJobs, Punchbowl, The Dispatch, The 19th, Mediabistro, Media Job Board, LinkedIn alert, Pasted link |
+| H | Source | Text. One of: Indeed, JournalismJobs, Mediabistro, Daybook, LinkedIn alert, Pasted link |
 | I | Posted | Date (yyyy-mm-dd) if known, blank otherwise. See "The 14-day window" |
 | J | First seen | Date (yyyy-mm-dd) the scan first found the job |
 | K | Link | URL of the posting |
@@ -101,6 +101,10 @@ LinkedIn repeats one role once per location. Before checking against the Sheet, 
 
 1. **Link or source ID.** Same normalised Link, or same Source ID. A Seen row may hold several IDs joined with `; `: match each one.
 2. **Org + Title, with a location check.** Same normalised Org and normalised Title, and either the Locations overlap (any shared location), or either side is Remote, Hybrid, or DC metro. Some sources mint a new ID or link when they repost a job, which is why the first test alone is not enough.
+
+### Daybook jobs with a hidden employer
+
+When Org is `Employer hidden (Daybook)`, Org + Title cannot tell two different employers apart. For these rows, skip test 2 and use only test 1: the Daybook link, or the Daybook `_id` stored as Source ID. Do not collapse two hidden-employer jobs within a run on Org + Title either. Collapse only on the Daybook ID. Notes carries `Employer hidden, open the Daybook link`.
 
 ### Rules for known jobs
 

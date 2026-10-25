@@ -56,18 +56,10 @@ In priority order. Only the types he wants:
 
 ## Sources
 The sources /find-jobs checks. On by default, he can turn any off.
-- [x] Axios
-- [x] Semafor
-- [x] NPR
-- [x] CQ Roll Call
-- [x] Washington Post
-- [x] WAMU
+- [x] Indeed
 - [x] JournalismJobs (DC)
-- [x] Punchbowl News
-- [x] The Dispatch
-- [x] The 19th
 - [x] Mediabistro (national)
-- [x] Media Job Board (national)
+- [x] Daybook
 - [x] LinkedIn job alerts (Gmail)
 
 ## Tracker sheet
