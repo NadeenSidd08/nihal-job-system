@@ -17,7 +17,7 @@ Check these in order and start at the first one that is not done. Tell him: "Wel
 | Step | Done when |
 |---|---|
 | 1. Repo in place | You are working inside a folder named `nihal-job-system` that has `docs/personal-files.md` |
-| 2. Materials found | Nothing is saved for this step. If `../resume.md` exists, skip to step 4 and ask for the website link only if step 4 needs it. Otherwise do it. |
+| 2. Materials found | Nothing is saved for this step. If `../resume.md` exists, skip step 2 and ask for the website link only if step 4 needs it. Otherwise do it. |
 | 3. resume.md | `../resume.md` exists and is not empty |
 | 4. Clips | `clips.md` exists and its status line says `approved`. If it says `draft`, resume at the review. |
 | 5. Facts | `facts.md` exists and contains no "<" placeholder (write it only after he has skimmed it) |
@@ -47,7 +47,7 @@ Say: "First I'm downloading the job system into this folder."
 4. Done when `nihal-job-system/docs/personal-files.md` exists. From here, read `nihal-job-system/CLAUDE.md` if you haven't (it is this file) and continue with step 2, using the `nihal-job-system/` prefix for repo files.
 5. Write a two-line helper file in his working folder, `CLAUDE.md`, containing exactly:
    `@nihal-job-system/CLAUDE.md`
-   `Before any job task, read nihal-job-system/profile.md first, then run the command.`
+   `Before any job task (find jobs, apply, update the tracker), read nihal-job-system/profile.md first.`
    Do not overwrite a `CLAUDE.md` that is already there.
 6. Tell him: "From now on, open Claude in the `nihal-job-system` folder (inside the folder you made). That's where the commands live. We can keep going here for now."
 

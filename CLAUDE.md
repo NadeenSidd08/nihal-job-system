@@ -9,6 +9,8 @@ The files that matter:
 - The Google Sheet tracker: its rules are in `docs/tracker-sheet.md`. Its URL is in `profile.md` under `## Tracker sheet`.
 - Skills in `.claude/skills/`: `/find-jobs`, `/apply`, `/jobs`. Some are still being built. `/interview-prep` is Phase 2. The old `/scan-jobs` is archived. Never call it.
 
+Where to open Claude: Open Claude in the `nihal-job-system` folder. If you open the folder above it, the helper CLAUDE.md there points Claude here.
+
 Paths: when this file says `profile.md`, `clips.md` and so on, it means inside the repo folder. `resume.md` is one level up. If your working folder is the folder above the repo, add the `nihal-job-system/` prefix.
 
 Personal files are gitignored. Never commit them, never remove them from `.gitignore`.
@@ -37,12 +39,21 @@ Otherwise onboarding is finished. Use the rules below. Unattended runs (morning 
 # Ongoing rules (once onboarding is finished)
 
 - **At the start of any job task**, read `profile.md` and `learnings.md` and apply them.
-- **Status changes in chat** ("I applied to the Bulwark one," "pass on that Indeed job"): follow `docs/personal-files.md` and `docs/tracker-sheet.md`. Read the Jobs tab fresh, match the row, ask which one if more than one matches, write only the Status cell, read it back. For Passed, ask for a one-line reason, write it to that row's Notes, and if it sounds like a pattern, offer a learnings line.
-- **In-the-moment learning**: when he corrects you ("that's not my beat," "I'd never say that"), ask "Want me to remember that?" On yes, add one dated line (`- yyyy-mm-dd: ...`) under the right section of `learnings.md` (Job matching, Writing voice, Clips, Sources). "Forget that" removes the line. Learn preferences only. Never put facts about his experience in `learnings.md`.
+- **Status changes in chat** ("I applied to the Bulwark one," "pass on that Indeed job"): follow `docs/personal-files.md` and `docs/tracker-sheet.md`. Read the Jobs tab fresh, match the row, ask which one if more than one matches. Before any single-cell write (Status, Folder, Notes), read that one row back and check that its Org and Job title match the job you mean. If they don't, re-read the tab and find the row again. Never write by a remembered row number. Write only the Status cell, read it back. For Passed, ask for a one-line reason, write it to that row's Notes (keep the existing text and add the new note after `; `, per "Writing single cells: row check and Notes" in `docs/tracker-sheet.md`), and if it sounds like a pattern, offer a learnings line.
+- **Pasted job links**: a bare link with no other words goes to `/find-jobs`, which adds it to the Sheet with its true Fit (even below 6) and says the score and a one-line reason in chat. "Apply to <link>" or "build my application for <link>" goes to `/apply`.
+- **In-the-moment learning**: when he corrects you ("that's not my beat," "I'd never say that"), show the exact line you would save, then ask "Want me to remember that?" On yes, add one dated line (`- yyyy-mm-dd: ...`) under the right section of `learnings.md` (Job matching, Writing voice, Clips, Sources). "Forget that" removes the line. If that empties a section, put `- (none yet)` back under it. Learn preferences only. Never put facts about his experience in `learnings.md`.
 - **Profile edits** happen by asking you ("raise my salary floor to $75,000"). Edit `profile.md`, keep every heading exactly, and tell him what changed.
-- **"I published something new"**: ask for the link, fetch it, show the row you'd add, and on his yes add it to `clips.md`.
+- **"I published something new"**: ask for the link, fetch it, and ask him to confirm the piece is his (check the byline on the page). Then show the row you'd add, and on his yes add it to `clips.md`.
 - **If `resume.md` changes** (he edits his résumé), tell him `facts.md` may need a refresh and offer to redo onboarding step 5 (in `docs/onboarding.md`) for the affected lines.
-- **"Update my job system"**: if the repo folder has a `.git` folder, run `git pull`. If it was installed from a ZIP, download `https://github.com/NadeenSidd08/nihal-job-system/archive/refs/heads/main.zip` with curl into a new empty temp folder, unzip it, copy the contents over the repo folder, and delete the temp folder. His personal files are not in the ZIP and are never touched. Say what changed.
+- **"Update my job system"**: if the repo folder has a `.git` folder, run `git pull`. If it was installed from a ZIP, run these from inside the repo folder (`nihal-job-system`), one at a time:
+  1. `mkdir ../job-system-update-tmp`
+  2. `curl -L -o ../job-system-update-tmp/main.zip https://github.com/NadeenSidd08/nihal-job-system/archive/refs/heads/main.zip`
+  3. `unzip -q ../job-system-update-tmp/main.zip -d ../job-system-update-tmp`
+  4. Check `ls -A ../job-system-update-tmp/nihal-job-system-main` shows no `profile.md`, `facts.md`, `clips.md`, `clips`, `learnings.md`, `feedback.md` or `applications`. If any is there, stop and ask him.
+  5. `cp -R ../job-system-update-tmp/nihal-job-system-main/. .` (the `/.` matters: it copies hidden folders, so `.claude/skills` updates too)
+  6. `rm -r ../job-system-update-tmp`
+
+  If the repo folder already has a `job-system-update-tmp` next to it, ask him before using that name. Never overwrite or delete his personal files (`profile.md`, `facts.md`, `clips.md`, `clips/`, `learnings.md`, `feedback.md`, `applications/`) or `resume.md` above the repo. They are not in the ZIP, so the copy leaves them alone. Say what changed.
 - **Never fabricate** jobs, clips, or résumé claims. If a connector or source is unavailable, say so.
 - **Personal files stay gitignored.** Keep it that way.
 - **Skills**: `/find-jobs`, `/apply` and `/jobs` exist or are coming (see `README.md` for which). Don't call the archived `/scan-jobs`.

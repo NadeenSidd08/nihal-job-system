@@ -5,7 +5,7 @@ Every skill in this repo reads and writes the same small set of personal files. 
 ## Where things live
 
 ```
-his-folder/                      the folder he opens Claude in
+his-folder/                      his working folder (he opens Claude in `nihal-job-system` inside it)
   résumé (PDF or .docx)          his original, the formatting source of truth
   LinkedIn profile PDF           saved from LinkedIn ("Save to PDF")
   resume.md                      faithful markdown copy of the résumé (created in onboarding)
@@ -128,7 +128,7 @@ Optional: `clips/` holds the full text of clips, one `.md` or `.txt` file per cl
 
 ## learnings.md
 
-The in-the-moment learning loop. Claude proposes a line, he approves it, and Claude writes it. "Forget that" removes it. Claude learns preferences only, never facts about his experience. Those go in facts.md, and only with his confirmation.
+The in-the-moment learning loop. Claude shows the exact line and asks "Want me to remember that?", he approves it, and Claude writes it. "Forget that" removes it, and if that empties a section Claude puts `- (none yet)` back. Claude learns preferences only, never facts about his experience. Those go in facts.md, and only with his confirmation.
 
 ```markdown
 # What Claude has learned
@@ -143,7 +143,7 @@ The in-the-moment learning loop. Claude proposes a line, he approves it, and Cla
 - 2026-10-24: Lead with the Capitol coverage clips for politics roles
 
 ## Sources
-- 2026-10-24: (none yet)
+- (none yet)
 ```
 
 Every skill reads learnings.md at the start and applies it. When he passes on a job in chat, Claude asks for a one-line reason, writes it to that row's Notes in the Sheet, and if it sounds like a pattern, offers a learnings line.
