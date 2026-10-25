@@ -49,7 +49,7 @@ curl -s -A 'Mozilla/5.0' -m 30 'https://www.daybook.com/jobs/communications/in/w
 curl -s -A 'Mozilla/5.0' -m 30 'https://www.daybook.com/jobs/public-policy/in/washington-dc' | grep -o '__APOLLO_STATE__={.*}</script>' | sed 's/^__APOLLO_STATE__=//; s/<\/script>$//' | jq -c '. as $d | .ROOT_QUERY | to_entries[] | select(.key | startswith("getJobs")) | .value.jobs[].__ref as $r | $d[$r] | {id: ._id, title, org: .organization, paywalled: .organizationPaywalled, loc: .location.name, posted: .dateAdded[:10], url: .slugUrl}'
 ```
 
-Line by line: 1 JournalismJobs DC, 2 JournalismJobs DC freelance, 3 to 8 Daybook Washington DC (reporter, editor, journalist, writer, producer, correspondent), 9 and 10 Daybook remote (reporter, editor), 11 and 12 Daybook Communications and Public Policy category pages for DC. Line 2 runs only if Freelance is a ticked opportunity type. Lines 11 and 12 run only if Nearby field is ticked.
+Line by line: 1 JournalismJobs DC, 2 JournalismJobs DC freelance, 3 to 8 Daybook Washington DC (reporter, editor, journalist, writer, producer, correspondent), 9 and 10 Daybook remote (reporter, editor), 11 and 12 Daybook Communications and Public Policy category pages for DC. Line 2 runs only if Freelance is listed under `## Opportunity types` in the profile. Lines 11 and 12 run only if Nearby field is listed there.
 
 Hosts used: www.journalismjobs.com, www.daybook.com.
 
@@ -74,7 +74,7 @@ mcp__<indeed-server-id>__get_job_details
 
 ## 3. Gmail connector (LinkedIn job alerts)
 
-Read only. The skill makes one `search_threads` call with `query` `from:jobalerts-noreply@linkedin.com newer_than:3d`, `pageSize` 20, `view` `THREAD_VIEW_MINIMAL`. Then it calls `get_thread` with `messageFormat` `PLAIN_TEXT` for each thread. It never labels, drafts, sends or deletes.
+Read only. The skill makes one `search_threads` call with `query` `from:jobalerts-noreply@linkedin.com newer_than:Nd`, `pageSize` 20, `view` `THREAD_VIEW_MINIMAL`. N is the only part that changes. It is one of 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 or 14: 3 normally, or a larger number so the window covers the days since the last scan (days since the newest Scan log date plus 1, at most 14). If 20 threads come back, it makes the same call once more for the next page. Then it calls `get_thread` with `messageFormat` `PLAIN_TEXT` for each thread. It never labels, drafts, sends or deletes.
 
 ```
 mcp__<gmail-server-id>__search_threads

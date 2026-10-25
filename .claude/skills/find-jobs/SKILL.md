@@ -18,6 +18,7 @@ Rules that never bend:
 ## Modes
 
 - **Attended** (he is in the chat): normal.
+- **Pasted link routing.** A bare link with no other words comes here and adds just that job (no source scan, no Scan log row). "Apply to <link>" or "build my application for <link>" goes to `/apply`, not here. `/find-jobs` plus a link runs the full scan and also adds the link.
 - **Unattended** (the scheduled morning task, nobody to answer): never ask a question. If something needs an answer (a missing header, an ambiguous row, a pasted link you cannot read), skip it and say so in the summary. Never stop to wait.
 - **"Show me more"**: skip to the section "Show me more". Do not search sources.
 
@@ -25,7 +26,7 @@ Track the time. The whole run should take a couple of minutes at most.
 
 ## Unattended mode: tools used
 
-An unattended run uses exactly these tools and nothing else. Each one needs a saved approval, and an approval only matches the same thing again. So nothing here may vary between runs.
+The fixed command and call tables in Step 2 (the Indeed calls, C1 to C12, the WebFetch page, the LinkedIn search) are used in BOTH attended and unattended runs. An attended run uses the same commands and calls for the scan itself. An unattended run uses exactly these tools and nothing else. Each one needs a saved approval, and an approval only matches the same thing again. So nothing here may vary between runs.
 
 - **Bash**: only the 12 fixed `curl` lines in Step 2 (C1 to C12). `curl`, `jq`, `grep` and `sed` appear only inside those lines.
 - **WebFetch**: only the one URL in the WebFetch table in Step 2 (Mediabistro).
@@ -80,7 +81,7 @@ Call `get_job_details` only for a job that has already passed the relevance filt
 
 ### Fixed commands (curl)
 
-Copy each command exactly, character for character. Never change quoting, flags, filters, or order. Never combine commands with `&`, `wait`, or `;`. Run them one at a time. Each line is one whole pipeline. The lines are numbered by position for reference: C1 is the first line, C2 the second, and so on. Do not type the label.
+These commands are used in both attended and unattended runs. Unattended runs additionally may never deviate from them or fetch anything else. Copy each command exactly, character for character. Never change quoting, flags, filters, or order. Never combine commands with `&`, `wait`, or `;`. Run them one at a time. Each line is one whole pipeline. The lines are numbered by position for reference: C1 is the first line, C2 the second, and so on. Do not type the label.
 
 ```
 curl -s -A 'Mozilla/5.0' -m 30 'https://www.journalismjobs.com/job-listings?location=7' | grep -o 'href="/[0-9]\{6,\}-[^"]*"\|Posted [A-Z][a-z]* [0-9]*\|Featured Jobs'
@@ -100,10 +101,10 @@ curl -s -A 'Mozilla/5.0' -m 30 'https://www.daybook.com/jobs/public-policy/in/wa
 | Command | Source (profile name) | Sheet "Source" value | Notes |
 |---|---|---|---|
 | C1 | JournalismJobs (DC) | JournalismJobs | The output alternates a path (the slug holds the title and org) and a "Posted" date. **Stop reading at the "Featured Jobs" line.** Everything after it is sponsored and not DC-filtered. Source ID = the number at the start of the path. Link = `https://www.journalismjobs.com` followed by the path. The list shows "Posted October 20" with no year: use the current year, or last year if that would put the date in the future. Do not open the job pages. |
-| C2 | JournalismJobs (DC), freelance | JournalismJobs | Run only if Freelance is a ticked opportunity type. Same reading as C1. |
+| C2 | JournalismJobs (DC), freelance | JournalismJobs | Run only if Freelance is listed under `## Opportunity types`. Same reading as C1. |
 | C3 to C8 | Daybook, Washington DC | Daybook | Search terms reporter, editor, journalist, writer, producer, correspondent, for Washington, DC. See "Daybook" below. |
 | C9, C10 | Daybook, remote | Daybook | The terms reporter and editor, for remote jobs. |
-| C11, C12 | Daybook, Communications and Public Policy | Daybook | Run only if Nearby field is a ticked opportunity type. Category pages for Washington, DC. |
+| C11, C12 | Daybook, Communications and Public Policy | Daybook | Run only if Nearby field is listed under `## Opportunity types`. Category pages for Washington, DC. |
 
 ### Fixed WebFetch page
 
@@ -115,12 +116,12 @@ Unattended, WebFetch only this URL and no other domain. Use this exact prompt: `
 
 Allowed WebFetch domain, unattended: `www.mediabistro.com`. A job's own detail page or apply link is on another domain, so never fetch it. Keep what the list gives and add `details not checked` to Notes.
 
-Attended runs may WebFetch anything the user asks about, including pasted links. He is there to approve each new site.
+Attended runs use the same fixed page for the scan, and may also WebFetch anything else the user asks about, including pasted links. He is there to approve each new site.
 
 | Source (profile name) | Sheet "Source" value | How |
 |---|---|---|
 | LinkedIn job alerts (Gmail) | LinkedIn alert | See "LinkedIn alerts" below. |
-| Pasted links | Pasted link | Attended only. Any job link in the same message. WebFetch it and evaluate like any other job. Use whatever date the page shows, else leave Posted blank. A link you cannot read: say so. Unattended: skip and mention. |
+| Pasted links | Pasted link | Attended only. Any job link in the same message. WebFetch it and score it like any other job, but skip the Step 3 relevance filter and the Fit floor: it is always added with its true Fit, even below 6. State the score and a one-line reason in chat. The floor applies only to jobs the scan found itself. Use whatever date the page shows, else leave Posted blank. If it is already on Jobs or Seen, say which row and add nothing. A link you cannot read: say so. A pasted link outside a full scan writes no Scan log row. Unattended: skip and mention. |
 
 Cross-source copies are common (the same job on the company site, JournalismJobs, Mediabistro, Daybook and Indeed). They collapse in Step 5. Prefer the link in this order: company site or ATS, JournalismJobs, Mediabistro, Daybook, Indeed, LinkedIn.
 
@@ -141,7 +142,7 @@ Each Daybook line prints one JSON object per job: `id`, `title`, `org`, `paywall
 
 ### LinkedIn alerts
 
-The Gmail tools are already loaded from Step 1. Make this one search call, with these exact parameters every time: `search_threads` with `query` = `from:jobalerts-noreply@linkedin.com newer_than:3d`, `pageSize` = `20`, `view` = `THREAD_VIEW_MINIMAL`. Then read each thread it returns with `get_thread`, passing the thread id and `messageFormat` = `PLAIN_TEXT`. Always `get_thread`, never `get_message`. If Gmail is not connected or the search errors, record "LinkedIn alert" as failed. If the search works but finds no alert emails, that is not a failure: say `No LinkedIn alert emails yet` in the chat summary and still list LinkedIn alert as checked.
+The Gmail tools are already loaded from Step 1. Make this one search call, with these exact parameters every time: `search_threads` with `query` = `from:jobalerts-noreply@linkedin.com newer_than:Nd`, `pageSize` = `20`, `view` = `THREAD_VIEW_MINIMAL`. The query is fixed text apart from N. Pick N from the newest date in the Scan log (read in Step 1): if the last scan was more than 3 days ago, N = the days since then plus 1, capped at 14. Otherwise (or if the Scan log has no dates yet) N = 3. The only allowed queries are `newer_than:3d`, `newer_than:4d`, `newer_than:5d`, `newer_than:6d`, `newer_than:7d`, `newer_than:8d`, `newer_than:9d`, `newer_than:10d`, `newer_than:11d`, `newer_than:12d`, `newer_than:13d` and `newer_than:14d`. If 20 threads come back, make the same call once more for the next page (one extra page at most). Then read each thread it returns with `get_thread`, passing the thread id and `messageFormat` = `PLAIN_TEXT`. Always `get_thread`, never `get_message`. If Gmail is not connected or the search errors, record "LinkedIn alert" as failed. If the search works but finds no alert emails, that is not a failure: say `No LinkedIn alert emails yet` in the chat summary and still list LinkedIn alert as checked.
 
 Nadeen's session verified this card format on a real alert email on 2026-10-24. An alert looks like this: a header line "Your job alert for {search} in {location}", then about 6 job cards separated by lines of dashes. Each card is: title line, company line, location line, an optional badge line ("Top applicant", "3 connections", "This company is actively hiring"), then `View job: https://www.linkedin.com/comm/jobs/view/{id}/?...`. Blank lines may appear inside a card. There is no salary, date or description.
 
@@ -151,12 +152,12 @@ For each card:
 - Posted = the date the email was received. Source = `LinkedIn alert`. Notes = `limited info`.
 - LinkedIn repeats one role once per location. These collapse in Step 5.
 
-Use the same cards in every alert thread from the last 3 days. Repeats across emails are handled by dedupe.
+Use the same cards in every alert thread the search returned. Repeats across emails are handled by dedupe.
 
 ## Step 3. Relevance filter
 
 Job boards are full of comms, policy, marketing, sales, technical editing, finance, HR and engineering roles. Indeed and Daybook are the noisiest. Keep a job only if:
-- Its title is a journalism role (reporter, correspondent, editor, producer, writer, columnist, fellow, host, anchor, photojournalist, data or audio or video journalist) that matches a Target role or one of his Beats, or it is a Nearby field role (comms, policy writing, think tank editing) and he ticked Nearby field. Drop sales, account, revenue, partnerships, marketing, audience growth, finance, HR, legal, product, engineering, design and admin titles, even at a newsroom.
+- Its title is a journalism role (reporter, correspondent, editor, producer, writer, columnist, fellow, host, anchor, photojournalist, assistant (for example news assistant or editorial assistant), data or audio or video journalist) that matches a Target role or one of his Beats, or it is a Nearby field role (comms, policy writing, think tank editing) and Nearby field is listed under `## Opportunity types`. Drop sales, account, revenue, partnerships, marketing, audience growth, finance, HR, legal, product, engineering, design and admin titles, even at a newsroom.
 - It is not an Excluded title and not a Dealbreaker. Internships are skipped unless profile.md lists them.
 - Its location fits (the Location section). Treat "Washington DC", "Washington D.C.", "Washington, District of Columbia", "DC-Washington-...", Arlington, Alexandria and Bethesda as DC metro. A location that says "Remote" counts as remote.
 - It is inside the 14-day window when the source gives a date. A source with no date makes the job eligible.
@@ -170,7 +171,7 @@ When a title alone is not enough (attended runs only), read the posting (the Jou
 
 ## Step 4. Score
 
-For each survivor use profile.md's rubric: role match 0 to 4, beat and substance 0 to 4, logistics 0 to 2. Add them for Fit (1 to 10, whole number). Apply learnings. Do not inflate to reach 6. Drop anything below **6** (not added anywhere).
+For each survivor use profile.md's rubric: role match 0 to 4, beat and substance 0 to 4, logistics 0 to 2. Add them for Fit (1 to 10, whole number). Apply learnings. Do not inflate to reach 6. Drop anything below **6** (not added anywhere). The one exception is a link he pasted in an attended run: it keeps its true Fit and is added anyway (see the Pasted links row in Step 2).
 
 The number of distinct jobs left after scoring (they passed the relevance filter, the 14-day window and the Fit floor, after copies of the same job within this run were collapsed, and before the Sheet check) is **found** for the chat summary. LinkedIn jobs have no description: score from title, company and location only, and do not claim details you do not have.
 
@@ -188,15 +189,16 @@ Follow the spec exactly (normalise, collapse, known-job rules).
 2. **Check each against Jobs and Seen** (both read fresh in Step 1):
    - Indeed jobs are matched on Org + Title only (their ID and link change on every call). A match is a known job: skip it, no repost note, no mention.
    - Known by Link or Source ID: skip it entirely. A Seen row can hold several IDs joined by `; ` (a collapsed LinkedIn job keeps every ID it merged), so match against each one.
-   - Known by Org + Title with a location check (locations overlap, or either side is Remote, Hybrid or DC metro) but not by Link or Source ID, **and the matched row has the same Source as the new job**: it is a **repost**. Skip it as a new job. If the match is a Jobs row, append `Reposted YYYY-MM-DD, new link: <url>` to that row's Notes (keep the existing text, add a space or `; ` first). Status Passed: do nothing. Status Closed: add the note and mention it in chat. Any other Status: add the note. If the match is only a Seen row: do nothing.
+   - Known by Org + Title with a location check (locations overlap, or either side is Remote, Hybrid or DC metro) but not by Link or Source ID, **and the matched row has the same Source as the new job**: it is a **repost**. Skip it as a new job. If the match is a Jobs row, append `Reposted YYYY-MM-DD, new link: <url>` to that row's Notes (keep the existing text and add the new note after `; `). Status Passed: do nothing. Status Closed: add the note and mention it in chat. Any other Status: add the note. If the match is only a Seen row: do nothing.
    - Same Org + Title match but the matched row has a **different** Source (for example the Mediabistro copy of a job already added from JournalismJobs): it is the same job seen on another board, not a repost. Do nothing: no row, no note, no mention in chat.
 3. What is left is the new set. Sort by Fit (highest first), then newer Posted, then newer First seen. The top 10 go to Jobs. All of them go to Seen. The cap applies to this run's new jobs only. Seen rows from earlier runs never compete for today's 10: a run with 3 new jobs adds 3 even if 30 rows are waiting in Seen.
-4. **Write, in this order** (Jobs first, so a failure can never hide a job):
+4. **Re-read right before writing.** Read Jobs and Seen again, fresh. Drop any candidate that is now already there (same Link or Source ID, or the same Org + Title with the location check), because another run may have written in the meantime. If two scans overlap, the second one only writes what is still new. If nothing is left, skip the Jobs and Seen appends and still write the Scan log row.
+5. **Write, in this order** (Jobs first, so a failure can never hide a job):
    - `append_values` to `Jobs!A1` with up to 10 rows. Build every row from the header map, all 13 cells, `""` for blank: Status `New`, Fit, Type, Job title, Org, Location, Why it fits, Source, Posted, First seen, Link, Folder blank, Notes (`limited info` for LinkedIn, plus any talent pool, email-apply or `Employer hidden by Daybook (Premium only)` note, else blank). Put the cells in the order the header map gives, even if the Sheet columns were rearranged. If a title could be read as a number, date or formula, start it with an apostrophe.
    - `append_values` to `Seen!A1` with a row for **every** new job that cleared the floor: Link, Source ID (when jobs were collapsed, list every ID, joined with `; `), Org, Job title, Location, Fit, First seen, `On Jobs tab` (`yes` for the top 10, `no` for the rest), Type, Source, Posted, Why it fits. Send all 12 cells, `""` for blank ones. Do not add `more` text anywhere.
-   - Repost notes: `update_values` on the single Notes cell of the matched row (row number = array index + 1; column letter from the header map).
-   - `append_values` to `'Scan log'!A1` with one row: Date (today), Sources checked (the Sheet's Source value from the table above for each ticked source that was tried, for example `Mediabistro` not `Mediabistro (national)`, comma separated), Sources that failed (blank if none), New jobs added (rows added to Jobs, 0 to 10). Write this row even when nothing was added.
-5. **Verify**: `get_values` on the appended Jobs range and confirm the rows are there. If a write fails, say which one, and do not claim success.
+   - Repost notes: `update_values` on the single Notes cell of the matched row (column letter from the header map). Before each one: Before any single-cell write (Status, Folder, Notes), read that one row back and check that its Org and Job title match the job you mean. If they don't, re-read the tab and find the row again. Never write by a remembered row number. Notes appends always keep the existing text and add the new note after `; ` (see "Writing single cells: row check and Notes" in `docs/tracker-sheet.md`).
+   - `append_values` to `'Scan log'!A1` with one row: Date (today), Sources checked (the Sheet's Source value from the table above for each ticked source that was tried, for example `Mediabistro` not `Mediabistro (national)`, comma separated), Sources that failed (blank if none), New jobs added (rows added to Jobs, 0 to 10). Write this row even when nothing was added, but only for a full scan. A pasted link added outside a full scan writes no Scan log row.
+6. **Verify**: `get_values` on the appended Jobs range and confirm the rows are there. Check that none of the rows you wrote duplicates a row another run wrote moments earlier. If a write fails, say which one, and do not claim success.
 
 ## Show me more
 
@@ -234,6 +236,7 @@ Rules:
 - One nudge line for every Jobs row whose Status is still `Ready to apply`.
 - For a repost matched to a Closed row, say: `Reposted: <title> at <org> was marked Closed and is listed again. Say "reopen" if you want it back.`
 - Nothing new: say `Nothing new today.` plus the failed-source and nudge lines. Do not pad.
+- If the Verify step shows that rows this run wrote duplicate rows written moments earlier by another run, say so plainly and tell him which row numbers to clear. Never delete rows yourself.
 - Unattended: add one line for anything you skipped because it needed an answer.
 - End with the Sheet link (the profile URL).
 
@@ -244,7 +247,8 @@ If he says "reopen" for a Closed row, change only its Status cell (to New, or wh
 If he reacts to results in the same conversation ("that one's not my beat", "pass on the Bulwark job", "I applied to the Indeed one"):
 
 1. Find the row by reading Jobs fresh and matching Org, Title or Source words. More than one match: ask which. Never guess.
-2. Write only the Status cell (`update_values` on that one cell, column from the header map). Any of the 8 values is allowed. Read the row back and confirm what it now says. Never set Applied unless he says he applied.
-3. For Passed, ask for a one-line reason and write it to that row's Notes (keep existing text, append).
-4. If the reason sounds like a pattern (a kind of role, a beat, an employer, a source), offer one line for `learnings.md`, for example: `Add to what I've learned: "Skip roles that are mainly newsletter production"? (yes/no)`. Write it under `## Job matching` (or `## Sources`) as `- YYYY-MM-DD: <rule> (<his reason>)` only after he says yes. Learn preferences only, never facts about his experience.
-5. Unattended: skip all of this.
+2. Before any single-cell write (Status, Folder, Notes), read that one row back and check that its Org and Job title match the job you mean. If they don't, re-read the tab and find the row again. Never write by a remembered row number.
+3. Write only the Status cell (`update_values` on that one cell, column from the header map). Any of the 8 values is allowed. Read the row back and confirm what it now says. Never set Applied unless he says he applied.
+4. For Passed, ask for a one-line reason and write it to that row's Notes. Notes appends always keep the existing text and add the new note after `; ` (see "Writing single cells: row check and Notes" in `docs/tracker-sheet.md`).
+5. If the reason sounds like a pattern (a kind of role, a beat, an employer, a source), show the exact line you would save, for example `Skip roles that are mainly newsletter production`, then ask: "Want me to remember that?" Write it under `## Job matching` (or `## Sources`) as `- YYYY-MM-DD: <rule> (<his reason>)` only after he says yes. Learn preferences only, never facts about his experience. "Forget that" removes the line. If that empties a section, put `- (none yet)` back under it.
+6. Unattended: skip all of this.

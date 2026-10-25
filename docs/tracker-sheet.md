@@ -72,6 +72,11 @@ Claude's memory of every job found that cleared the Fit floor, whether or not it
 
 Skills never set Applied on their own.
 
+## Writing single cells: row check and Notes
+
+- **Row check.** Before any single-cell write (Status, Folder, Notes), read that one row back and check that its Org and Job title match the job you mean. If they don't, re-read the tab and find the row again. Never write by a remembered row number.
+- **Notes appends.** Always keep the existing text and add the new note after `; `. Never replace or shorten what is already there. If the cell is blank, write the note alone. Every skill and every chat request that adds to Notes follows this rule.
+
 ## Reading the Sheet: by header, never by position
 
 Every run, before anything else:
@@ -114,7 +119,7 @@ Indeed's Job Id and View Job URL change on every call. Write Source ID blank for
 
 - Never add a known job again. No second row on Jobs, no second row on Seen.
 - Never change the Status of a known job.
-- **Repost:** a job that matches a Jobs or Seen row by the Org + Title rule, does **not** match it by Link or Source ID, and has the **same Source** as that row. When the matched row is on Jobs, append `Reposted YYYY-MM-DD, new link: <url>` to the end of that row's Notes, keeping existing text. Status Passed: do nothing. Status Closed: add the note and mention it in chat. Any other Status: add the note. A repost matched only to a Seen row: do nothing.
+- **Repost:** a job that matches a Jobs or Seen row by the Org + Title rule, does **not** match it by Link or Source ID, and has the **same Source** as that row. When the matched row is on Jobs, append `Reposted YYYY-MM-DD, new link: <url>` to that row's Notes (see "Writing single cells: row check and Notes"). Status Passed: do nothing. Status Closed: add the note and mention it in chat. Any other Status: add the note. A repost matched only to a Seen row: do nothing.
 - **Cross-source copy:** the same Org + Title match where the new job's Source differs from the row's (for example the Mediabistro copy of a job already added from JournalismJobs). It's the same job seen on another board, not a repost. Do nothing: no row, no note, no mention in chat.
 - Salary or other content changes are not tracked, because salary is not stored.
 
@@ -132,6 +137,8 @@ Age counts from Posted when known, otherwise from First seen. A job older than 1
 Seen rows that are **not** on the Jobs tab age out of the pool 14 days after their First seen. Aged-out rows are skipped when choosing jobs to promote, but they stay in Seen so dedupe still recognises them.
 
 ## Fit floor, the cap of 10, and the Seen tab
+
+The floor applies only to jobs the scan found itself. A link he pastes into `/find-jobs` (attended) is always added with its true Fit, even below 6, and Claude states the score and a one-line reason in chat. Such a job is written to Jobs only (Seen holds jobs that cleared the floor) and does not use up the cap.
 
 Per run:
 
@@ -154,6 +161,10 @@ When the user says "show me more", Claude:
 4. Does not write a Scan log row (no scan ran) and does not search sources again.
 5. Tells him how many it added and how many are still waiting.
 
+## Concurrent runs
+
+Another run (the morning scan, or a scan he started in another chat) may write to the Sheet while this one is working. So, right before appending, read Jobs and Seen again and drop any candidate that is now already there (another run may have written in the meantime). If two scans overlap, the second one only writes what is still new. If the run notices that rows it wrote duplicate rows written moments earlier, it says so plainly in the chat summary and tells him which row numbers to clear. It still never deletes rows itself.
+
 ## What /find-jobs writes per run
 
 Exactly this, and nothing else:
@@ -161,7 +172,7 @@ Exactly this, and nothing else:
 1. **Up to 10 new rows** on the Jobs tab (appended below the last row). Each has Status `New`, Fit, Type, Job title, Org, Location, Why it fits, Source, Posted (blank if unknown), First seen (today), Link, Folder blank, Notes (`limited info` for LinkedIn alert jobs, otherwise blank).
 2. **Seen rows** for every found job that cleared the Fit floor (see above).
 3. **Notes additions** on existing Jobs rows only for the repost case.
-4. **One Scan log row**: Date (today), Sources checked, Sources that failed (blank if none), New jobs added (rows added to Jobs this run, 0 to 10).
+4. **One Scan log row**: Date (today), Sources checked, Sources that failed (blank if none), New jobs added (rows added to Jobs this run, 0 to 10). Only a full scan writes this row. A pasted link added outside a full scan writes no Scan log row.
 
 It never edits Status, Fit, Type, Folder or any other cell of an existing Jobs row, and never deletes or reorders rows.
 
@@ -183,9 +194,9 @@ Only these cells on the one row for the job being applied to:
 
 - **Folder** (column L): the link to the job's Google Drive folder. Always written. If the Drive connector is off, the local folder path instead.
 - **Status** (column A): set to `Ready to apply`, but **only when the current Status is New or Saved**. For any other Status (for example Applied, Interviewing, Passed), leave Status alone, still write Folder, and say so in the reply.
-- **Notes** (column M): append `Apply by yyyy-mm-dd` when the posting gives a deadline, keeping existing text.
+- **Notes** (column M): append `Apply by yyyy-mm-dd` when the posting gives a deadline, keeping existing text (see "Writing single cells: row check and Notes").
 
-`/apply` never sets Applied. Find the row by Link, or by the Org + Title rule, and write only those cells, not the whole row.
+`/apply` never sets Applied. Find the row by Link, or by the Org + Title rule, and write only those cells, not the whole row. Each single-cell write follows the row check in "Writing single cells: row check and Notes".
 
 ## The user changes status in chat
 
@@ -193,8 +204,9 @@ A request like "I applied to the Axios one" or "pass on Mock Policy Group" is ha
 
 1. Read the Jobs tab fresh and match the row by Org, Title or Source words from the request.
 2. If more than one row matches, ask which one. Do not guess.
-3. Write only the Status cell. **Any of the 8 values is allowed, with no transition limits** (the user may move a job backwards or sideways).
-4. Read the row back and confirm to the user what the row now says.
+3. Row check: Before any single-cell write (Status, Folder, Notes), read that one row back and check that its Org and Job title match the job you mean. If they don't, re-read the tab and find the row again. Never write by a remembered row number.
+4. Write only the Status cell. **Any of the 8 values is allowed, with no transition limits** (the user may move a job backwards or sideways).
+5. Read the row back and confirm to the user what the row now says. For Passed, add his one-line reason to that row's Notes (see "Writing single cells: row check and Notes").
 
 ## The user edits the Sheet too
 
@@ -260,7 +272,7 @@ All worked in one batch:
 
 ### 8. Change one cell (Sheets connector)
 
-`update_values` with one cell, for example `range` `Jobs!A3`, `values` `[["Ready to apply"]]`, then `range` `Jobs!L3` for Folder. Find the row number from a fresh read (array index plus 1 for the header). Use the column letter found from the header, not a fixed letter.
+`update_values` with one cell, for example `range` `Jobs!A3`, `values` `[["Ready to apply"]]`, then `range` `Jobs!L3` for Folder. Find the row number from a fresh read of the tab (the sheet row of the matching entry, counting the header as row 1). Use the column letter found from the header, not a fixed letter. Before the write, do the row check: Before any single-cell write (Status, Folder, Notes), read that one row back and check that its Org and Job title match the job you mean. If they don't, re-read the tab and find the row again. Never write by a remembered row number. For Notes, keep the existing text and add the new note after `; `.
 
 ### 9. Verify (Sheets connector)
 

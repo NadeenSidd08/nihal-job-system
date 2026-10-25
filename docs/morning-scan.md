@@ -52,7 +52,7 @@ You can also ask Claude to do any of these.
 - **Scans stopped and the app shows a yellow "sign in again" banner.** Sign in again, then click Run now once.
 - **A run stalls on a prompt after day one.** Tell Nadeen which site or tool it named.
 - **It did not run.** The app was closed or the Mac was asleep at that time. Open the app and wake the Mac. One catch-up run happens on its own. See "Keep computer awake" above.
-- **The summary says "no LinkedIn alert emails".** There were no job alert emails from LinkedIn in the last 3 days. Set up job alerts on LinkedIn for journalism roles in Washington, DC, with email delivery, and they will be picked up on the next run.
+- **The summary says "no LinkedIn alert emails".** There were no job alert emails from LinkedIn since the last scan (at least the last 3 days). Set up job alerts on LinkedIn for journalism roles in Washington, DC, with email delivery, and they will be picked up on the next run.
 - **A source did not work.** The summary says which one. The other sources still ran. Tell Claude and it will check.
 - **The run was rejected.** You are at your plan's usage limit. Wait for it to reset, or turn on usage credits.
 
