@@ -4,7 +4,7 @@ The morning scan is a scheduled task that runs `/find-jobs` for you on weekday m
 
 ## What it does and when
 
-Every weekday around 7:30 (you can change this), Claude opens your `nihal-job-system` folder, checks all the sources you ticked in `profile.md` (Indeed through its connector, JournalismJobs, Mediabistro, Daybook, and your LinkedIn job alert emails in Gmail), scores new jobs against your criteria, and adds the best ones to the Jobs tab of your tracker Sheet. It never applies to anything on Indeed or any other site. It never applies to anything, never marks anything Applied, and never sends an email. A run takes about 10 minutes.
+Every weekday around 7:30 (you can change this), Claude opens your `nihal-job-system` folder, checks all the sources you ticked in `profile.md` (Indeed through its connector, JournalismJobs, Mediabistro, Daybook, and your LinkedIn job alert emails in Gmail), scores new jobs against your criteria, and adds the best ones to the Jobs tab of your tracker Sheet. It never applies to anything on Indeed or any other site, never marks anything Applied, and never sends an email. A run takes about 10 minutes.
 
 ## What it costs
 

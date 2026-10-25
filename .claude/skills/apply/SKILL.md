@@ -1,6 +1,6 @@
 ---
 name: apply
-description: Build the application package for a job (job post, company notes, tailored résumé, cover letter in his voice, clip picks) in applications/<Org - Role>/, and mark the Sheet row Ready to apply. Use when he says "/apply", "apply to the Axios one", "build my application", "tailor my résumé for ...", "cover letter for ...", "my top 3 this week", or pastes a job link and wants to apply.
+description: Build the application package for a job (job post, company notes, tailored résumé, cover letter in his voice, clip picks) in applications/<Org - Role>/, and mark the Sheet row Ready to apply. Use when he says "/apply", "apply to the Bulwark one", "build my application", "tailor my résumé for ...", "cover letter for ...", "my top 3 this week", or pastes a job link and wants to apply.
 ---
 
 # /apply
@@ -26,17 +26,16 @@ Rules that never bend:
 
 ## Step 2. Resolve the job or jobs
 
-- **A name** ("the Axios one", "the Bulwark editor"): match Org, Job title or Source words against Jobs rows. More than one match: list them and ask which. Never guess.
+- **A name** ("the Indeed one", "the Bulwark editor"): match Org, Job title or Source words against Jobs rows. More than one match: list them and ask which. Never guess.
 - **"My top N this week"**: rows with Status New or Saved, highest Fit first (ties: newer Posted). Show the N and ask him to confirm or swap.
 - **A pasted link**:
   1. If the Link matches an existing row (same link without tracking bits or trailing slash, or same Org and Title), use that row.
-  2. Otherwise fetch the posting (WebFetch, or curl for Greenhouse and JournalismJobs, see the source table in `.claude/skills/find-jobs/SKILL.md`). Read Org, Title, Location and posted date from it only. If you cannot tell the Org or Title, ask.
+  2. Otherwise fetch the posting (WebFetch; for a Daybook link use `https://www.daybook.com/job/<slug>`, for Indeed use `get_job_details` if the job came from this session's search, otherwise WebFetch the link). Read Org, Title, Location and posted date from it only. If you cannot tell the Org or Title, ask.
   3. Score it with the profile rubric: Fit 1 to 10, whole number, no inflating. Set Type, a one-line Why it fits written for him, Source `Pasted link`, Posted from the page or blank, First seen today.
   4. The row is appended at Step 6, after he confirms. Do not write to the Sheet before then.
   5. If the Fit is below 6, give the score and a one-line reason and ask "Build anyway?". Use the true Fit. Never inflate it.
 - **A "limited info" row (Notes says it, usually LinkedIn alert), or any posting you cannot fetch or that returns almost nothing** (login wall, 403, 404, empty page): say why, and ask him to paste the job description. If it looks gone (404), ask if he has another link or a saved copy. Never guess the description. If he has nothing to give, stop and build nothing for that job.
-
-- **A row whose Org is "Employer hidden (Daybook)"**: Daybook hides the employer on its public page. Before building anything, ask him to open the Daybook link, then paste the job details including the employer's name. Wait for the answer. Use the pasted details as the posting, and use the employer he names as the Org in the package. Do not guess the employer. If he has nothing to give, stop and build nothing for that job.
+- **A row whose Org is "Employer hidden (Daybook)"**: Daybook shows the employer only to paid Premium members. The public page gives a short description and often a salary. Before building anything, ask him to paste the description from the page, and to name the employer only if he knows it or finds the same posting elsewhere (the title often gives it away). Wait for the answer. Use the pasted text as the posting. If he can't name the employer, build with Org `Employer hidden (Daybook)` only if he says to. Otherwise stop and build nothing for that job. Never guess the employer.
 
 Skip rows whose Status is Passed or Closed unless he names them on purpose. Then say the Status will stay as it is.
 
@@ -46,8 +45,8 @@ Show, then ask once. If the posting gives an Apply by date within 7 days, say so
 
 ```
 Building for:
-  Reporter, News at Axios (Fit 7, Status New)
-Folder: applications/Axios - Reporter, News/ (also copied to Google Docs in Drive)
+  Reporter, News at The Bulwark (Fit 7, Status New)
+Folder: applications/The Bulwark - Reporter, News/ (also copied to Google Docs in Drive)
 Files: job-post.md, company-context.md, tailored-resume.md, cover-letter.md, clip-picks.md
 Go?
 ```
@@ -74,7 +73,7 @@ Do not add anything the posting does not say. Formatting only: replace any em da
 ### company-context.md
 Short, under one page. Headings: What they do, Recent coverage relevant to this role, Who might read this (editor or hiring manager, only if public), Why it fits you.
 
-Sources, in order: the posting; `curl -s -A 'Mozilla/5.0'` on the outlet's page; if that fails, WebSearch `site:<outlet> <beat>` for two recent headlines. For Axios use `https://api.axios.com/feed/`. If all fail, write one `Unconfirmed:` line and move on. Never block the build on this. Mark anything not confirmed as `Unconfirmed:`. No guessing at names, numbers or news.
+Sources, in order: the posting; `curl -s -A 'Mozilla/5.0'` on the outlet's page; if that fails, WebSearch `site:<outlet> <beat>` for two recent headlines. If all fail, write one `Unconfirmed:` line and move on. Never block the build on this. Mark anything not confirmed as `Unconfirmed:`. No guessing at names, numbers or news.
 
 "Why it fits you" uses only profile.md, facts.md and clips.md. End it with a **Gaps to know about** block: requirements in the posting that facts.md does not support (for example years of experience, managing people, a beat). This is private. Gaps go here and nowhere else.
 
@@ -133,8 +132,8 @@ Per `docs/tracker-sheet.md`, "What /apply writes". Read Jobs fresh again first, 
 Short:
 
 ```
-Built for Reporter, News at Axios:
-  applications/Axios - Reporter, News/
+Built for Reporter, News at The Bulwark:
+  applications/The Bulwark - Reporter, News/
   tailored-resume.md   claims to confirm: 0
   cover-letter.md      claims to confirm: 1
   (plus job-post, company-context, clip-picks)
@@ -144,7 +143,7 @@ Built for Reporter, News at Axios:
 Sheet: Status is now Ready to apply. Folder is filled in.
 Edit them in Google Docs, then File, Download, PDF to upload.
 Read the letter and tell me what to change.
-When you've sent it, tell me "I applied to Axios" or set Status to Applied.
+When you've sent it, tell me "I applied to The Bulwark" or set Status to Applied.
 ```
 
 Say the claims-to-confirm count for each file, and list them if there are any. Print the gap count the same way ("2 gaps noted in company-context.md (8+ years, managing people)"), or omit the line if none. If the posting has an Apply by date within 7 days, say so. For a batch, one block per job.

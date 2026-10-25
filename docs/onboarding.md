@@ -125,10 +125,10 @@ Ask one question at a time. Use examples drawn from his résumé and clips (name
 5. Salary floor: "Is there a minimum salary you won't go below? It's fine to say none."
 6. Dealbreakers: "Anything that rules a job out? For example unpaid work, a long commute, a shift schedule."
 7. Sources: explain in one line each, then ask "Keep them all on? (A. Yes, recommended. B. Turn some off.)"
-   - Indeed: Indeed's job search, run for each of your target roles in Washington, DC and remote. It is broad and noisy, so I filter hard. Needs the Indeed connector (optional, recommended).
+   - Indeed: Indeed's job search, run for reporter, journalist and news editor in Washington, DC, plus journalist for remote if you want remote jobs. It is broad and noisy, so I filter hard. Needs the Indeed connector (optional, recommended).
    - JournalismJobs (DC): a journalism job board filtered to DC.
    - Mediabistro: a national media job board. I keep only the DC and remote jobs.
-   - Daybook: a news and communications job board. I search it for reporter, editor, journalist and writer jobs in DC and remote. Some listings hide the employer.
+   - Daybook: a news and communications job board. I search it for reporter, editor, journalist, writer, producer and correspondent jobs in DC, and reporter and editor jobs that are remote. Some listings hide the employer.
    - LinkedIn job alerts (Gmail): emails from LinkedIn that I read. This is how I see Politico, The Atlantic, The Hill and others I can't read directly.
 
 Then write `profile.md` from `profile.template.md`, following `docs/personal-files.md` exactly:
@@ -205,7 +205,7 @@ Give a summary of at most 5 lines of what is set up (résumé copy, clips, fact 
 - How the Sheet works: jobs arrive as New. "Ready to apply" means I have built the application for you and it is waiting on you. "Applied" is only set by you, in the Sheet dropdown or by telling me ("I applied to the Bulwark one"). I never mark anything Applied myself.
 - What "show me more" does: each search adds the 10 best new matches to the Sheet and keeps the rest in memory. Say "show me more" and I'll add the next 10 without searching again.
 - "Next time, open Claude in the `nihal-job-system` folder, not the folder above it."
-- Daybook: some jobs hide the employer. Those rows show `Employer hidden (Daybook)` in the Org column. Open the link to see who it is, and paste the details if you want me to build an application for it.
+- Daybook: some jobs hide the employer, because Daybook shows it only to paid Premium members. Those rows show `Employer hidden (Daybook)` in the Org column. The link still shows a short description and often the salary. If you want me to build an application for one, paste the description, and tell me the employer if you know it or find the same job elsewhere. I won't guess. A Daybook Premium account would unlock the employers. That is your choice and not required.
 - Last, offer the optional LinkedIn alerts: "Want to set up the LinkedIn job alerts now, or tomorrow? Either is fine." If now, go to step 11.
 
 ## Step 11. LinkedIn job alerts (optional, now or tomorrow)

@@ -20,7 +20,7 @@ One row per job. Row 1 is a bold, frozen header. Columns, in this order:
 | B | Fit | Whole number 1 to 10 |
 | C | Type | Dropdown, exactly: Staff, Fellowship, Freelance, Nearby field |
 | D | Job title | Text |
-| E | Org | Text. Daybook jobs whose employer is paywalled carry `Employer hidden (Daybook)` here. The employer is only visible on the Daybook page, so he opens the link. `/apply` asks him to paste the details before building |
+| E | Org | Text. Daybook jobs whose employer is paywalled carry `Employer hidden (Daybook)` here. Daybook shows the employer only to paid Premium members. The public page gives a short description and often a salary. /apply asks him to paste that, and to name the employer if he knows it |
 | F | Location | Text. Several locations are joined with a semicolon, for example `Washington, DC; Arlington, VA` |
 | G | Why it fits | One or two plain sentences |
 | H | Source | Text. One of: Indeed, JournalismJobs, Mediabistro, Daybook, LinkedIn alert, Pasted link |
@@ -104,7 +104,11 @@ LinkedIn repeats one role once per location. Before checking against the Sheet, 
 
 ### Daybook jobs with a hidden employer
 
-When Org is `Employer hidden (Daybook)`, Org + Title cannot tell two different employers apart. For these rows, skip test 2 and use only test 1: the Daybook link, or the Daybook `_id` stored as Source ID. Do not collapse two hidden-employer jobs within a run on Org + Title either. Collapse only on the Daybook ID. Notes carries `Employer hidden, open the Daybook link`.
+When Org is `Employer hidden (Daybook)`, Org + Title cannot tell two different employers apart. For these rows, skip test 2 and use only test 1: the Daybook link, or the Daybook `_id` stored as Source ID. Do not collapse two hidden-employer jobs within a run on Org + Title either. Collapse only on the Daybook ID. Notes carries `Employer hidden by Daybook (Premium only)`. A hidden Daybook copy of a job already found elsewhere can't be matched, so two rows for one job are possible and acceptable. Do not match on Title alone.
+
+### Indeed jobs
+
+Indeed's Job Id and View Job URL change on every call. Write Source ID blank for Indeed. Keep the View Job URL as the Link (it works when clicked). Match Indeed jobs to Jobs and Seen rows on Org + Title only (test 2, with the location check). An Indeed job that matches a row by Org + Title is a known job, never a repost: no note, no mention.
 
 ### Rules for known jobs
 
@@ -171,6 +175,7 @@ Each run ends with a short summary in chat that includes:
 - Sources that failed.
 - A one-line nudge for each row whose Status is still **Ready to apply**, for example `Still waiting on you: Politics editor at Sample Gazette is Ready to apply. Say "I applied" when you submit it.`
 - Any Closed-row repost, as described above.
+- When Daybook jobs with a hidden employer were added: `Daybook: N of the matches hide the employer. Daybook shows it only to paid members. The link still shows a short description and the salary.`
 
 ## What /apply writes
 

@@ -37,7 +37,7 @@ Otherwise onboarding is finished. Use the rules below. Unattended runs (morning 
 # Ongoing rules (once onboarding is finished)
 
 - **At the start of any job task**, read `profile.md` and `learnings.md` and apply them.
-- **Status changes in chat** ("I applied to the Axios one," "pass on that Semafor job"): follow `docs/personal-files.md` and `docs/tracker-sheet.md`. Read the Jobs tab fresh, match the row, ask which one if more than one matches, write only the Status cell, read it back. For Passed, ask for a one-line reason, write it to that row's Notes, and if it sounds like a pattern, offer a learnings line.
+- **Status changes in chat** ("I applied to the Bulwark one," "pass on that Indeed job"): follow `docs/personal-files.md` and `docs/tracker-sheet.md`. Read the Jobs tab fresh, match the row, ask which one if more than one matches, write only the Status cell, read it back. For Passed, ask for a one-line reason, write it to that row's Notes, and if it sounds like a pattern, offer a learnings line.
 - **In-the-moment learning**: when he corrects you ("that's not my beat," "I'd never say that"), ask "Want me to remember that?" On yes, add one dated line (`- yyyy-mm-dd: ...`) under the right section of `learnings.md` (Job matching, Writing voice, Clips, Sources). "Forget that" removes the line. Learn preferences only. Never put facts about his experience in `learnings.md`.
 - **Profile edits** happen by asking you ("raise my salary floor to $75,000"). Edit `profile.md`, keep every heading exactly, and tell him what changed.
 - **"I published something new"**: ask for the link, fetch it, show the row you'd add, and on his yes add it to `clips.md`.

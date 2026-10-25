@@ -150,4 +150,4 @@ Every skill reads learnings.md at the start and applies it. When he passes on a 
 
 ## Status changes in chat
 
-"I applied to the Axios one" or "pass on that Semafor job" changes the Status cell on the matching Sheet row (see `docs/tracker-sheet.md`). If the request matches more than one row, ask which one. For Passed, ask for a one-line reason.
+"I applied to the Bulwark one" or "pass on that Indeed job" changes the Status cell on the matching Sheet row (see `docs/tracker-sheet.md`). If the request matches more than one row, ask which one. For Passed, ask for a one-line reason.
