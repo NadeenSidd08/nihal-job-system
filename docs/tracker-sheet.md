@@ -138,7 +138,7 @@ Seen rows that are **not** on the Jobs tab age out of the pool 14 days after the
 
 ## Fit floor, the cap of 10, and the Seen tab
 
-The floor applies only to jobs the scan found itself. A link he pastes into `/find-jobs` (attended) is always added with its true Fit, even below 6, and Claude states the score and a one-line reason in chat. Such a job is written to Jobs only (Seen holds jobs that cleared the floor) and does not use up the cap.
+The floor applies only to jobs the scan found itself. A link he pastes into `/find-jobs` (attended) is always added with its true Fit, even below 6, and Claude states the score and a one-line reason in chat. Every pasted link, whatever its Fit, is written to Jobs only, the same as a link given to /apply. It does not use up the cap.
 
 Per run:
 
@@ -172,7 +172,7 @@ Exactly this, and nothing else:
 1. **Up to 10 new rows** on the Jobs tab (appended below the last row). Each has Status `New`, Fit, Type, Job title, Org, Location, Why it fits, Source, Posted (blank if unknown), First seen (today), Link, Folder blank, Notes (`limited info` for LinkedIn alert jobs, otherwise blank).
 2. **Seen rows** for every found job that cleared the Fit floor (see above).
 3. **Notes additions** on existing Jobs rows only for the repost case.
-4. **One Scan log row**: Date (today), Sources checked, Sources that failed (blank if none), New jobs added (rows added to Jobs this run, 0 to 10). Only a full scan writes this row. A pasted link added outside a full scan writes no Scan log row.
+4. **One Scan log row**: Date (today), Sources checked, Sources that failed (blank if none), New jobs added (rows added to Jobs this run, 0 to 10). A pasted link added in the same run counts in New jobs added and in the chat summary, so the number can be 11. Only a full scan writes this row. A pasted link added outside a full scan writes no Scan log row.
 
 It never edits Status, Fit, Type, Folder or any other cell of an existing Jobs row, and never deletes or reorders rows.
 
@@ -204,7 +204,7 @@ A request like "I applied to the Axios one" or "pass on Mock Policy Group" is ha
 
 1. Read the Jobs tab fresh and match the row by Org, Title or Source words from the request.
 2. If more than one row matches, ask which one. Do not guess.
-3. Row check: Before any single-cell write (Status, Folder, Notes), read that one row back and check that its Org and Job title match the job you mean. If they don't, re-read the tab and find the row again. Never write by a remembered row number.
+3. Row check: Do the row check from "Writing single cells" above, before writing.
 4. Write only the Status cell. **Any of the 8 values is allowed, with no transition limits** (the user may move a job backwards or sideways).
 5. Read the row back and confirm to the user what the row now says. For Passed, add his one-line reason to that row's Notes (see "Writing single cells: row check and Notes").
 
@@ -272,7 +272,7 @@ All worked in one batch:
 
 ### 8. Change one cell (Sheets connector)
 
-`update_values` with one cell, for example `range` `Jobs!A3`, `values` `[["Ready to apply"]]`, then `range` `Jobs!L3` for Folder. Find the row number from a fresh read of the tab (the sheet row of the matching entry, counting the header as row 1). Use the column letter found from the header, not a fixed letter. Before the write, do the row check: Before any single-cell write (Status, Folder, Notes), read that one row back and check that its Org and Job title match the job you mean. If they don't, re-read the tab and find the row again. Never write by a remembered row number. For Notes, keep the existing text and add the new note after `; `.
+`update_values` with one cell, for example `range` `Jobs!A3`, `values` `[["Ready to apply"]]`, then `range` `Jobs!L3` for Folder. Find the row number from a fresh read of the tab (the sheet row of the matching entry, counting the header as row 1). Use the column letter found from the header, not a fixed letter. Before the write, do the row check from "Writing single cells" above. For Notes, keep the existing text and add the new note after `; `.
 
 ### 9. Verify (Sheets connector)
 

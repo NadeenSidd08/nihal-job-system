@@ -74,7 +74,7 @@ mcp__<indeed-server-id>__get_job_details
 
 ## 3. Gmail connector (LinkedIn job alerts)
 
-Read only. The skill makes one `search_threads` call with `query` `from:jobalerts-noreply@linkedin.com newer_than:Nd`, `pageSize` 20, `view` `THREAD_VIEW_MINIMAL`. N is the only part that changes. It is one of 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 or 14: 3 normally, or a larger number so the window covers the days since the last scan (days since the newest Scan log date plus 1, at most 14). If 20 threads come back, it makes the same call once more for the next page. Then it calls `get_thread` with `messageFormat` `PLAIN_TEXT` for each thread. It never labels, drafts, sends or deletes.
+Read only. The skill makes one `search_threads` call with `query` `from:jobalerts-noreply@linkedin.com newer_than:Nd`, `pageSize` 20, `view` `THREAD_VIEW_MINIMAL`. N is the only part that changes. It is one of 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 or 14: 3 normally, or a larger number so the window covers the days since the last scan (days since the newest Scan log date plus 1, at most 14). If the first call returns a `nextPageToken`, it makes the call once more with the same `query`, `pageSize` and `view`, plus `pageToken` set to that token. One extra page at most. Then it calls `get_thread` with `messageFormat` `PLAIN_TEXT` for each thread. It never labels, drafts, sends or deletes.
 
 ```
 mcp__<gmail-server-id>__search_threads

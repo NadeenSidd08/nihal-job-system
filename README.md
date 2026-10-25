@@ -8,7 +8,7 @@ You start from the onboarding page Nadeen sends you (link to be added). It tells
 
 ## Where to open Claude
 
-Open Claude in the `nihal-job-system` folder. If you open the folder above it, the helper CLAUDE.md there points Claude here.
+Open Claude in the `nihal-job-system` folder. If you open the folder above it instead, a small file that setup left there sends Claude to the right place.
 
 ## What you need
 
