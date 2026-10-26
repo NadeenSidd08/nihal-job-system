@@ -23,9 +23,9 @@ The task only runs while the Claude desktop app is open and your Mac is awake. I
    ```
 
 2. **Check the task's settings.** In the Claude desktop app, open **Scheduled** in the sidebar, click the task, then **Edit**. Set:
-   - **Working folder** to your `nihal-job-system` folder. A task that Claude creates starts with the folder of the chat it was made in, which is wrong, so do not skip this.
-   - **Model** to Sonnet.
-   - **Permission mode** to **Auto**. In Auto mode, Claude's safety check approves the routine steps (fetching job pages, searching Indeed through its connector, reading Gmail alerts, writing to your Sheet), so the scan never stops to ask you. If Auto is not in the list, your Claude plan may not include it. Stop here and tell Nadeen, because the other modes stop at permission prompts every morning.
+   - **Working folder** to your `nihal-job-system` folder. In the Edit window it is the folder row at the bottom of the Instructions box. A task that Claude creates starts with the folder of the chat it was made in, which is wrong, so do not skip this. After you save, open the task page again and check that **Folder** now ends in `nihal-job-system`. If it does not, set it again.
+   - **Model** to Sonnet. In the Edit window it is the "Default" menu at the bottom right of the Instructions box.
+   - **Permission mode** to **Auto**. In the Edit window it is the "Manual" button at the bottom left of the Instructions box. In Auto mode, Claude's safety check approves the routine steps (fetching job pages, searching Indeed through its connector, reading Gmail alerts, writing to your Sheet), so the scan never stops to ask you. If Auto is not in the list, your Claude plan may not include it. Stop here and tell Nadeen, because the other modes stop at permission prompts every morning.
    Save.
 
 3. **Keep the Mac awake.** In the Claude desktop app, go to Settings > This computer > System and turn on **Keep computer awake**. Otherwise a scan that starts while the Mac sleeps waits until you wake it. Closing the laptop lid still puts it to sleep.
