@@ -45,10 +45,10 @@ An empty Sheet: `Your Sheet has no jobs yet.`
 
 Then a one-line recommendation, chosen from the state (first rule that fits):
 
-1. Any Ready to apply: `Suggested: A, or tell me which ones you've sent so I can mark them Applied (D).` Name the job if there is just one.
+1. Any Ready to apply: `Suggested: D, tell me which ones you've sent so I can mark them Applied. Or C, to finish applying.` Name the job if there is just one.
 2. Many New (5 or more): `Suggested: look over the New rows on your Sheet, or pick the best one to apply to (C).`
 3. Some New (1 to 4): `Suggested: look over the New rows, then pick one to apply to (C).`
-4. Nothing New and no Ready to apply, but jobs are waiting: `Suggested: B, to bring in the next 10.`
+4. Nothing New and no Ready to apply, but jobs are waiting: `Suggested: B, to bring in the next 10 waiting.`
 5. Nothing at all to act on: `Suggested: A, to look for new jobs.`
 
 Then the menu, exactly this text. For B, write the real number when it is known and above zero (`Show me more (the next 10 of N waiting)`, or `the next N` if fewer than 10), and `Show me more (none waiting)` when it is zero. If Seen could not be read, write `Show me more (the next 10 waiting)`.
