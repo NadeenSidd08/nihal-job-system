@@ -1,0 +1,445 @@
+<title>Your Job Desk Setup</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap');
+:root {
+  --bg: #f2f6f7;
+  --surface: #ffffff;
+  --ink: #16252b;
+  --muted: #52646c;
+  --line: #cbd8dc;
+  --accent: #0b6e7f;
+  --accent-ink: #ffffff;
+  --accent-bg: #e1f0f3;
+  --done: #2b7a4b;
+  --done-bg: #e3f3ea;
+  --lock-bg: #e9eef0;
+  --lock-ink: #6c7c83;
+  --code-bg: #eef3f4;
+  --warn: #7a5600;
+  --warn-bg: #fff3d1;
+  --focus: #1a64c8;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #11191c;
+    --surface: #182226;
+    --ink: #e6eef0;
+    --muted: #9db0b7;
+    --line: #2f3f45;
+    --accent: #5cc0d1;
+    --accent-ink: #0d1a1d;
+    --accent-bg: #19333a;
+    --done: #7fd3a0;
+    --done-bg: #17301f;
+    --lock-bg: #151e21;
+    --lock-ink: #7c8d94;
+    --code-bg: #1d2b30;
+    --warn: #f0c864;
+    --warn-bg: #33290d;
+    --focus: #8cb9f5;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #11191c;
+  --surface: #182226;
+  --ink: #e6eef0;
+  --muted: #9db0b7;
+  --line: #2f3f45;
+  --accent: #5cc0d1;
+  --accent-ink: #0d1a1d;
+  --accent-bg: #19333a;
+  --done: #7fd3a0;
+  --done-bg: #17301f;
+  --lock-bg: #151e21;
+  --lock-ink: #7c8d94;
+  --code-bg: #1d2b30;
+  --warn: #f0c864;
+  --warn-bg: #33290d;
+  --focus: #8cb9f5;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 16px/1.55 "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+.wrap { max-width: 760px; margin: 0 auto; padding: 24px 16px 64px; }
+h1, h2, h3 { font-family: "Newsreader", Georgia, "Times New Roman", serif; font-weight: 600; line-height: 1.2; margin: 0; }
+h1 { font-size: 2rem; }
+h2 { font-size: 1.45rem; margin: 40px 0 10px; }
+h3 { font-size: 1.15rem; }
+p { margin: 0 0 10px; }
+a { color: var(--accent); }
+code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .9em; background: var(--code-bg); padding: 1px 5px; border-radius: 4px; }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.slug { font: 600 .72rem/1 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+.lede { color: var(--muted); font-size: 1.05rem; margin: 10px 0 0; }
+
+/* progress */
+.progress { position: sticky; top: 0; z-index: 5; background: var(--bg); padding: 12px 0 10px; margin-top: 18px; border-bottom: 1px solid var(--line); }
+.progress-row { display: flex; justify-content: space-between; font-size: .9rem; font-weight: 600; margin-bottom: 6px; }
+.bar { height: 10px; background: var(--lock-bg); border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+.bar > i { display: block; height: 100%; width: 0; background: var(--done); transition: width .3s ease; }
+
+/* levels */
+.level { background: var(--surface); border: 1px solid var(--line); border-left: 5px solid var(--accent); border-radius: 8px; padding: 16px; margin-top: 18px; }
+.level.done { border-left-color: var(--done); }
+.level.locked { background: var(--lock-bg); border-left-color: var(--line); color: var(--lock-ink); }
+.level.locked h3, .level.locked .goal, .level.locked .slug { color: var(--lock-ink); }
+.level.locked pre, .level.locked code, .level.locked .peek { opacity: .75; }
+.goal { font-weight: 500; margin: 6px 0 10px; }
+.level ol, .level ul { margin: 0 0 12px; padding-left: 22px; }
+.level li { margin-bottom: 5px; }
+.lockmsg { display: none; font-size: .88rem; font-weight: 600; margin: 8px 0 0; }
+.level.locked .lockmsg { display: block; }
+.peek, .note { border-radius: 6px; padding: 10px 12px; margin: 12px 0; font-size: .95rem; }
+.peek { background: var(--accent-bg); }
+.note { background: var(--warn-bg); color: var(--ink); border-left: 4px solid var(--warn); }
+.peek b, .note b { display: block; font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 2px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+.donewhen { font-weight: 600; margin: 12px 0 10px; }
+.check { display: flex; gap: 10px; align-items: center; padding-top: 10px; border-top: 1px solid var(--line); font-weight: 600; }
+.check input { width: 22px; height: 22px; flex: none; accent-color: var(--done); }
+.check label { cursor: pointer; }
+.level.locked .check label { cursor: not-allowed; }
+
+/* message box */
+.msg { margin: 12px 0; }
+.msg-label { font-size: .85rem; font-weight: 600; margin-bottom: 4px; display: block; }
+input[type="text"], input[type="url"] { width: 100%; font: inherit; padding: 9px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); color: var(--ink); margin-bottom: 8px; }
+pre { margin: 0 0 8px; padding: 12px; background: var(--code-bg); border: 1px solid var(--line); border-radius: 6px; white-space: pre-wrap; word-break: break-word; font: .9rem/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; color: var(--ink); }
+.btn { font: inherit; font-weight: 600; background: var(--accent); color: var(--accent-ink); border: 0; border-radius: 6px; padding: 9px 16px; cursor: pointer; min-height: 40px; }
+.btn:hover { filter: brightness(1.08); }
+.copied { margin-left: 10px; font-size: .88rem; color: var(--done); font-weight: 600; }
+
+/* week */
+.week { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 22px; margin: 14px 0; }
+.wbox { position: relative; background: var(--surface); border: 1px solid var(--line); border-top: 4px solid var(--accent); border-radius: 8px; padding: 12px; font-size: .92rem; }
+.wbox h3 { font-size: 1.02rem; margin-bottom: 4px; }
+.wbox p { margin: 0; color: var(--muted); }
+.wbox .say { display: block; margin-top: 6px; }
+.wbox:not(:last-child)::after { content: ""; position: absolute; top: 50%; right: -17px; border: 6px solid transparent; border-left: 8px solid var(--muted); border-right: 0; transform: translateY(-50%); }
+
+/* cheat sheet */
+.twrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: .95rem; }
+th, td { text-align: left; vertical-align: top; padding: 9px 12px; border-bottom: 1px solid var(--line); }
+th { font-size: .75rem; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); background: var(--lock-bg); }
+tr:last-child td { border-bottom: 0; }
+td:first-child { white-space: nowrap; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; margin: 10px 0; }
+.card ul { margin: 6px 0 0; padding-left: 20px; }
+.card li { margin-bottom: 6px; }
+
+@media (max-width: 640px) {
+  h1 { font-size: 1.65rem; }
+  .week { grid-template-columns: 1fr; gap: 24px; }
+  .wbox:not(:last-child)::after { top: auto; bottom: -17px; right: auto; left: 50%; border: 6px solid transparent; border-top: 8px solid var(--muted); border-bottom: 0; transform: translateX(-50%); }
+  td:first-child { white-space: normal; }
+  table { font-size: .9rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="slug">Job desk / Setup guide</div>
+    <h1>Your Job Desk Setup</h1>
+    <p class="lede">Every weekday morning, this system finds journalism jobs for you and adds them to a Google Sheet. When one looks good, it drafts a tailored résumé, a cover letter in your voice, and clip picks for that application. Setup takes about an hour in total, in a few sittings. Work through the five levels below before your check-in call with Nadeen.</p>
+  </header>
+
+  <div class="progress" role="group" aria-label="Progress">
+    <div class="progress-row"><span id="progLabel">0 of 5 levels done</span><span id="progPct">0%</span></div>
+    <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="5" aria-valuenow="0" aria-labelledby="progLabel" id="bar"><i id="barFill"></i></div>
+  </div>
+
+  <!-- LEVEL 1 -->
+  <section class="level" id="level1" data-level="1" aria-labelledby="h1-title">
+    <div class="slug">Level 1 / Gather</div>
+    <h3 id="h1-title">Gather your stuff</h3>
+    <p class="goal">Goal: have everything in one folder before you meet Claude.</p>
+    <ol>
+      <li>Install the Claude desktop app on your Mac. You need a paid Claude plan.</li>
+      <li>Make a new folder. Call it something like "Job search".</li>
+      <li>Put two files in it: your résumé (PDF or .docx), and your LinkedIn profile as a PDF. To get the PDF, open your own profile on LinkedIn, click More, then Save to PDF. Move the downloaded file into your folder.</li>
+      <li>Have the link to your personal website of clips ready.</li>
+    </ol>
+    <div class="peek"><b>What you'll see</b>A folder with two files in it: your résumé and a LinkedIn PDF (usually named Profile.pdf).</div>
+    <p class="donewhen">Done when: the Claude app is installed, and the folder holds your résumé and your LinkedIn PDF.</p>
+    <p class="lockmsg"></p>
+    <div class="check"><input type="checkbox" id="chk1" data-level="1"><label for="chk1">Level 1 done</label></div>
+  </section>
+
+  <!-- LEVEL 2 -->
+  <section class="level" id="level2" data-level="2" aria-labelledby="h2-title">
+    <div class="slug">Level 2 / Connect</div>
+    <h3 id="h2-title">Connect your accounts</h3>
+    <p class="goal">Goal: let Claude reach your Google account and Indeed.</p>
+    <ol>
+      <li>Open the Claude app, then Settings, then Connectors.</li>
+      <li>Find each connector below, click Connect, and sign in.</li>
+    </ol>
+    <ul>
+      <li><b>Google Drive.</b> Claude creates your tracker Sheet here and saves your application Docs.</li>
+      <li><b>Google Sheets.</b> Claude writes new jobs into your tracker and reads your changes.</li>
+      <li><b>Gmail.</b> Claude reads LinkedIn job alert emails, which is how it sees jobs at sites it cannot read directly, like Politico, The Atlantic and The Hill. It never sends email.</li>
+      <li><b>Indeed.</b> Optional but recommended. It adds a broad set of listings to the daily search.</li>
+    </ul>
+    <div class="peek"><b>What you'll see</b>Each connector shows as connected in the list. If one is missing, Claude will tell you in Level 3 and show you how to fix it.</div>
+    <p class="donewhen">Done when: Drive, Sheets and Gmail are connected, plus Indeed if you want it.</p>
+    <p class="lockmsg"></p>
+    <div class="check"><input type="checkbox" id="chk2" data-level="2"><label for="chk2">Level 2 done</label></div>
+  </section>
+
+  <!-- LEVEL 3 -->
+  <section class="level" id="level3" data-level="3" aria-labelledby="h3-title">
+    <div class="slug">Level 3 / Meet Claude / about 30 min</div>
+    <h3 id="h3-title">Meet Claude</h3>
+    <p class="goal">Goal: Claude learns your work and builds your system with you.</p>
+    <ol>
+      <li>In the Claude app, open Claude in your "Job search" folder.</li>
+      <li>Type your website link below. It fills into the message.</li>
+      <li>Press Copy, paste the message into Claude, and send it.</li>
+      <li>Answer Claude's questions. It asks one at a time.</li>
+    </ol>
+    <div class="msg">
+      <label class="msg-label" for="siteUrl">Your website link (leave empty if you have no site)</label>
+      <input type="url" id="siteUrl" inputmode="url" autocomplete="off" placeholder="https://yourname.com">
+      <span class="msg-label" id="msgLabel">Message to paste into Claude</span>
+      <pre id="setupMsg" aria-labelledby="msgLabel" tabindex="0"></pre>
+      <button type="button" class="btn" id="copySetup">Copy message</button><span class="copied" id="copiedSetup" role="status" aria-live="polite"></span>
+    </div>
+    <div class="peek"><b>What you'll see</b>Claude downloads the job system into your folder, reads your résumé and your website, and shows a table of your clips for you to approve. Then it asks about the jobs you want, one question at a time, and builds your Google Sheet. It gives you the Sheet link. Bookmark it.</div>
+    <div class="note"><b>Heads-ups</b>
+      <ul style="margin:4px 0 0;padding-left:20px">
+        <li>A Mac window may pop up asking to install "command line developer tools". Either button is fine.</li>
+        <li>Claude may ask permission to read the folder above. Say yes.</li>
+      </ul>
+    </div>
+    <p><b>From now on, open Claude in the <code>nihal-job-system</code> folder</b> (it sits inside your "Job search" folder). That is where the commands live.</p>
+    <p class="donewhen">Done when: Claude has given you the link to your Google Sheet.</p>
+    <p class="lockmsg"></p>
+    <div class="check"><input type="checkbox" id="chk3" data-level="3"><label for="chk3">Level 3 done</label></div>
+  </section>
+
+  <!-- LEVEL 4 -->
+  <section class="level" id="level4" data-level="4" aria-labelledby="h4-title">
+    <div class="slug">Level 4 / Morning scan</div>
+    <h3 id="h4-title">Switch on your morning scan</h3>
+    <p class="goal">Goal: new jobs land in your Sheet every weekday morning on their own.</p>
+    <p>Claude offers this at the end of Level 3. Say yes to weekdays around 7:30. If you skipped it, paste the message below. Then check three settings.</p>
+    <div class="msg">
+      <pre id="scanMsg" tabindex="0">Set up my morning scan.</pre>
+      <button type="button" class="btn" id="copyScan">Copy message</button><span class="copied" id="copiedScan" role="status" aria-live="polite"></span>
+    </div>
+    <ol>
+      <li>In the Claude app, open Scheduled in the sidebar, click your task, then Edit.</li>
+      <li>Working folder: set it to your <code>nihal-job-system</code> folder. It is the folder row at the bottom of the Instructions box. Save, open the task page again, and check that Folder now ends in <code>nihal-job-system</code>.</li>
+      <li>Model: set it to Sonnet. It is the "Default" menu at the bottom right of the Instructions box.</li>
+      <li>Permission mode: set it to Auto. It is the "Manual" button at the bottom left of the Instructions box. Auto lets the scan run without stopping to ask you. If Auto is not in the list, stop and tell Nadeen.</li>
+      <li>Go to Settings, then This computer, then System, and turn on Keep computer awake.</li>
+      <li>Click Run now once, and leave it alone for about 10 minutes.</li>
+    </ol>
+    <div class="peek"><b>What you'll see</b>The test run finishes with "succeeded" and a 3-line summary: how many jobs were added, the best one, and anything skipped. New rows appear in your Sheet with Status New. If it stops to ask you something, tell Nadeen what it named.</div>
+    <div class="note"><b>Optional: LinkedIn job alerts</b>
+      Some employers block Claude from reading their job pages. LinkedIn alert emails are how it sees those jobs. On linkedin.com, click Jobs, search for a role you want, and set the location to Washington, DC. Turn on the Set alert switch, then choose Daily and Email. Repeat for two or three roles.
+    </div>
+    <p class="donewhen">Done when: the Run now test says "succeeded". The scan only runs while the Claude app is open and your Mac is awake.</p>
+    <p class="lockmsg"></p>
+    <div class="check"><input type="checkbox" id="chk4" data-level="4"><label for="chk4">Level 4 done</label></div>
+  </section>
+
+  <!-- LEVEL 5 -->
+  <section class="level" id="level5" data-level="5" aria-labelledby="h5-title">
+    <div class="slug">Level 5 / First application</div>
+    <h3 id="h5-title">Your first application</h3>
+    <p class="goal">Goal: one real application, built by Claude and sent by you.</p>
+    <ol>
+      <li>Open your Google Sheet and pick a job that interests you.</li>
+      <li>In Claude (in the <code>nihal-job-system</code> folder), type <code>/apply</code> and the job, for example the title and organization. You can also paste a link to a job posting.</li>
+      <li>Claude may show a short list of what it will build. Say yes.</li>
+      <li>Claude builds a Google Doc résumé and a Google Doc cover letter in your Drive, in a folder called "Job applications". It also picks 3 to 5 of your clips, and lists any claims it wants you to confirm. In your Sheet the job's Status becomes Ready to apply.</li>
+      <li>Open the Docs and edit them until they sound like you. Then File, Download, PDF.</li>
+      <li>Apply on the employer's own site. Claude never applies for you.</li>
+      <li>Tell Claude "I applied to" and the organization name, for example "I applied to The Bulwark". Claude changes the Status to Applied.</li>
+    </ol>
+    <div class="peek"><b>What you'll see</b>A reply listing your two Google Docs, the clip picks, and any claims to confirm. Your Sheet row now has a Folder link.</div>
+    <p class="donewhen">Done when: you have applied to one job and told Claude.</p>
+    <p class="lockmsg"></p>
+    <div class="check"><input type="checkbox" id="chk5" data-level="5"><label for="chk5">Level 5 done</label></div>
+  </section>
+
+  <p id="allDone" class="note" hidden><b>All five levels done</b>You are set up. Bring your questions to your check-in call with Nadeen.</p>
+
+  <h2>How your week works</h2>
+  <div class="week">
+    <div class="wbox"><div class="slug">Morning</div><h3>The scan runs</h3><p>It adds up to 10 new jobs to your Sheet. You skim the Sheet over coffee.</p></div>
+    <div class="wbox"><div class="slug">Something looks good</div><h3>Say /apply</h3><p>Claude builds your résumé, cover letter and clip picks in Google Docs.</p></div>
+    <div class="wbox"><div class="slug">After you apply</div><h3>Tell Claude</h3><p>Say "I applied to" and the organization. Claude marks it Applied in your Sheet.</p></div>
+    <div class="wbox"><div class="slug">Weekly batch</div><h3>Top 3</h3><p>Say <code>my top 3 this week</code> and Claude builds applications for your three best jobs.</p></div>
+  </div>
+
+  <h2>Cheat sheet</h2>
+  <p>Open Claude in the <code>nihal-job-system</code> folder. Then say any of these.</p>
+  <div class="twrap" role="region" aria-label="Things you can say to Claude" tabindex="0">
+    <table>
+      <thead><tr><th>You say</th><th>What happens</th></tr></thead>
+      <tbody>
+        <tr><td><code>/jobs</code></td><td>A simple menu that points you to the next step. Coming soon.</td></tr>
+        <tr><td><code>find me jobs</code></td><td>Claude searches your sources now and adds the best new matches to your Sheet. Also <code>/find-jobs</code>.</td></tr>
+        <tr><td><code>show me more</code></td><td>Adds the next 10 matches that were waiting. No new search.</td></tr>
+        <tr><td><code>/apply</code> plus a job or link</td><td>Builds your résumé, cover letter and clip picks for that job.</td></tr>
+        <tr><td><code>I applied to X</code></td><td>Sets that job to Applied.</td></tr>
+        <tr><td><code>pass on X</code></td><td>Sets that job to Passed. Claude asks for a one-line reason.</td></tr>
+        <tr><td><code>I published something new</code></td><td>Claude asks for the link and, once you confirm it is your piece, offers to add it to your clips.</td></tr>
+        <tr><td><code>update my job system</code></td><td>Gets the newest version of the system. Your own files are not touched.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 style="margin-top:24px">The 10-a-day cap</h3>
+  <p>Each search adds only the 10 best new jobs to your Sheet, so it never floods. The other matches wait in Claude's memory, and they expire after 14 days. Say "show me more" to add the next 10.</p>
+
+  <h3 style="margin-top:24px">What each Status means</h3>
+  <div class="twrap" role="region" aria-label="Status meanings" tabindex="0">
+    <table>
+      <thead><tr><th>Status</th><th>Meaning</th></tr></thead>
+      <tbody>
+        <tr><td>New</td><td>Found by a scan. You have not looked at it yet.</td></tr>
+        <tr><td>Saved</td><td>You want to keep it.</td></tr>
+        <tr><td>Ready to apply</td><td>Claude has built your application and it is waiting for you to send it.</td></tr>
+        <tr><td>Applied</td><td>You sent it. Only you set this, in the dropdown or by telling Claude. Claude never marks anything Applied.</td></tr>
+        <tr><td>Interviewing</td><td>You are in a hiring process.</td></tr>
+        <tr><td>Offer</td><td>You have an offer.</td></tr>
+        <tr><td>Passed</td><td>You are not interested.</td></tr>
+        <tr><td>Closed</td><td>The posting is gone or the process ended.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="margin-top:12px">Ready to apply and Applied are different: Ready to apply means the ball is with you. Applied means you sent it.</p>
+  <p>Some Daybook jobs show "Employer hidden (Daybook)" in the Org column. Daybook shows the employer only to paid members. The link still shows a short description and often the salary. To build an application for one, paste the description into Claude, and tell it the employer if you know it. Claude will not guess.</p>
+
+  <h2>If something goes wrong</h2>
+  <div class="card">
+    <ul>
+      <li><b>The scan stalled.</b> A prompt is waiting for an answer. Check that the task's Permission mode is still Auto (Scheduled, your task, Edit). Then open the run from the task's History list and answer the prompt. If it keeps stopping, tell Nadeen.</li>
+      <li><b>The app shows a yellow "sign in again" banner.</b> Sign in again, then click Run now once.</li>
+      <li><b>It did not run.</b> The app was closed or the Mac was asleep. Open the app and wake the Mac. One catch-up run happens on its own. Also check that Keep computer awake is on.</li>
+      <li><b>The summary says "no LinkedIn alert emails".</b> No alert emails arrived from LinkedIn in the last few days. Set up the LinkedIn job alerts from Level 4, with email delivery.</li>
+      <li><b>The run was rejected.</b> You are at your Claude plan's usage limit. Wait for it to reset.</li>
+    </ul>
+  </div>
+
+  <h2>Questions?</h2>
+  <p>Ask Nadeen on your check-in call.</p>
+</div>
+
+<script>
+(function () {
+  var KEY = 'nihalQuest.v1';
+  var state = { checks: [false, false, false, false, false], site: '' };
+
+  function load() {
+    try {
+      var raw = window.localStorage.getItem(KEY);
+      if (raw) {
+        var s = JSON.parse(raw);
+        if (s && Array.isArray(s.checks) && s.checks.length === 5) state.checks = s.checks.map(Boolean);
+        if (s && typeof s.site === 'string') state.site = s.site;
+      }
+    } catch (e) { /* storage unavailable: page still works */ }
+  }
+  function save() {
+    try { window.localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) { /* ignore */ }
+  }
+
+  var boxes = [];
+  for (var i = 1; i <= 5; i++) boxes.push(document.getElementById('chk' + i));
+  var levels = [];
+  for (var j = 1; j <= 5; j++) levels.push(document.getElementById('level' + j));
+
+  function render() {
+    var done = 0;
+    for (var n = 0; n < 5; n++) {
+      var unlocked = n === 0 || state.checks[n - 1];
+      if (!unlocked) state.checks[n] = false;
+      boxes[n].checked = state.checks[n];
+      boxes[n].disabled = !unlocked;
+      levels[n].classList.toggle('locked', !unlocked);
+      levels[n].classList.toggle('done', state.checks[n]);
+      var msg = levels[n].querySelector('.lockmsg');
+      msg.textContent = unlocked ? '' : 'Locked until Level ' + n + ' is done. You can read ahead.';
+      if (state.checks[n]) done++;
+    }
+    document.getElementById('progLabel').textContent = done + ' of 5 levels done';
+    document.getElementById('progPct').textContent = (done * 20) + '%';
+    document.getElementById('barFill').style.width = (done * 20) + '%';
+    document.getElementById('bar').setAttribute('aria-valuenow', String(done));
+    document.getElementById('allDone').hidden = done !== 5;
+  }
+
+  boxes.forEach(function (b, idx) {
+    b.addEventListener('change', function () {
+      state.checks[idx] = b.checked;
+      render();
+      save();
+    });
+  });
+
+  // setup message
+  var site = document.getElementById('siteUrl');
+  var pre = document.getElementById('setupMsg');
+  function setupText() {
+    var url = site.value.trim();
+    var web = url
+      ? 'My website with my published articles is ' + url + '.'
+      : "I don't have a website, so please ask me for links to my 10 to 15 best articles.";
+    return 'Please set up my job search system. Download it from https://github.com/NadeenSidd08/nihal-job-system into this folder (use git clone, or a ZIP download if git is not available). Then read nihal-job-system/CLAUDE.md and follow it. My r\u00e9sum\u00e9 and my LinkedIn PDF are in this folder. ' + web;
+  }
+  function updateMsg() { pre.textContent = setupText(); }
+  site.addEventListener('input', function () {
+    state.site = site.value;
+    updateMsg();
+    save();
+  });
+
+  function selectText(el) {
+    var range = document.createRange();
+    range.selectNodeContents(el);
+    var sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+  }
+  function wireCopy(btnId, preEl, textFn, statusId) {
+    var btn = document.getElementById(btnId);
+    var status = document.getElementById(statusId);
+    btn.addEventListener('click', function () {
+      var text = textFn();
+      function fallback() {
+        selectText(preEl);
+        status.textContent = 'Press Cmd+C to copy the selected text.';
+      }
+      try {
+        navigator.clipboard.writeText(text).then(function () {
+          status.textContent = 'Copied.';
+          setTimeout(function () { status.textContent = ''; }, 3000);
+        }, fallback);
+      } catch (e) { fallback(); }
+    });
+  }
+  wireCopy('copySetup', pre, setupText, 'copiedSetup');
+  var scanPre = document.getElementById('scanMsg');
+  wireCopy('copyScan', scanPre, function () { return scanPre.textContent; }, 'copiedScan');
+
+  load();
+  site.value = state.site;
+  updateMsg();
+  render();
+})();
+</script>
