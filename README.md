@@ -20,7 +20,7 @@ Open Claude in the `nihal-job-system` folder. If you open the folder above it in
 - Your LinkedIn profile as a PDF
 - A link to your website
 
-## The three commands
+## The commands
 
 | Command | What it does | Status |
 |---|---|---|

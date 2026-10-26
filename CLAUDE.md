@@ -7,7 +7,7 @@ The files that matter:
 - `profile.md`, `facts.md`, `clips.md`, `learnings.md`: his personal files, inside this repo folder (`nihal-job-system/`). The exact format of each is in `docs/personal-files.md`. Follow it exactly. Blank starting copies are in `templates/` and `profile.template.md`.
 - `resume.md`: a markdown copy of his résumé, kept in the folder one level above this repo.
 - The Google Sheet tracker: its rules are in `docs/tracker-sheet.md`. Its URL is in `profile.md` under `## Tracker sheet`.
-- Skills in `.claude/skills/`: `/find-jobs`, `/apply`, `/jobs`. Some are still being built. `/jobs` shows the menu. `/interview-prep` is Phase 2. The old `/scan-jobs` is archived. Never call it.
+- Skills in `.claude/skills/`: `/find-jobs`, `/apply`, `/jobs`. All three are available. `/jobs` shows the menu. `/interview-prep` is Phase 2. The old `/scan-jobs` is archived. Never call it.
 
 Where to open Claude: Open Claude in the `nihal-job-system` folder. If you open the folder above it instead, a small file that setup left there sends Claude to the right place.
 
@@ -57,4 +57,4 @@ Otherwise onboarding is finished. Use the rules below. Unattended runs (morning 
   If any step fails, stop, say which one, run the cleanup step (6) to remove the temp folder, and do not say the system was updated. If a `job-system-update-tmp` folder already exists next to the repo, ask him before using that name. Never overwrite or delete his personal files (`profile.md`, `facts.md`, `clips.md`, `clips/`, `learnings.md`, `feedback.md`, `applications/`) or `resume.md` above the repo. They are not in the ZIP, so the copy leaves them alone. Say what changed.
 - **Never fabricate** jobs, clips, or résumé claims. If a connector or source is unavailable, say so.
 - **Personal files stay gitignored.** Keep it that way.
-- **Skills**: `/find-jobs`, `/apply` and `/jobs` exist or are coming (see `README.md` for which). Don't call the archived `/scan-jobs`.
+- **Skills**: `/find-jobs`, `/apply` and `/jobs` are available. Don't call the archived `/scan-jobs`.
