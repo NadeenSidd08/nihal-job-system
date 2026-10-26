@@ -131,6 +131,9 @@ th, td { text-align: left; vertical-align: top; padding: 9px 12px; border-bottom
 th { font-size: .75rem; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); background: var(--lock-bg); }
 tr:last-child td { border-bottom: 0; }
 td:first-child { white-space: nowrap; }
+.note ul.tight { margin: 4px 0 0; padding-left: 20px; }
+h3.sub { margin-top: 24px; }
+.gap-top { margin-top: 12px; }
 .card { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; margin: 10px 0; }
 .card ul { margin: 6px 0 0; padding-left: 20px; }
 .card li { margin-bottom: 6px; }
@@ -192,7 +195,7 @@ td:first-child { white-space: nowrap; }
       <li><b>Indeed.</b> Optional but recommended. It adds a broad set of listings to the daily search.</li>
     </ul>
     <div class="peek"><b>What you'll see</b>Each connector shows as connected in the list. If one is missing, Claude will tell you in Level 3 and show you how to fix it.</div>
-    <p class="donewhen">Done when: Drive, Sheets and Gmail are connected, plus Indeed if you want it.</p>
+    <p class="donewhen">Done when: Drive and Sheets are connected. Gmail and Indeed if you can.</p>
     <p class="lockmsg"></p>
     <div class="check"><input type="checkbox" id="chk2" data-level="2"><label for="chk2">Level 2 done</label></div>
   </section>
@@ -203,7 +206,7 @@ td:first-child { white-space: nowrap; }
     <h3 id="h3-title">Meet Claude</h3>
     <p class="goal">Goal: Claude learns your work and builds your system with you.</p>
     <ol>
-      <li>In the Claude app, open Claude in your "Job search" folder.</li>
+      <li>In the Claude app, open Claude in your "Job search" folder. <!-- CONFIRM-UI-LABELS -->In the Claude desktop app, open the Code tab, start a new session, and choose your Job search folder as its folder.<!-- /CONFIRM-UI-LABELS --></li>
       <li>Type your website link below. It fills into the message.</li>
       <li>Press Copy, paste the message into Claude, and send it.</li>
       <li>Answer Claude's questions. It asks one at a time.</li>
@@ -217,12 +220,12 @@ td:first-child { white-space: nowrap; }
     </div>
     <div class="peek"><b>What you'll see</b>Claude downloads the job system into your folder, reads your résumé and your website, and shows a table of your clips for you to approve. Then it asks about the jobs you want, one question at a time, and builds your Google Sheet. It gives you the Sheet link. Bookmark it.</div>
     <div class="note"><b>Heads-ups</b>
-      <ul style="margin:4px 0 0;padding-left:20px">
+      <ul class="tight">
         <li>A Mac window may pop up asking to install "command line developer tools". Either button is fine.</li>
         <li>Claude may ask permission to read the folder above. Say yes.</li>
       </ul>
     </div>
-    <p><b>From now on, open Claude in the <code>nihal-job-system</code> folder</b> (it sits inside your "Job search" folder). That is where the commands live.</p>
+    <p><b>From now on, open Claude in the <code>nihal-job-system</code> folder</b> (it sits inside your "Job search" folder). That is where the commands live. <!-- CONFIRM-UI-LABELS -->To open it, open the Code tab, start a new session, and choose the nihal-job-system folder as its folder.<!-- /CONFIRM-UI-LABELS --></p>
     <p class="donewhen">Done when: Claude has given you the link to your Google Sheet.</p>
     <p class="lockmsg"></p>
     <div class="check"><input type="checkbox" id="chk3" data-level="3"><label for="chk3">Level 3 done</label></div>
@@ -231,9 +234,9 @@ td:first-child { white-space: nowrap; }
   <!-- LEVEL 4 -->
   <section class="level" id="level4" data-level="4" aria-labelledby="h4-title">
     <div class="slug">Level 4 / Morning scan</div>
-    <h3 id="h4-title">Switch on your morning scan</h3>
+    <h3 id="h4-title">Check your morning scan</h3>
     <p class="goal">Goal: new jobs land in your Sheet every weekday morning on their own.</p>
-    <p>Claude offers this at the end of Level 3. Say yes to weekdays around 7:30. If you skipped it, paste the message below. Then check three settings.</p>
+    <p>Claude set this up with you at the end of Level 3 and walked you through these settings. Use this list to double-check, or to do it later. If Claude never offered it, paste this message:</p>
     <div class="msg">
       <pre id="scanMsg" tabindex="0">Set up my morning scan.</pre>
       <button type="button" class="btn" id="copyScan">Copy message</button><span class="copied" id="copiedScan" role="status" aria-live="polite"></span>
@@ -291,7 +294,7 @@ td:first-child { white-space: nowrap; }
     <table>
       <thead><tr><th>You say</th><th>What happens</th></tr></thead>
       <tbody>
-        <tr><td><code>/jobs</code></td><td>A simple menu that points you to the next step. Coming soon.</td></tr>
+        <tr><td><code>/jobs</code></td><td>A simple menu that points you to the next step. Type it whenever you forget the commands.</td></tr>
         <tr><td><code>find me jobs</code></td><td>Claude searches your sources now and adds the best new matches to your Sheet. Also <code>/find-jobs</code>.</td></tr>
         <tr><td><code>show me more</code></td><td>Adds the next 10 matches that were waiting. No new search.</td></tr>
         <tr><td><code>/apply</code> plus a job or link</td><td>Builds your résumé, cover letter and clip picks for that job.</td></tr>
@@ -303,10 +306,10 @@ td:first-child { white-space: nowrap; }
     </table>
   </div>
 
-  <h3 style="margin-top:24px">The 10-a-day cap</h3>
+  <h3 class="sub">The 10-a-day cap</h3>
   <p>Each search adds only the 10 best new jobs to your Sheet, so it never floods. The other matches wait in Claude's memory, and they expire after 14 days. Say "show me more" to add the next 10.</p>
 
-  <h3 style="margin-top:24px">What each Status means</h3>
+  <h3 class="sub">What each Status means</h3>
   <div class="twrap" role="region" aria-label="Status meanings" tabindex="0">
     <table>
       <thead><tr><th>Status</th><th>Meaning</th></tr></thead>
@@ -314,7 +317,7 @@ td:first-child { white-space: nowrap; }
         <tr><td>New</td><td>Found by a scan. You have not looked at it yet.</td></tr>
         <tr><td>Saved</td><td>You want to keep it.</td></tr>
         <tr><td>Ready to apply</td><td>Claude has built your application and it is waiting for you to send it.</td></tr>
-        <tr><td>Applied</td><td>You sent it. Only you set this, in the dropdown or by telling Claude. Claude never marks anything Applied.</td></tr>
+        <tr><td>Applied</td><td>You sent it. Only you set this, in the dropdown or by telling Claude 'I applied'. Claude never marks it Applied on its own.</td></tr>
         <tr><td>Interviewing</td><td>You are in a hiring process.</td></tr>
         <tr><td>Offer</td><td>You have an offer.</td></tr>
         <tr><td>Passed</td><td>You are not interested.</td></tr>
@@ -322,7 +325,7 @@ td:first-child { white-space: nowrap; }
       </tbody>
     </table>
   </div>
-  <p style="margin-top:12px">Ready to apply and Applied are different: Ready to apply means the ball is with you. Applied means you sent it.</p>
+  <p class="gap-top">Ready to apply and Applied are different: Ready to apply means the ball is with you. Applied means you sent it.</p>
   <p>Some Daybook jobs show "Employer hidden (Daybook)" in the Org column. Daybook shows the employer only to paid members. The link still shows a short description and often the salary. To build an application for one, paste the description into Claude, and tell it the employer if you know it. Claude will not guess.</p>
 
   <h2>If something goes wrong</h2>

@@ -32,6 +32,8 @@ Check these in order and start at the first one that is not done. Tell him: "Wel
 
 Do this only if you are NOT already inside a folder named `nihal-job-system` that contains `docs/personal-files.md`. (If you are, skip to step 2.)
 
+If the setup message already cloned it, skip to item 4.
+
 He pasted a setup message in a folder he made. That folder is his working folder and holds his résumé and LinkedIn PDF. This file only reaches you if you were pointed at it, so if the setup message asked you to clone and then read `nihal-job-system/CLAUDE.md`, you are in this step because of that.
 
 Say: "First I'm downloading the job system into this folder."
