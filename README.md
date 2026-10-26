@@ -24,7 +24,7 @@ Open Claude in the `nihal-job-system` folder. If you open the folder above it in
 
 | Command | What it does | Status |
 |---|---|---|
-| `/jobs` | A simple menu that points you to the right next step | Coming soon |
+| `/jobs` | A simple menu that points you to the right next step | Available |
 | `/find-jobs` | Finds journalism jobs that fit you (Indeed, JournalismJobs, Mediabistro, Daybook and your LinkedIn job alert emails) and adds them to your Google Sheet | Available |
 | `/apply` | Tailors your résumé, writes a cover letter, and picks clips for one job | Available |
 | `/interview-prep` | Prepares you for an interview. It gets adapted in Phase 2 | Coming later |

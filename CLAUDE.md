@@ -7,7 +7,7 @@ The files that matter:
 - `profile.md`, `facts.md`, `clips.md`, `learnings.md`: his personal files, inside this repo folder (`nihal-job-system/`). The exact format of each is in `docs/personal-files.md`. Follow it exactly. Blank starting copies are in `templates/` and `profile.template.md`.
 - `resume.md`: a markdown copy of his résumé, kept in the folder one level above this repo.
 - The Google Sheet tracker: its rules are in `docs/tracker-sheet.md`. Its URL is in `profile.md` under `## Tracker sheet`.
-- Skills in `.claude/skills/`: `/find-jobs`, `/apply`, `/jobs`. Some are still being built. `/interview-prep` is Phase 2. The old `/scan-jobs` is archived. Never call it.
+- Skills in `.claude/skills/`: `/find-jobs`, `/apply`, `/jobs`. Some are still being built. `/jobs` shows the menu. `/interview-prep` is Phase 2. The old `/scan-jobs` is archived. Never call it.
 
 Where to open Claude: Open Claude in the `nihal-job-system` folder. If you open the folder above it instead, a small file that setup left there sends Claude to the right place.
 
