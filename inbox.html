@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Job Inbox (mockup)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..600&family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F4EDE0; --paper-2:#E7DCC7; --card:#FCF8F1;
+  --ink:#1A1526; --ink-2:#4A3F5E; --ink-3:#6B6079;
+  --on-ink:#F4EDE0;
+  --violet:#7C5BD9; --violet-deep:#4C2E9E; --lavender:#B9A6E8;
+  --coral:#EE8A5E; --pink:#E8689A; --teal:#3FC7B8; --amber:#F0A35E;
+  --link:#4C2E9E; --focus:#4C2E9E;
+  --banner-bg:#FFF1C7; --banner-ink:#4A3A00;
+  --fixed-dark:#1A1526;
+  --shadow:5px 5px 0 var(--ink); --shadow-lg:8px 8px 0 var(--ink);
+  --radius:4px;
+  --font-display:"Fraunces",Georgia,serif;
+  --font-body:"Inter",system-ui,sans-serif;
+  --font-grot:"Space Grotesk","Inter",sans-serif;
+  --ease:cubic-bezier(.22,.61,.36,1);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#16121E; --paper-2:#2A2338; --card:#211B2D;
+    --ink:#EFE6D4; --ink-2:#CFC5DD; --ink-3:#A89DBA;
+    --on-ink:#16121E;
+    --link:#C9B8F5; --focus:#F0A35E;
+    --banner-bg:#3A3110; --banner-ink:#F6E7A8;
+    --shadow:5px 5px 0 #000; --shadow-lg:8px 8px 0 #000;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#16121E; --paper-2:#2A2338; --card:#211B2D;
+  --ink:#EFE6D4; --ink-2:#CFC5DD; --ink-3:#A89DBA;
+  --on-ink:#16121E;
+  --link:#C9B8F5; --focus:#F0A35E;
+  --banner-bg:#3A3110; --banner-ink:#F6E7A8;
+  --shadow:5px 5px 0 #000; --shadow-lg:8px 8px 0 #000;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-body);color:var(--ink);background:var(--paper);font-size:16px;line-height:1.55;min-height:100vh;overflow-x:hidden}
+.wrap{max-width:1180px;margin:0 auto;padding:0 16px 120px}
+@media(min-width:760px){.wrap{padding:0 40px 120px}}
+:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+a{color:var(--link)}
+
+.banner{background:var(--banner-bg);color:var(--banner-ink);border-bottom:2px dashed var(--ink-3);font-size:15px;text-align:center;padding:8px 16px}
+
+header{display:flex;flex-wrap:wrap;align-items:flex-end;gap:14px 24px;padding:30px 0 6px}
+h1{font-family:var(--font-display);font-weight:600;font-size:clamp(44px,8vw,66px);letter-spacing:-.03em;line-height:.95}
+h1 em{font-style:normal;color:var(--pink)}
+.hright{margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;gap:8px;font-size:15px;color:var(--ink-3)}
+.hright .row{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.stats{display:flex;flex-wrap:wrap;gap:8px;padding:14px 0 4px}
+.stat{font-family:var(--font-grot);font-weight:700;font-size:14px;letter-spacing:.04em;text-transform:uppercase;background:var(--card);border:2px solid var(--ink);border-radius:3px;padding:4px 10px;color:var(--ink)}
+.stat b{background:var(--amber);color:var(--fixed-dark);border:2px solid var(--ink);border-radius:3px;padding:0 7px;margin-right:6px}
+
+.chip,.small{font-family:var(--font-grot);font-weight:700;font-size:14px;letter-spacing:.04em;text-transform:uppercase;
+  border:2px solid var(--ink);border-radius:3px;padding:9px 14px;background:var(--card);color:var(--ink);cursor:pointer;
+  box-shadow:2px 2px 0 var(--ink);transition:transform .12s var(--ease),box-shadow .12s var(--ease)}
+.chip:hover,.small:hover{transform:translate(-1px,-1px);box-shadow:3px 3px 0 var(--ink)}
+.chip:active,.small:active{transform:translate(1px,1px);box-shadow:1px 1px 0 var(--ink)}
+.chip[aria-pressed="true"],.chip[aria-selected="true"]{background:var(--ink);color:var(--on-ink)}
+.chip .cnt{margin-left:6px;opacity:.75}
+.small{padding:5px 12px;font-size:13px}
+
+.tabs{display:flex;gap:10px;padding:18px 0 4px}
+.tabs .chip{font-size:16px;padding:11px 24px}
+.tabs .chip[aria-selected="true"]{background:var(--violet);color:#fff}
+.filters{display:flex;flex-wrap:wrap;gap:9px;padding:12px 0 6px}
+
+/* section headers */
+section.grp{margin-top:34px}
+.slabel{display:flex;align-items:center;gap:14px;width:100%;background:none;border:0;color:var(--ink);cursor:pointer;text-align:left;font:inherit;padding:6px 0}
+.slabel .t{font-family:var(--font-display);font-weight:600;font-size:clamp(26px,4vw,32px);letter-spacing:-.02em;line-height:1.1}
+.slabel .count{font-family:var(--font-grot);font-weight:700;font-size:15px;color:var(--ink-3)}
+.slabel::after{content:"";flex:1;height:3px;background:var(--ink);border-radius:2px;order:3}
+.slabel .caret{order:4;font-size:22px;transition:transform .2s var(--ease)}
+section.closed .caret{transform:rotate(-90deg)}
+section.closed .body{display:none}
+
+/* top picks */
+.strip{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(250px,1fr);gap:14px;overflow-x:auto;padding:16px 6px 14px;margin:0 -6px}
+.pick{border:3px solid var(--ink);border-radius:var(--radius);padding:16px 18px;text-align:left;cursor:pointer;color:var(--fixed-dark);
+  box-shadow:var(--shadow);font:inherit;display:flex;flex-direction:column;gap:6px;transition:transform .16s var(--ease),box-shadow .16s var(--ease)}
+.pick:hover{transform:translate(-2px,-2px);box-shadow:7px 7px 0 var(--ink)}
+.pick .co{font-family:var(--font-display);font-weight:600;font-size:22px;line-height:1.1}
+.pick .ti{font-size:15px;font-weight:500;line-height:1.35;color:inherit;font-family:var(--font-body)}
+.pick .fit{font-family:var(--font-grot);font-weight:700;font-size:15px;margin-top:auto;padding-top:8px}
+.pick.c0{background:var(--pink)} .pick.c1{background:var(--violet);color:#fff} .pick.c2{background:var(--coral)}
+.pick.c3{background:var(--teal)} .pick.c4{background:var(--amber)}
+
+/* cards */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px;padding:18px 6px 8px;margin:0 -6px}
+@media(max-width:420px){.grid{grid-template-columns:minmax(0,1fr)}}
+.card{background:var(--card);border:3px solid var(--ink);border-radius:var(--radius);padding:18px;display:flex;flex-direction:column;gap:10px;
+  box-shadow:var(--shadow);transition:transform .16s var(--ease),opacity .3s var(--ease)}
+.card.leaving{opacity:0;transform:scale(.94)}
+.card.flash{animation:flash 1.2s var(--ease)}
+@keyframes flash{0%,60%{box-shadow:0 0 0 6px var(--amber),var(--shadow)}100%{box-shadow:var(--shadow)}}
+.top{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.fitb{font-family:var(--font-grot);font-weight:700;font-size:14px;border:2px solid var(--ink);border-radius:3px;padding:1px 9px;color:var(--fixed-dark)}
+.fit-hi{background:var(--teal)} .fit-mid{background:var(--amber)} .fit-lo{background:var(--paper-2);color:var(--ink)}
+.srcchip{font-family:var(--font-grot);font-weight:600;font-size:13px;color:var(--ink-2);border:2px solid var(--ink-3);border-radius:3px;padding:0 8px;margin-left:auto}
+.co{font-family:var(--font-display);font-weight:600;font-size:25px;line-height:1.1}
+.ti{font-family:var(--font-grot);font-size:17px;font-weight:600;color:var(--ink-2);line-height:1.3}
+.meta{font-size:15px;color:var(--ink-3)}
+.why{font-family:var(--font-display);font-style:italic;font-size:16px;line-height:1.45;border-left:3px solid var(--pink);padding-left:12px}
+.open{font-weight:600;font-size:15px}
+.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:auto;padding-top:12px;border-top:2px solid var(--ink)}
+.btn{font-family:var(--font-grot);font-weight:700;font-size:14px;letter-spacing:.04em;text-transform:uppercase;border-radius:3px;
+  padding:12px 14px;min-height:46px;cursor:pointer;text-align:center;border:2px solid var(--ink);background:var(--card);color:var(--ink);flex:1 1 auto;
+  text-decoration:none;display:inline-flex;align-items:center;justify-content:center;transition:transform .12s var(--ease),background .12s var(--ease)}
+.btn:active{transform:translateY(1px)}
+.btn.save:hover{background:var(--teal);color:var(--fixed-dark)}
+.btn.pass:hover{background:var(--coral);color:var(--fixed-dark)}
+.btn.main{background:var(--ink);color:var(--on-ink);flex-basis:100%}
+.btn.main:hover{background:var(--pink);color:var(--fixed-dark)}
+.passbox{display:flex;flex-direction:column;gap:8px;margin-top:auto;padding-top:12px;border-top:2px solid var(--ink)}
+.passbox label{font-weight:600;font-size:15px}
+.passbox input{font:inherit;font-size:16px;padding:10px 12px;border:2px solid var(--ink);border-radius:3px;background:var(--paper);color:var(--ink);width:100%}
+.passbox .row{display:flex;gap:8px}
+.copybox{display:flex;flex-direction:column;gap:6px;padding-top:8px;font-size:15px}
+.copybox input{font:inherit;font-size:15px;padding:8px 10px;border:2px solid var(--ink);border-radius:3px;background:var(--paper);color:var(--ink);width:100%}
+
+/* pipeline */
+.pipeline{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:18px;margin-top:22px}
+@media(max-width:1000px){.pipeline{grid-template-columns:minmax(0,1fr)}}
+.pcol{display:flex;flex-direction:column;gap:14px;min-width:0}
+.pcolhead{font-family:var(--font-grot);font-weight:700;font-size:15px;letter-spacing:.05em;text-transform:uppercase;display:flex;align-items:center;gap:8px;padding-bottom:9px;border-bottom:3px solid var(--ink)}
+.pcolhead .n{margin-left:auto;background:var(--ink);color:var(--on-ink);border-radius:3px;padding:0 9px}
+.pcard{background:var(--card);border:3px solid var(--ink);border-radius:var(--radius);padding:14px 16px;box-shadow:4px 4px 0 var(--ink);display:flex;flex-direction:column;gap:7px}
+.pcard .co{font-size:21px}
+.pcard .ti{font-size:16px}
+.pcard .actions{padding-top:10px}
+.pempty{font-family:var(--font-display);font-style:italic;color:var(--ink-3);font-size:16px;padding:6px 2px}
+.hidenote{margin-top:34px;font-size:15px;color:var(--ink-3)}
+.empty{font-family:var(--font-display);font-style:italic;color:var(--ink-2);padding:22px 4px;font-size:18px}
+
+.toast{position:fixed;bottom:22px;left:50%;transform:translate(-50%,20px);z-index:200;background:var(--ink);color:var(--on-ink);
+  border-left:6px solid var(--pink);border-radius:4px;padding:13px 22px;font-family:var(--font-grot);font-weight:600;font-size:16px;
+  opacity:0;pointer-events:none;transition:all .3s var(--ease);max-width:calc(100vw - 32px)}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="banner" role="note">Mockup with fake jobs. Buttons don't change any Sheet.</div>
+<div class="wrap">
+  <header>
+    <h1>Job Inbox<em>.</em></h1>
+    <div class="hright">
+      <span>Last read from your Sheet: just now (mock)</span>
+      <div class="row">
+        <button class="small" id="refresh" type="button">Refresh</button>
+        <button class="small" id="theme" type="button" aria-label="Switch between light and dark mode">Dark mode</button>
+      </div>
+    </div>
+  </header>
+  <div class="stats" id="stats" aria-label="Totals"></div>
+  <div class="tabs" role="tablist" aria-label="Views">
+    <button class="chip" role="tab" id="tab-inbox" data-tab="inbox" aria-selected="true" type="button">Inbox</button>
+    <button class="chip" role="tab" id="tab-pipeline" data-tab="pipeline" aria-selected="false" type="button">Pipeline</button>
+  </div>
+  <div id="inboxView">
+    <div class="filters" id="filters" role="group" aria-label="Filter by type"></div>
+    <div id="inboxBody"></div>
+  </div>
+  <div id="pipelineView" hidden></div>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+// MOCK DATA: fake jobs for a look-and-feel mockup. Nothing here is real.
+const daysAgo = n => { const d = new Date(); d.setDate(d.getDate() - n); return d.toISOString().slice(0,10); };
+const JOBS = [
+  {id:1, Status:"New", Fit:9, Type:"Staff", Title:"Health Policy Reporter", Org:"Capital Ledger", Location:"Washington, DC", Why:"Your Medicaid and hospital coverage maps straight onto this beat.", Source:"JournalismJobs", Posted:daysAgo(2), First:daysAgo(1), Link:"https://example.com/jobs/1", Folder:"", Notes:""},
+  {id:2, Status:"New", Fit:8, Type:"Staff", Title:"Senior Editor, Congress", Org:"The Potomac Dispatch", Location:"Washington, DC (hybrid)", Why:"You already edit Hill copy on deadline. This is that job with a title bump.", Source:"Indeed", Posted:daysAgo(4), First:daysAgo(3), Link:"https://example.com/jobs/2", Folder:"", Notes:""},
+  {id:3, Status:"New", Fit:6, Type:"Staff", Title:"Newsletter Producer", Org:"Employer hidden (Daybook)", Location:"Washington, DC", Why:"Newsletter work fits, but the employer is hidden so it is hard to judge.", Source:"Daybook", Posted:daysAgo(1), First:daysAgo(1), Link:"https://example.com/jobs/3", Folder:"", Notes:""},
+  {id:4, Status:"New", Fit:7, Type:"Staff", Title:"Audio Producer, Daily Podcast", Org:"Meridian Public Media", Location:"Washington, DC", Why:"Radio-style storytelling. Strong match if you want to move toward audio.", Source:"Mediabistro", Posted:daysAgo(9), First:daysAgo(7), Link:"https://example.com/jobs/4", Folder:"", Notes:""},
+  {id:5, Status:"New", Fit:9, Type:"Fellowship", Title:"Investigative Reporting Fellow", Org:"Civic Press Institute", Location:"Washington, DC", Why:"A paid year to chase one big accountability story. Built for someone with your clips.", Source:"JournalismJobs", Posted:daysAgo(3), First:daysAgo(2), Link:"https://example.com/jobs/5", Folder:"", Notes:""},
+  {id:6, Status:"New", Fit:8, Type:"Fellowship", Title:"AI and Newsroom Innovation Fellow", Org:"Northside Journalism Lab", Location:"Remote, DC preferred", Why:"Lets you learn AI tools on the job while still reporting.", Source:"LinkedIn alert", Posted:daysAgo(5), First:daysAgo(4), Link:"https://example.com/jobs/6", Folder:"", Notes:""},
+  {id:7, Status:"New", Fit:8, Type:"Contract/Freelance", Title:"Freelance Policy Writer", Org:"Anacostia Research Group", Location:"Remote", Why:"Steady paid writing while you wait on a full-time offer.", Source:"Pasted link", Posted:daysAgo(6), First:daysAgo(6), Link:"https://example.com/jobs/7", Folder:"", Notes:""},
+  {id:8, Status:"New", Fit:5, Type:"Contract/Freelance", Title:"Contract Fact-Checker", Org:"Lantern Weekly", Location:"Remote", Why:"Short gig. Lower fit, but quick money and a byline-adjacent credit.", Source:"Indeed", Posted:daysAgo(12), First:daysAgo(10), Link:"https://example.com/jobs/8", Folder:"", Notes:""},
+  {id:9, Status:"New", Fit:7, Type:"Nearby field", Title:"Communications Writer", Org:"Greater DC Housing Alliance", Location:"Washington, DC", Why:"Your plain-language writing would carry real weight here. Nonprofit pay.", Source:"Indeed", Posted:daysAgo(7), First:daysAgo(5), Link:"https://example.com/jobs/9", Folder:"", Notes:""},
+  {id:10, Status:"New", Fit:6, Type:"Nearby field", Title:"Speechwriter and Editor", Org:"Office of a House Member (fictional)", Location:"Washington, DC", Why:"Hill experience helps. Different from reporting, but a known path out of journalism.", Source:"LinkedIn alert", Posted:daysAgo(11), First:daysAgo(8), Link:"https://example.com/jobs/10", Folder:"", Notes:""},
+  {id:11, Status:"Saved", Fit:8, Type:"Staff", Title:"Metro Desk Reporter", Org:"The Washington Courier", Location:"Washington, DC", Why:"Local beat reporting with room to grow into investigations.", Source:"JournalismJobs", Posted:daysAgo(8), First:daysAgo(8), Link:"https://example.com/jobs/11", Folder:"", Notes:""},
+  {id:12, Status:"Saved", Fit:7, Type:"Fellowship", Title:"Data Journalism Fellow", Org:"Open Records Project", Location:"Washington, DC", Why:"Good way to add data skills. Deadline is in two weeks.", Source:"Mediabistro", Posted:daysAgo(10), First:daysAgo(9), Link:"https://example.com/jobs/12", Folder:"", Notes:""},
+  {id:13, Status:"Ready to apply", Fit:9, Type:"Staff", Title:"National Politics Editor", Org:"Blue Ridge News Service", Location:"Washington, DC", Why:"Top of your range. Cover letter and resume are done.", Source:"JournalismJobs", Posted:daysAgo(13), First:daysAgo(12), Link:"https://example.com/jobs/13", Folder:"https://example.com/docs/blue-ridge", Notes:""},
+  {id:14, Status:"Ready to apply", Fit:8, Type:"Contract/Freelance", Title:"Contract Features Writer", Org:"Rock Creek Magazine", Location:"Remote", Why:"Long-form features, flexible hours. Pitch samples are packed.", Source:"Pasted link", Posted:daysAgo(9), First:daysAgo(9), Link:"https://example.com/jobs/14", Folder:"https://example.com/docs/rock-creek", Notes:""},
+  {id:15, Status:"Applied", Fit:8, Type:"Staff", Title:"Deputy Editor, Energy", Org:"Tidewater Energy Report", Location:"Washington, DC", Why:"Strong beat match. Applied last week.", Source:"Indeed", Posted:daysAgo(14), First:daysAgo(13), Link:"https://example.com/jobs/15", Folder:"https://example.com/docs/tidewater", Notes:""},
+  {id:16, Status:"Interviewing", Fit:9, Type:"Fellowship", Title:"Washington Reporting Fellow", Org:"Heritage Square Foundation", Location:"Washington, DC", Why:"Second-round interview is on the calendar.", Source:"LinkedIn alert", Posted:daysAgo(14), First:daysAgo(14), Link:"https://example.com/jobs/16", Folder:"https://example.com/docs/heritage", Notes:""}
+];
+
+const TYPES = ["Staff","Fellowship","Contract/Freelance","Nearby field"];
+const PIPE = ["Saved","Ready to apply","Applied","Interviewing","Offer"];
+const $ = s => document.querySelector(s);
+let tab = "inbox", typeFilter = "ALL";
+const closedSecs = new Set();
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const byStatus = s => JOBS.filter(j => j.Status === s);
+const fitCls = f => f >= 8 ? "fit-hi" : f >= 7 ? "fit-mid" : "fit-lo";
+function ago(iso){
+  const a = new Date(iso + "T00:00:00"), t = new Date(); t.setHours(0,0,0,0);
+  const n = Math.round((t - a) / 86400000);
+  return n <= 0 ? "Posted today" : n === 1 ? "Posted yesterday" : "Posted " + n + " days ago";
+}
+
+/* toast */
+let tt;
+function toast(msg){
+  const el = $("#toast"); el.textContent = msg; el.classList.add("show");
+  clearTimeout(tt); tt = setTimeout(() => el.classList.remove("show"), 3200);
+}
+
+/* theme */
+function currentTheme(){
+  const r = document.documentElement.getAttribute("data-theme");
+  if (r) return r;
+  return matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+}
+function syncThemeBtn(){ $("#theme").textContent = currentTheme() === "dark" ? "Light mode" : "Dark mode"; }
+$("#theme").addEventListener("click", () => {
+  document.documentElement.setAttribute("data-theme", currentTheme() === "dark" ? "light" : "dark");
+  syncThemeBtn();
+});
+
+/* render */
+function renderStats(){
+  const items = [["New","New"],["Saved","Saved"],["Ready to apply","Ready to apply"],["Applied","Applied"]];
+  $("#stats").innerHTML = items.map(([l,s]) => `<span class="stat"><b>${byStatus(s).length}</b>${esc(l)}</span>`).join("");
+}
+function card(j){
+  return `<article class="card" id="job-${j.id}" data-id="${j.id}">
+    <div class="top"><span class="fitb ${fitCls(j.Fit)}">Fit ${j.Fit}</span><span class="srcchip">${esc(j.Source)}</span></div>
+    <div class="co">${esc(j.Org)}</div>
+    <div class="ti">${esc(j.Title)}</div>
+    <div class="meta">${esc(j.Location)} &middot; ${ago(j.Posted)}</div>
+    <div class="why">&ldquo;${esc(j.Why)}&rdquo;</div>
+    <a class="open" href="${esc(j.Link)}" target="_blank" rel="noopener">Open posting (opens a new tab)</a>
+    <div class="actions" data-actions>
+      <button class="btn save" type="button" data-act="save">Save</button>
+      <button class="btn pass" type="button" data-act="pass">Pass</button>
+      <button class="btn main" type="button" data-act="build">Build application</button>
+    </div>
+  </article>`;
+}
+function renderFilters(){
+  const news = byStatus("New");
+  const mk = (label, key, n) => `<button class="chip" type="button" data-type="${esc(key)}" aria-pressed="${typeFilter===key}">${esc(label)}<span class="cnt">${n}</span></button>`;
+  $("#filters").innerHTML = mk("All","ALL",news.length) + TYPES.map(t => mk(t,t,news.filter(j=>j.Type===t).length)).join("");
+}
+function renderInbox(){
+  renderFilters();
+  const news = byStatus("New");
+  const picks = news.filter(j => j.Fit >= 8).sort((a,b) => b.Fit - a.Fit).slice(0,5);
+  let html = "";
+  if (!news.length){ $("#inboxBody").innerHTML = '<p class="empty">Nothing new right now. Nice work.</p>'; return; }
+  if (picks.length){
+    html += `<section class="grp" id="sec-picks"><h2 class="slabel" style="cursor:default"><span class="t">Top Picks</span><span class="count">${picks.length}</span></h2>
+      <div class="strip">${picks.map((j,i) => `<button class="pick c${i}" type="button" data-pick="${j.id}"><span class="co">${esc(j.Org)}</span><span class="ti">${esc(j.Title)}</span><span class="fit">Fit ${j.Fit}</span></button>`).join("")}</div></section>`;
+  }
+  const types = typeFilter === "ALL" ? TYPES : [typeFilter];
+  let any = false;
+  types.forEach(t => {
+    const rows = news.filter(j => j.Type === t);
+    if (!rows.length) return;
+    any = true;
+    const closed = closedSecs.has(t);
+    html += `<section class="grp${closed ? " closed" : ""}" data-sec="${esc(t)}">
+      <h2 style="all:unset;display:block"><button class="slabel" type="button" data-toggle="${esc(t)}" aria-expanded="${!closed}"><span class="t">${esc(t)}</span><span class="count">${rows.length}</span><span class="caret" aria-hidden="true">&#9662;</span></button></h2>
+      <div class="body"><div class="grid">${rows.map(card).join("")}</div></div></section>`;
+  });
+  if (!any) html += '<p class="empty">No new jobs of this type.</p>';
+  $("#inboxBody").innerHTML = html;
+}
+function pcard(j){
+  let acts = "";
+  if (j.Status === "Saved") acts = `<button class="btn main" type="button" data-act="build" style="flex-basis:auto">Build application</button><button class="btn pass" type="button" data-act="pass">Pass</button>`;
+  if (j.Status === "Ready to apply") acts = `<a class="btn" href="${esc(j.Folder)}" target="_blank" rel="noopener">Open docs folder</a><button class="btn main" type="button" data-act="applied" style="flex-basis:auto">I applied</button>`;
+  if (j.Status === "Applied") acts = `<button class="btn main" type="button" data-act="toInterview" style="flex-basis:auto">Move to Interviewing</button>`;
+  if (j.Status === "Interviewing") acts = `<button class="btn main" type="button" data-act="toOffer" style="flex-basis:auto">Move to Offer</button>`;
+  return `<article class="pcard card-p" data-id="${j.id}">
+    <div class="top"><span class="fitb ${fitCls(j.Fit)}">Fit ${j.Fit}</span></div>
+    <div class="co">${esc(j.Org)}</div><div class="ti">${esc(j.Title)}</div>
+    <a class="open" href="${esc(j.Link)}" target="_blank" rel="noopener">Open posting (opens a new tab)</a>
+    ${acts ? `<div class="actions" data-actions>${acts}</div>` : ""}</article>`;
+}
+function renderPipeline(){
+  $("#pipelineView").innerHTML = `<div class="pipeline">` + PIPE.map(s => {
+    const rows = byStatus(s);
+    return `<div class="pcol"><div class="pcolhead"><span>${esc(s)}</span><span class="n">${rows.length}</span></div>
+      ${rows.length ? rows.map(pcard).join("") : '<p class="pempty">Nothing here yet.</p>'}</div>`;
+  }).join("") + `</div><p class="hidenote">Passed and Closed are hidden. They stay in your Sheet.</p>`;
+}
+function render(){
+  renderStats();
+  if (tab === "inbox") renderInbox(); else renderPipeline();
+}
+
+/* actions */
+function setStatus(id, status, msg, el){
+  const j = JOBS.find(x => x.id === id); if (!j) return;
+  const done = () => { j.Status = status; render(); toast(msg); };
+  if (el){ el.classList.add("leaving"); setTimeout(done, 300); } else done();
+}
+function copyText(text, el){
+  const fallback = () => {
+    const act = el.querySelector("[data-actions]");
+    if (act && !el.querySelector(".copybox")){
+      const box = document.createElement("div"); box.className = "copybox";
+      box.innerHTML = `<input readonly value="${esc(text)}" aria-label="Command to copy"><span>Press Cmd+C</span>`;
+      act.after(box); const inp = box.querySelector("input"); inp.focus(); inp.select();
+    }
+    toast("Press Cmd+C to copy, then paste it into Claude.");
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(() => toast("Copied. Paste it into Claude."), fallback);
+  } else fallback();
+}
+function showPass(el, id){
+  const act = el.querySelector("[data-actions]");
+  act.outerHTML = `<div class="passbox" data-passbox>
+    <label for="why-${id}">One line on why? (helps Claude learn)</label>
+    <input id="why-${id}" type="text" autocomplete="off">
+    <div class="row"><button class="btn" type="button" data-act="skip">Skip</button><button class="btn pass" type="button" data-act="passgo">Pass</button></div></div>`;
+  el.querySelector("input").focus();
+}
+document.addEventListener("click", e => {
+  const t = e.target.closest("button"); if (!t) return;
+  if (t.dataset.tab){
+    tab = t.dataset.tab;
+    document.querySelectorAll(".tabs .chip").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === tab));
+    $("#inboxView").hidden = tab !== "inbox"; $("#pipelineView").hidden = tab !== "pipeline";
+    render(); return;
+  }
+  if (t.dataset.type){ typeFilter = t.dataset.type; renderInbox(); return; }
+  if (t.dataset.toggle){
+    const k = t.dataset.toggle; closedSecs.has(k) ? closedSecs.delete(k) : closedSecs.add(k); renderInbox(); return;
+  }
+  if (t.dataset.pick){
+    const id = +t.dataset.pick, j = JOBS.find(x => x.id === id);
+    if (closedSecs.has(j.Type)){ closedSecs.delete(j.Type); renderInbox(); }
+    const c = document.getElementById("job-" + id);
+    if (c){ c.scrollIntoView({behavior:"smooth", block:"center"}); c.classList.add("flash"); setTimeout(() => c.classList.remove("flash"), 1300); }
+    return;
+  }
+  if (t.id === "refresh"){ toast("Mock data: nothing to refresh."); return; }
+  const act = t.dataset.act; if (!act) return;
+  const el = t.closest("[data-id]"); const id = +el.dataset.id;
+  const j = JOBS.find(x => x.id === id);
+  if (act === "save") setStatus(id, "Saved", "Saved. It's in Pipeline.", el);
+  else if (act === "pass") showPass(el, id);
+  else if (act === "skip" || act === "passgo") setStatus(id, "Passed", "Passed.", el);
+  else if (act === "build") copyText("/apply " + j.Org + ", " + j.Title, el);
+  else if (act === "applied"){ if (confirm("Mark " + j.Org + " as Applied?")) setStatus(id, "Applied", "Marked as Applied.", el); }
+  else if (act === "toInterview") setStatus(id, "Interviewing", "Moved to Interviewing.", el);
+  else if (act === "toOffer") setStatus(id, "Offer", "Moved to Offer.", el);
+});
+syncThemeBtn();
+render();
+</script>
+</body>
+</html>
