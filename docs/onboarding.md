@@ -24,6 +24,7 @@ Check these in order and start at the first one that is not done. Tell him: "Wel
 | 5. Facts | `facts.md` exists and contains no "<" placeholder (write it only after he has skimmed it) |
 | 6. Profile | `profile.md` exists with no `⟨` left |
 | 7. Google and Sheet | `## Tracker sheet` in `profile.md` holds a real URL |
+| 7b. Job Inbox page | `## Inbox page` in `profile.md` holds a real link |
 | 8. Learnings file | `learnings.md` exists |
 | 9. Morning scan | `## Morning scan` in `profile.md` says On or Off |
 | 10. Wrap up | Right after step 9 is recorded. It is a message, so just give it. |
@@ -200,7 +201,27 @@ Say: "Now I'm checking that Claude can reach your Google Drive and Google Sheets
 
 Done when `profile.md` holds the URL and the read-back matched the headers.
 
+If a Sheets write is denied right after Drive created the file, Drive and Sheets are probably signed into different Google accounts. Ask him to open Settings, Connectors, Google Sheets and reconnect it with the same account as Drive. Then retry the call.
+
 If a call fails: say which one, retry once, then tell him plainly and stop. Don't write the URL until the headers check out. In the next chat, step 7 starts again and finds the half-made `Job tracker` in Drive (item 3).
+
+## Step 7b. Publish his Job Inbox page
+
+Say: "Now I'm making you a page where you can see new jobs and save or pass on them with one click."
+
+1. Read the first lines of `inbox.html` in this repo. The HTML comment at the very top holds the exact capabilities to publish with. Use them as written.
+2. Make a copy of `inbox.html` in a scratch location outside the repo. In the copy only, set `const PREFILL_SHEET_URL = "";` to his Sheet URL from `## Tracker sheet` in `profile.md`. Never put his URL in the repo's `inbox.html`.
+3. Publish the copy as a private claude.ai artifact (Artifact tool, with the capabilities from the comment). Keep the link it gives you.
+4. Add this to `profile.md`, after `## Tracker sheet` (write the heading if it is not there yet):
+
+```
+## Inbox page
+<the artifact link>
+```
+
+5. Give him the link and say: "This is your Job Inbox. Open it any time to see new jobs and save or pass on them. Bookmark it." Tell him it needs the Google Sheets connector signed into the same Google account that owns the Sheet. Ask him to open it once and confirm his jobs show up (or "No jobs yet" before the first scan).
+
+Done when `profile.md` holds the link. If publishing fails, tell him plainly, leave `## Inbox page` out, and carry on. The next chat starts here again.
 
 ## Step 8. Learnings file
 

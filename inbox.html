@@ -1,9 +1,11 @@
+<!-- Publish capabilities (exact JSON): {"mcp":{"servers":[{"server":"Google Sheets","tools":["get_values","update_values"]}]},"db":{},"user":{}}
+     Needs the Google Sheets connector signed into the Google account that owns the tracker Sheet. -->
 <!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Job Inbox (mockup)</title>
+<title>Job Inbox</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..600&family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
@@ -53,7 +55,6 @@ body{font-family:var(--font-body);color:var(--ink);background:var(--paper);font-
 :focus-visible{outline:3px solid var(--focus);outline-offset:3px}
 a{color:var(--link)}
 
-.banner{background:var(--banner-bg);color:var(--banner-ink);border-bottom:2px dashed var(--ink-3);font-size:15px;text-align:center;padding:8px 16px}
 
 header{display:flex;flex-wrap:wrap;align-items:flex-end;gap:14px 24px;padding:30px 0 6px}
 h1{font-family:var(--font-display);font-weight:600;font-size:clamp(44px,8vw,66px);letter-spacing:-.03em;line-height:.95}
@@ -148,77 +149,97 @@ section.grp{margin-top:34px}
   opacity:0;pointer-events:none;transition:all .3s var(--ease);max-width:calc(100vw - 32px)}
 .toast.show{opacity:1;transform:translate(-50%,0)}
 @media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+
+.setup{max-width:560px;margin:34px auto 0;background:var(--card);border:3px solid var(--ink);border-radius:var(--radius);box-shadow:var(--shadow);padding:24px;display:flex;flex-direction:column;gap:12px}
+.setup h2{font-family:var(--font-display);font-weight:600;font-size:26px;line-height:1.15}
+.setup p{font-size:15px;color:var(--ink-2)}
+.setup label{font-weight:600;font-size:15px;display:block;margin-bottom:6px}
+.setup input{font:inherit;font-size:16px;padding:11px 12px;border:2px solid var(--ink);border-radius:3px;background:var(--paper);color:var(--ink);width:100%}
+.setup .row{display:flex;gap:8px;margin-top:12px}
+.notice{display:flex;flex-wrap:wrap;align-items:center;gap:12px;background:var(--banner-bg);color:var(--banner-ink);border:2px solid var(--ink);border-radius:var(--radius);padding:12px 16px;margin-top:18px;font-size:15px;font-weight:500}
+.notice .btn{flex:0 0 auto}
+.btn:disabled{opacity:.6;cursor:default}
+.card.busy,.pcard.busy{opacity:.7}
+.linkbtn{background:none;border:0;font:inherit;font-size:14px;color:var(--link);text-decoration:underline;cursor:pointer;padding:5px 4px}
+.pcard.leaving{opacity:0;transform:scale(.94);transition:all .3s}
 </style>
 </head>
 <body>
-<div class="banner" role="note">Mockup with fake jobs. Buttons don't change any Sheet.</div>
 <div class="wrap">
   <header>
     <h1>Job Inbox<em>.</em></h1>
     <div class="hright">
-      <span>Last read from your Sheet: just now (mock)</span>
+      <span id="lastread"></span>
       <div class="row">
-        <button class="small" id="refresh" type="button">Refresh</button>
+        <button class="small" id="refresh" type="button" hidden>Refresh</button>
         <button class="small" id="theme" type="button" aria-label="Switch between light and dark mode">Dark mode</button>
+        <button class="linkbtn" id="changesheet" type="button" hidden>Change Sheet</button>
       </div>
     </div>
   </header>
   <div class="tabs" role="tablist" aria-label="Views">
-    <button class="chip" role="tab" id="tab-inbox" data-tab="inbox" aria-selected="true" type="button">Inbox <span class="cnt" id="cnt-inbox"></span></button>
-    <button class="chip" role="tab" id="tab-pipeline" data-tab="pipeline" aria-selected="false" type="button">Pipeline <span class="cnt" id="cnt-pipeline"></span></button>
+    <button class="chip" role="tab" id="tab-inbox" data-tab="inbox" aria-selected="true" type="button">Inbox <span class="cnt" id="cnt-inbox" hidden></span></button>
+    <button class="chip" role="tab" id="tab-pipeline" data-tab="pipeline" aria-selected="false" type="button">Pipeline <span class="cnt" id="cnt-pipeline" hidden></span></button>
   </div>
-  <div id="inboxView">
-    <div class="filters" id="filters" role="group" aria-label="Filter by type"></div>
-    <p class="helper">Build in Claude copies a command. Paste it into Claude and it builds your r&eacute;sum&eacute; and cover letter.</p>
-    <div id="inboxBody"></div>
+  <div id="msgView"></div>
+  <div id="setupView" hidden></div>
+  <div id="mainView" hidden>
+    <div id="inboxView">
+      <div class="filters" id="filters" role="group" aria-label="Filter by type"></div>
+      <p class="helper" id="helper" hidden>Build in Claude copies a command. Paste it into Claude and it builds your r&eacute;sum&eacute; and cover letter.</p>
+      <div id="inboxBody"></div>
+    </div>
+    <div id="pipelineView" hidden></div>
   </div>
-  <div id="pipelineView" hidden></div>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
-
 <script>
-// MOCK DATA: fake jobs for a look-and-feel mockup. Nothing here is real.
-const daysAgo = n => { const d = new Date(); d.setDate(d.getDate() - n); return d.toISOString().slice(0,10); };
-const JOBS = [
-  {id:1, Status:"New", Fit:9, Type:"Staff", Title:"Health Policy Reporter", Org:"Capital Ledger", Location:"Washington, DC", Why:"Your Medicaid and hospital coverage maps straight onto this beat.", Source:"JournalismJobs", Posted:daysAgo(2), First:daysAgo(1), Link:"https://example.com/jobs/1", Folder:"", Notes:""},
-  {id:2, Status:"New", Fit:8, Type:"Staff", Title:"Senior Editor, Congress", Org:"The Potomac Dispatch", Location:"Washington, DC (hybrid)", Why:"You already edit Hill copy on deadline. This is that job with a title bump.", Source:"Indeed", Posted:daysAgo(4), First:daysAgo(3), Link:"https://example.com/jobs/2", Folder:"", Notes:""},
-  {id:3, Status:"New", Fit:6, Type:"Staff", Title:"Newsletter Producer", Org:"Employer hidden (Daybook)", Location:"Washington, DC", Why:"Newsletter work fits, but the employer is hidden so it is hard to judge.", Source:"Daybook", Posted:daysAgo(1), First:daysAgo(1), Link:"https://example.com/jobs/3", Folder:"", Notes:""},
-  {id:4, Status:"New", Fit:7, Type:"Staff", Title:"Audio Producer, Daily Podcast", Org:"Meridian Public Media", Location:"Washington, DC", Why:"Radio-style storytelling. Strong match if you want to move toward audio.", Source:"Mediabistro", Posted:daysAgo(9), First:daysAgo(7), Link:"https://example.com/jobs/4", Folder:"", Notes:""},
-  {id:5, Status:"New", Fit:9, Type:"Fellowship", Title:"Investigative Reporting Fellow", Org:"Civic Press Institute", Location:"Washington, DC", Why:"A paid year to chase one big accountability story. Built for someone with your clips.", Source:"JournalismJobs", Posted:daysAgo(3), First:daysAgo(2), Link:"https://example.com/jobs/5", Folder:"", Notes:""},
-  {id:6, Status:"New", Fit:8, Type:"Fellowship", Title:"AI and Newsroom Innovation Fellow", Org:"Northside Journalism Lab", Location:"Remote, DC preferred", Why:"Lets you learn AI tools on the job while still reporting.", Source:"LinkedIn alert", Posted:daysAgo(5), First:daysAgo(4), Link:"https://example.com/jobs/6", Folder:"", Notes:""},
-  {id:7, Status:"New", Fit:8, Type:"Contract/Freelance", Title:"Freelance Policy Writer", Org:"Anacostia Research Group", Location:"Remote", Why:"Steady paid writing while you wait on a full-time offer.", Source:"Pasted link", Posted:daysAgo(6), First:daysAgo(6), Link:"https://example.com/jobs/7", Folder:"", Notes:""},
-  {id:8, Status:"New", Fit:5, Type:"Contract/Freelance", Title:"Contract Fact-Checker", Org:"Lantern Weekly", Location:"Remote", Why:"Short gig. Lower fit, but quick money and a byline-adjacent credit.", Source:"Indeed", Posted:daysAgo(12), First:daysAgo(10), Link:"https://example.com/jobs/8", Folder:"", Notes:""},
-  {id:9, Status:"New", Fit:7, Type:"Nearby field", Title:"Communications Writer", Org:"Greater DC Housing Alliance", Location:"Washington, DC", Why:"Your plain-language writing would carry real weight here. Nonprofit pay.", Source:"Indeed", Posted:daysAgo(7), First:daysAgo(5), Link:"https://example.com/jobs/9", Folder:"", Notes:""},
-  {id:10, Status:"New", Fit:6, Type:"Nearby field", Title:"Speechwriter and Editor", Org:"Office of a House Member (fictional)", Location:"Washington, DC", Why:"Hill experience helps. Different from reporting, but a known path out of journalism.", Source:"LinkedIn alert", Posted:daysAgo(11), First:daysAgo(8), Link:"https://example.com/jobs/10", Folder:"", Notes:""},
-  {id:11, Status:"Saved", Fit:8, Type:"Staff", Title:"Metro Desk Reporter", Org:"The Washington Courier", Location:"Washington, DC", Why:"Local beat reporting with room to grow into investigations.", Source:"JournalismJobs", Posted:daysAgo(8), First:daysAgo(8), Link:"https://example.com/jobs/11", Folder:"", Notes:""},
-  {id:12, Status:"Saved", Fit:7, Type:"Fellowship", Title:"Data Journalism Fellow", Org:"Open Records Project", Location:"Washington, DC", Why:"Good way to add data skills. Deadline is in two weeks.", Source:"Mediabistro", Posted:daysAgo(10), First:daysAgo(9), Link:"https://example.com/jobs/12", Folder:"", Notes:""},
-  {id:13, Status:"Ready to apply", Fit:9, Type:"Staff", Title:"National Politics Editor", Org:"Blue Ridge News Service", Location:"Washington, DC", Why:"Top of your range. Cover letter and resume are done.", Source:"JournalismJobs", Posted:daysAgo(13), First:daysAgo(12), Link:"https://example.com/jobs/13", Folder:"https://example.com/docs/blue-ridge", Notes:""},
-  {id:14, Status:"Ready to apply", Fit:8, Type:"Contract/Freelance", Title:"Contract Features Writer", Org:"Rock Creek Magazine", Location:"Remote", Why:"Long-form features, flexible hours. Pitch samples are packed.", Source:"Pasted link", Posted:daysAgo(9), First:daysAgo(9), Link:"https://example.com/jobs/14", Folder:"https://example.com/docs/rock-creek", Notes:""},
-  {id:15, Status:"Applied", Fit:8, Type:"Staff", Title:"Deputy Editor, Energy", Org:"Tidewater Energy Report", Location:"Washington, DC", Why:"Strong beat match. Applied last week.", Source:"Indeed", Posted:daysAgo(14), First:daysAgo(13), Link:"https://example.com/jobs/15", Folder:"https://example.com/docs/tidewater", Notes:""},
-  {id:16, Status:"Interviewing", Fit:9, Type:"Fellowship", Title:"Washington Reporting Fellow", Org:"Heritage Square Foundation", Location:"Washington, DC", Why:"Second-round interview is on the calendar.", Source:"LinkedIn alert", Posted:daysAgo(14), First:daysAgo(14), Link:"https://example.com/jobs/16", Folder:"https://example.com/docs/heritage", Notes:""}
-];
+const PREFILL_SHEET_URL = "";
 
-const TYPES = ["Staff","Fellowship","Contract/Freelance","Nearby field"];
+const SERVER = "Google Sheets";
+const TAB_NAME = "Jobs";
+const STATUSES = ["New","Saved","Ready to apply","Applied","Interviewing","Offer","Passed","Closed"];
 const PIPE = ["Saved","Ready to apply","Applied","Interviewing","Offer"];
+const TYPE_ORDER = ["Staff","Fellowship","Freelance","Contract/Freelance","Nearby field"];
+const LS_KEY = "jobInboxSheetUrl";
 const $ = s => document.querySelector(s);
-let tab = "inbox", typeFilter = "ALL";
-const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const byStatus = s => JOBS.filter(j => j.Status === s);
-const fitCls = f => f >= 8 ? "fit-hi" : f >= 7 ? "fit-mid" : "fit-lo";
-function ago(iso){
-  const a = new Date(iso + "T00:00:00"), t = new Date(); t.setHours(0,0,0,0);
-  const n = Math.round((t - a) / 86400000);
-  return n <= 0 ? "Posted today" : n === 1 ? "Posted yesterday" : "Posted " + n + " days ago";
-}
+const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
-/* toast */
+let mcp = null, sheetId = null, sheetUrl = "";
+let COL = {};            // header name -> column index
+let JOBS = [];           // parsed rows
+let loaded = false, loading = false;
+let lastRead = null;
+let tab = "inbox", typeFilter = "ALL";
+let notice = null;       // {text, retry}
+let mode = "boot";       // boot | nomcp | setup | ready
+const busy = new Set();  // sheet row numbers being written
+
+/* ---------- small helpers ---------- */
 let tt;
 function toast(msg){
   const el = $("#toast"); el.textContent = msg; el.classList.add("show");
-  clearTimeout(tt); tt = setTimeout(() => el.classList.remove("show"), 3200);
+  clearTimeout(tt); tt = setTimeout(() => el.classList.remove("show"), 4200);
+}
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const colLetter = i => String.fromCharCode(65 + i);
+const fitCls = f => f >= 8 ? "fit-hi" : f >= 7 ? "fit-mid" : "fit-lo";
+function ago(v){
+  if (!v) return "";
+  if (/^\d{4}-\d{2}-\d{2}$/.test(v)){
+    const a = new Date(v + "T00:00:00"), t = new Date(); t.setHours(0,0,0,0);
+    const n = Math.round((t - a) / 86400000);
+    return n <= 0 ? "Posted today" : n === 1 ? "Posted yesterday" : "Posted " + n + " days ago";
+  }
+  return "Posted " + v;
+}
+function parsePayload(r){
+  let p = r && r.payload;
+  if (typeof p === "string"){ try { p = JSON.parse(p); } catch(e){ p = null; } }
+  return p || {};
 }
 
-/* theme */
+/* ---------- theme ---------- */
 function currentTheme(){
   const r = document.documentElement.getAttribute("data-theme");
   if (r === "dark" || r === "light") return r;
@@ -231,84 +252,273 @@ $("#theme").addEventListener("click", () => {
 });
 matchMedia("(prefers-color-scheme: dark)").addEventListener("change", syncThemeBtn);
 
-/* render */
+/* ---------- error messages ---------- */
+function explain(e){
+  const code = e && e.code, msg = (e && e.message) || "";
+  let blob = msg; try { blob += " " + JSON.stringify((e && e.result) || ""); } catch(x){}
+  if (code === "needs_reauth") return {text:"Reconnect Google Sheets in claude.ai Settings, Connectors."};
+  if (code === "server_not_connected") return {text:"Add the Google Sheets connector in claude.ai Settings, Connectors."};
+  if (code === "approval_required" || code === "not_in_manifest") return {text:"This page needs your OK to use Google Sheets.", retry:true};
+  if (code === "tool_error"){
+    if (/permission|forbidden|denied|not have access|insufficient|403|caller does not/i.test(blob))
+      return {text:"Your Google Sheets connector can't open this Sheet. Check it's signed into the same Google account that owns the Sheet."};
+    if (/unable to parse range|not found|no sheet|404/i.test(blob))
+      return {text:"I could not find that Sheet or its Jobs tab. Check the link."};
+    return {text:"Google Sheets said: " + (msg || "it could not do that.")};
+  }
+  if (code === "server_unavailable" || code === "upstream_error" || code === "rate_limited")
+    return {text:"Google Sheets did not answer. Try again in a moment.", retry:true};
+  return {text:"Something went wrong talking to Google Sheets. Try again in a moment.", retry:true};
+}
+
+/* ---------- Sheets calls ---------- */
+async function sheets(tool, input, opts, isRead){
+  try {
+    return await mcp.callTool(SERVER, tool, input, opts);
+  } catch (e){
+    if (isRead && e && e.retryable){        // reads only: one automatic retry
+      await sleep(600 + Math.random() * 1400);
+      return await mcp.callTool(SERVER, tool, input, opts);
+    }
+    throw e;
+  }
+}
+const readRange = (range, fresh) => sheets("get_values", {spreadsheetId: sheetId, range}, fresh ? {cache:false} : undefined, true);
+const writeCell = (range, value) => sheets("update_values", {spreadsheetId: sheetId, range, values: [[value]]}, undefined, false);
+
+/* ---------- saved Sheet link ---------- */
+function extractId(text){
+  const t = String(text || "").trim();
+  const m = t.match(/\/d\/([a-zA-Z0-9_-]+)/);
+  if (m) return m[1];
+  return /^[a-zA-Z0-9_-]{20,}$/.test(t) ? t : null;
+}
+async function dbDoc(){
+  try {
+    const user = await window.claude.use("user"); if (!user) return null;
+    const id = await user.id(); if (!id) return null;
+    const db = await window.claude.use("db"); if (!db) return null;
+    return db.doc("data/users/" + id + "/settings");
+  } catch(e){ return null; }
+}
+async function getStoredUrl(){
+  const doc = await dbDoc();
+  if (doc){
+    try { const s = await doc.get(); const u = s.exists && s.data() && s.data().sheetUrl; if (u) return u; } catch(e){}
+  }
+  try { const u = localStorage.getItem(LS_KEY); if (u) return u; } catch(e){}
+  return "";
+}
+async function storeUrl(url){
+  const doc = await dbDoc();
+  if (doc){ try { await doc.set({sheetUrl: url}); } catch(e){} }
+  try { localStorage.setItem(LS_KEY, url); } catch(e){}
+}
+
+/* ---------- reading ---------- */
+function parseJobs(values){
+  const head = (values[0] || []).map(h => String(h).trim());
+  COL = {}; head.forEach((h, i) => { if (h && !(h in COL)) COL[h] = i; });
+  const get = (row, name) => (name in COL && row[COL[name]] != null) ? String(row[COL[name]]).trim() : "";
+  const out = [];
+  for (let i = 1; i < values.length; i++){
+    const row = values[i] || [];
+    if (!row.some(c => String(c == null ? "" : c).trim() !== "")) continue;
+    const st = get(row, "Status");
+    const canon = STATUSES.find(s => s.toLowerCase() === st.toLowerCase()) || st;
+    const fit = parseInt(get(row, "Fit"), 10);
+    out.push({row: i + 1, Status: canon, Fit: isNaN(fit) ? null : fit, Type: get(row, "Type") || "Other",
+      Title: get(row, "Job title"), Org: get(row, "Org"), Location: get(row, "Location"), Why: get(row, "Why it fits"),
+      Source: get(row, "Source"), Posted: get(row, "Posted"), Link: get(row, "Link"), Folder: get(row, "Folder"), Notes: get(row, "Notes")});
+  }
+  return out;
+}
+function headersOk(values){
+  const h = ((values && values[0]) || []).map(x => String(x).trim());
+  return ["Status","Org","Job title"].every(n => h.includes(n));
+}
+async function load(fresh){
+  if (loading) return; loading = true;
+  notice = null; renderAll();
+  try {
+    const r = await readRange(TAB_NAME + "!A1:Z", fresh);
+    const values = parsePayload(r).values || [];
+    if (!headersOk(values)){
+      notice = {text:"This does not look like your job tracker. I need a Jobs tab with Status, Org and Job title columns."};
+    } else {
+      JOBS = parseJobs(values); loaded = true;
+      lastRead = new Date((r.cache && r.cache.storedAt) || Date.now());
+    }
+  } catch(e){ notice = explain(e); }
+  loading = false; renderAll();
+}
+
+/* ---------- rendering ---------- */
+const byStatus = s => JOBS.filter(j => j.Status === s);
+function renderHeader(){
+  $("#lastread").textContent = (mode === "ready" && lastRead)
+    ? "Last read from your Sheet: " + lastRead.toLocaleTimeString([], {hour:"numeric", minute:"2-digit"}) : "";
+  $("#refresh").hidden = mode !== "ready";
+  $("#changesheet").hidden = !(mode === "ready" || mode === "setup") ;
+  $("#cnt-inbox").textContent = loaded ? byStatus("New").length : "";
+  $("#cnt-pipeline").textContent = loaded ? PIPE.reduce((n, s) => n + byStatus(s).length, 0) : "";
+  document.querySelectorAll(".tabs .cnt").forEach(c => c.hidden = !loaded);
+}
+function noticeHtml(){
+  if (!notice) return "";
+  return `<div class="notice" role="alert"><span>${esc(notice.text)}</span>${notice.retry ? '<button class="btn fill" type="button" data-act="retryload">Allow and try again</button>' : ""}</div>`;
+}
+function setupHtml(){
+  return `<div class="setup"><h2>Paste the link to your job tracker Sheet</h2>
+    <p>It is the Google Sheet called Job tracker. Open it, copy the link from the top of your browser, and paste it here. You only do this once.</p>
+    <form id="setupForm"><label for="sheetLink">Sheet link</label>
+      <input id="sheetLink" type="text" inputmode="url" autocomplete="off" placeholder="https://docs.google.com/spreadsheets/d/...">
+      <div class="row"><button class="btn fill" type="submit" id="setupSave">Save</button>${loaded ? '<button class="btn" type="button" data-act="setupcancel">Cancel</button>' : ""}</div>
+    </form>${noticeHtml()}</div>`;
+}
 function card(j){
-  return `<article class="card" id="job-${j.id}" data-id="${j.id}">
-    <div class="top"><span class="fitb ${fitCls(j.Fit)}">Fit ${j.Fit}</span><span class="srcchip">${esc(j.Source)}</span></div>
+  const isBusy = busy.has(j.row);
+  return `<article class="card${isBusy ? " busy" : ""}" id="job-${j.row}" data-row="${j.row}">
+    <div class="top">${j.Fit != null ? `<span class="fitb ${fitCls(j.Fit)}">Fit ${j.Fit}</span>` : ""}${j.Source ? `<span class="srcchip">${esc(j.Source)}</span>` : ""}</div>
     <div class="co">${esc(j.Org)}</div>
     <div class="ti">${esc(j.Title)}</div>
-    <div class="meta"><span>${esc(j.Location)} &middot; ${ago(j.Posted)}</span><a class="open" href="${esc(j.Link)}" target="_blank" rel="noopener">Open posting</a></div>
-    <div class="why">&ldquo;${esc(j.Why)}&rdquo;</div>
+    <div class="meta"><span>${esc([j.Location, ago(j.Posted)].filter(Boolean).join(" · "))}</span>${j.Link ? `<a class="open" href="${esc(j.Link)}" target="_blank" rel="noopener">Open posting</a>` : ""}</div>
+    ${j.Why ? `<div class="why">&ldquo;${esc(j.Why)}&rdquo;</div>` : ""}
     <div class="actions" data-actions>
-      <button class="btn fill" type="button" data-act="save">Save</button>
-      <button class="btn" type="button" data-act="pass">Pass</button>
+      <button class="btn fill" type="button" data-act="save"${isBusy ? " disabled" : ""}>${isBusy ? "Saving..." : "Save"}</button>
+      <button class="btn" type="button" data-act="pass"${isBusy ? " disabled" : ""}>Pass</button>
       <button class="btn wide" type="button" data-act="build">Build in Claude</button>
     </div>
   </article>`;
 }
-function renderFilters(){
-  const news = byStatus("New");
-  const mk = (label, key, n) => `<button class="chip" type="button" data-type="${esc(key)}" aria-pressed="${typeFilter===key}">${esc(label)}<span class="cnt">${n}</span></button>`;
-  $("#filters").innerHTML = mk("All","ALL",news.length) + TYPES.map(t => mk(t,t,news.filter(j=>j.Type===t).length)).join("");
-}
 function renderInbox(){
-  renderFilters();
   const news = byStatus("New");
-  const picks = news.filter(j => j.Fit >= 8).sort((a,b) => b.Fit - a.Fit).slice(0,5);
-  let html = "";
-  if (!news.length){ $("#inboxBody").innerHTML = '<p class="empty">Nothing new right now. Nice work.</p>'; return; }
-  if (picks.length){
-    html += `<section class="grp" id="sec-picks"><h2 class="slabel"><span class="t">Top Picks</span><span class="count">${picks.length}</span></h2>
-      <div class="strip">${picks.map((j,i) => `<button class="pick c${i}" type="button" data-pick="${j.id}"><span class="co">${esc(j.Org)}</span><span class="ti">${esc(j.Title)}</span><span class="fit">Fit ${j.Fit}</span></button>`).join("")}</div></section>`;
+  const types = [...TYPE_ORDER.filter(t => news.some(j => j.Type === t)), ...[...new Set(news.map(j => j.Type))].filter(t => !TYPE_ORDER.includes(t))];
+  const mk = (label, key, n) => `<button class="chip" type="button" data-type="${esc(key)}" aria-pressed="${typeFilter === key}">${esc(label)}<span class="cnt">${n}</span></button>`;
+  $("#filters").innerHTML = (loaded && news.length) ? mk("All","ALL",news.length) + types.map(t => mk(t, t, news.filter(j => j.Type === t).length)).join("") : "";
+  $("#helper").hidden = !loaded;
+  let html = noticeHtml();
+  if (!loaded){
+    if (!notice) html = '<p class="empty">Reading your Sheet...</p>';
+    $("#inboxBody").innerHTML = html; return;
   }
-  const types = typeFilter === "ALL" ? TYPES : [typeFilter];
-  let any = false;
-  types.forEach(t => {
+  if (!JOBS.length){ $("#inboxBody").innerHTML = html + '<p class="empty">No jobs yet. Your morning scan adds them.</p>'; return; }
+  if (!news.length){ $("#inboxBody").innerHTML = html + '<p class="empty">Nothing new right now. Nice work.</p>'; return; }
+  if (typeFilter !== "ALL" && !types.includes(typeFilter)) typeFilter = "ALL";
+  const picks = news.filter(j => j.Fit != null && j.Fit >= 8).sort((a,b) => b.Fit - a.Fit).slice(0,5);
+  if (picks.length){
+    html += `<section class="grp"><h2 class="slabel"><span class="t">Top Picks</span><span class="count">${picks.length}</span></h2>
+      <div class="strip">${picks.map((j,i) => `<button class="pick c${i}" type="button" data-pick="${j.row}"><span class="co">${esc(j.Org)}</span><span class="ti">${esc(j.Title)}</span><span class="fit">Fit ${j.Fit}</span></button>`).join("")}</div></section>`;
+  }
+  (typeFilter === "ALL" ? types : [typeFilter]).forEach(t => {
     const rows = news.filter(j => j.Type === t);
     if (!rows.length) return;
-    any = true;
-    html += `<section class="grp" data-sec="${esc(t)}">
-      <h2 class="slabel"><span class="t">${esc(t)}</span><span class="count">${rows.length}</span></h2>
+    html += `<section class="grp"><h2 class="slabel"><span class="t">${esc(t)}</span><span class="count">${rows.length}</span></h2>
       <div class="body"><div class="grid">${rows.map(card).join("")}</div></div></section>`;
   });
-  if (!any) html += '<p class="empty">No new jobs of this type.</p>';
   $("#inboxBody").innerHTML = html;
 }
 function pcard(j){
+  const b = busy.has(j.row), d = b ? " disabled" : "";
   let acts = "";
-  if (j.Status === "Saved") acts = `<button class="btn fill" type="button" data-act="build">Build in Claude</button><button class="btn" type="button" data-act="pass">Pass</button>`;
-  if (j.Status === "Ready to apply") acts = `<a class="btn" href="${esc(j.Folder)}" target="_blank" rel="noopener">Open docs folder</a><button class="btn fill" type="button" data-act="applied">I applied</button>`;
-  if (j.Status === "Applied") acts = `<button class="btn fill" type="button" data-act="toInterview">Move to Interviewing</button>`;
-  if (j.Status === "Interviewing") acts = `<button class="btn fill" type="button" data-act="toOffer">Move to Offer</button>`;
-  const why = (j.Status === "Saved" || j.Status === "Ready to apply") ? `<div class="why">&ldquo;${esc(j.Why)}&rdquo;</div>` : "";
-  return `<article class="pcard" data-id="${j.id}">
-    <div class="top"><span class="fitb ${fitCls(j.Fit)}">Fit ${j.Fit}</span></div>
+  if (j.Status === "Saved") acts = `<button class="btn fill" type="button" data-act="build">Build in Claude</button><button class="btn" type="button" data-act="pass"${d}>Pass</button>`;
+  if (j.Status === "Ready to apply") acts = `${j.Folder ? `<a class="btn" href="${esc(j.Folder)}" target="_blank" rel="noopener">Open docs folder</a>` : ""}<button class="btn fill" type="button" data-act="applied"${d}>I applied</button>`;
+  if (j.Status === "Applied") acts = `<button class="btn fill" type="button" data-act="toInterview"${d}>Move to Interviewing</button>`;
+  if (j.Status === "Interviewing") acts = `<button class="btn fill" type="button" data-act="toOffer"${d}>Move to Offer</button>`;
+  const why = (j.Why && (j.Status === "Saved" || j.Status === "Ready to apply")) ? `<div class="why">&ldquo;${esc(j.Why)}&rdquo;</div>` : "";
+  return `<article class="pcard${b ? " busy" : ""}" data-row="${j.row}">
+    <div class="top">${j.Fit != null ? `<span class="fitb ${fitCls(j.Fit)}">Fit ${j.Fit}</span>` : ""}</div>
     <div class="co">${esc(j.Org)}</div><div class="ti">${esc(j.Title)}</div>
-    <div class="meta"><span>${esc(j.Location)} &middot; ${ago(j.Posted)}</span><a class="open" href="${esc(j.Link)}" target="_blank" rel="noopener">Open posting</a></div>
+    <div class="meta"><span>${esc([j.Location, ago(j.Posted)].filter(Boolean).join(" · "))}</span>${j.Link ? `<a class="open" href="${esc(j.Link)}" target="_blank" rel="noopener">Open posting</a>` : ""}</div>
     ${why}
     ${acts ? `<div class="actions" data-actions>${acts}</div>` : ""}</article>`;
 }
 function renderPipeline(){
-  $("#pipelineView").innerHTML = `<div class="pipeline">` + PIPE.map(s => {
+  if (!loaded){ $("#pipelineView").innerHTML = noticeHtml() || '<p class="empty">Reading your Sheet...</p>'; return; }
+  $("#pipelineView").innerHTML = noticeHtml() + `<div class="pipeline">` + PIPE.map(s => {
     const rows = byStatus(s);
     return `<div class="pcol"><div class="pcolhead"><span>${esc(s)}</span><span class="n">${rows.length}</span></div>
       ${rows.length ? rows.map(pcard).join("") : '<p class="pempty">Nothing here yet.</p>'}</div>`;
   }).join("") + `</div><p class="hidenote">Passed and Closed are hidden. They stay in your Sheet.</p>`;
 }
-function renderTabs(){
-  $("#cnt-inbox").textContent = byStatus("New").length;
-  $("#cnt-pipeline").textContent = PIPE.reduce((n,s) => n + byStatus(s).length, 0);
-}
-function render(){
-  renderTabs();
-  if (tab === "inbox") renderInbox(); else renderPipeline();
+function renderAll(){
+  renderHeader();
+  const main = $("#mainView"), setup = $("#setupView"), msg = $("#msgView");
+  main.hidden = mode !== "ready"; setup.hidden = mode !== "setup"; msg.hidden = !(mode === "boot" || mode === "nomcp");
+  if (mode === "boot") msg.innerHTML = '<p class="empty">Connecting to Google Sheets...</p>';
+  if (mode === "nomcp") msg.innerHTML = '<div class="notice" role="alert"><span>Open this page on claude.ai to see your jobs.</span></div>';
+  if (mode === "setup"){ const v = $("#sheetLink") ? $("#sheetLink").value : ""; setup.innerHTML = setupHtml(); if (v) $("#sheetLink").value = v; }
+  if (mode === "ready"){
+    $("#inboxView").hidden = tab !== "inbox"; $("#pipelineView").hidden = tab !== "pipeline";
+    if (tab === "inbox") renderInbox(); else renderPipeline();
+  }
 }
 
-/* actions */
-function setStatus(id, status, msg, el){
-  const j = JOBS.find(x => x.id === id); if (!j) return;
-  const done = () => { j.Status = status; render(); toast(msg); };
-  if (el){ el.classList.add("leaving"); setTimeout(done, 300); } else done();
+/* ---------- writing ---------- */
+async function writeStatus(job, status, reason){
+  if (!("Status" in COL)) throw {code:"tool_error", message:"This Sheet has no Status column."};
+  const sc = colLetter(COL.Status), r = job.row;
+  // 1. re-read the row and make sure it is still the same job
+  const cur = parsePayload(await readRange(`${TAB_NAME}!A${r}:Z${r}`, true)).values || [];
+  const row = cur[0] || [];
+  const at = n => (n in COL && row[COL[n]] != null) ? String(row[COL[n]]).trim() : "";
+  if (at("Org") !== job.Org || at("Job title") !== job.Title) throw {code:"changed"};
+  // 2. write only the Status cell. A failure here might still have gone through, so check by reading it back.
+  try { await writeCell(`${TAB_NAME}!${sc}${r}`, status); }
+  catch(e){
+    const back = parsePayload(await readRange(`${TAB_NAME}!${sc}${r}`, true).catch(() => null)).values;
+    if (!(back && back[0] && String(back[0][0]).trim() === status)) throw e;
+  }
+  // 3. read the Status cell back
+  const back = parsePayload(await readRange(`${TAB_NAME}!${sc}${r}`, true)).values;
+  if (!(back && back[0] && String(back[0][0]).trim() === status)) throw {code:"verify"};
+  job.Status = status;
+  // 4. Pass with a reason: add it to Notes (keeps existing text)
+  let noteFailed = false;
+  if (status === "Passed" && reason){
+    if (!("Notes" in COL)) noteFailed = true;
+    else {
+      const old = at("Notes"), add = "Passed: " + reason;
+      const nv = old ? old + "; " + add : add;
+      try { await writeCell(`${TAB_NAME}!${colLetter(COL.Notes)}${r}`, nv); job.Notes = nv; } catch(e){ noteFailed = true; }
+    }
+  }
+  return {noteFailed};
+}
+async function changeStatus(row, status, okMsg, reason, el){
+  const job = JOBS.find(x => x.row === row); if (!job || busy.has(row)) return;
+  busy.add(row); renderAll();
+  try {
+    const res = await writeStatus(job, status, reason);
+    busy.delete(row);
+    const card = document.querySelector(`[data-row="${row}"]`);
+    if (card){ card.classList.add("leaving"); await sleep(300); }
+    renderAll();
+    toast(res.noteFailed ? okMsg + " The note did not save." : okMsg);
+  } catch(e){
+    busy.delete(row);
+    if (e && e.code === "changed"){ toast("Your Sheet changed. Refreshing."); renderAll(); load(true); return; }
+    if (e && e.code === "verify"){ toast("I could not confirm the change in your Sheet. Refreshing."); renderAll(); load(true); return; }
+    toast(explain(e).text); renderAll();
+  }
+}
+
+/* ---------- inline boxes ---------- */
+function showPass(el, row){
+  el.querySelector("[data-actions]").outerHTML = `<div class="passbox">
+    <label for="why-${row}">Why pass? One line is enough.</label>
+    <input id="why-${row}" type="text" autocomplete="off" placeholder="e.g. Too junior, wrong beat">
+    <div class="row"><button class="btn" type="button" data-act="skip">Skip</button><button class="btn fill" type="button" data-act="passgo">Pass</button></div></div>`;
+  const inp = el.querySelector("input"); inp.focus();
+  inp.addEventListener("keydown", e => {
+    if (e.key === "Enter"){ e.preventDefault(); changeStatus(row, "Passed", "Passed.", inp.value.trim(), el); }
+    else if (e.key === "Escape"){ e.preventDefault(); renderAll(); }
+  });
+}
+function showApplied(el){
+  el.querySelector("[data-actions]").outerHTML = `<div class="passbox"><label>Did you submit it?</label>
+    <div class="row"><button class="btn" type="button" data-act="appliedno">Not yet</button><button class="btn fill" type="button" data-act="appliedyes">Yes, I applied</button></div></div>`;
+  el.querySelector("[data-act=appliedyes]").focus();
 }
 function copyText(text, el){
   const fallback = () => {
@@ -324,55 +534,73 @@ function copyText(text, el){
     navigator.clipboard.writeText(text).then(() => toast("Copied. Paste it into Claude."), fallback);
   } else fallback();
 }
-function cancelAct(){ render(); }
-function showPass(el, id){
-  const act = el.querySelector("[data-actions]");
-  act.outerHTML = `<div class="passbox" data-passbox>
-    <label for="why-${id}">Why pass? One line is enough.</label>
-    <input id="why-${id}" type="text" autocomplete="off" placeholder="e.g. Too junior, wrong beat">
-    <div class="row"><button class="btn" type="button" data-act="skip">Skip</button><button class="btn fill" type="button" data-act="passgo">Pass</button></div></div>`;
-  const inp = el.querySelector("input"); inp.focus();
-  inp.addEventListener("keydown", e => {
-    if (e.key === "Enter"){ e.preventDefault(); setStatus(id, "Passed", "Passed.", el); }
-    else if (e.key === "Escape"){ e.preventDefault(); cancelAct(); }
-  });
+
+/* ---------- Sheet link setup ---------- */
+async function saveSheetLink(raw){
+  const id = extractId(raw);
+  const box = $("#setupView");
+  const showErr = text => { notice = {text}; $("#setupView").innerHTML = setupHtml(); $("#sheetLink").value = raw; };
+  if (!id){ showErr("That does not look like a Google Sheets link. It should contain /d/ and a long code."); return; }
+  $("#setupSave").disabled = true; $("#setupSave").textContent = "Checking...";
+  const prev = sheetId; sheetId = id;
+  try {
+    const r = await readRange(TAB_NAME + "!A1:Z1", true);
+    if (!headersOk(parsePayload(r).values)){ sheetId = prev; showErr("I opened that Sheet, but it does not look like your job tracker. I need a Jobs tab with Status, Org and Job title columns."); return; }
+  } catch(e){ sheetId = prev; const x = explain(e); showErr(x.text); return; }
+  sheetUrl = raw.trim(); notice = null; loaded = false; JOBS = [];
+  await storeUrl(sheetUrl);
+  mode = "ready"; tab = "inbox"; typeFilter = "ALL";
+  load(true);
 }
-function showApplied(el){
-  el.querySelector("[data-actions]").outerHTML = `<div class="passbox"><label>Did you submit it?</label>
-    <div class="row"><button class="btn" type="button" data-act="appliedno">Not yet</button><button class="btn fill" type="button" data-act="appliedyes">Yes, I applied</button></div></div>`;
-  el.querySelector("[data-act=appliedyes]").focus();
-}
+
+/* ---------- events ---------- */
+document.addEventListener("submit", e => {
+  if (e.target.id === "setupForm"){ e.preventDefault(); saveSheetLink($("#sheetLink").value); }
+});
 document.addEventListener("click", e => {
   const t = e.target.closest("button"); if (!t) return;
   if (t.dataset.tab){
     tab = t.dataset.tab;
     document.querySelectorAll(".tabs .chip").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === tab));
-    $("#inboxView").hidden = tab !== "inbox"; $("#pipelineView").hidden = tab !== "pipeline";
-    render(); return;
+    renderAll(); return;
   }
   if (t.dataset.type){ typeFilter = t.dataset.type; renderInbox(); return; }
   if (t.dataset.pick){
-    const id = +t.dataset.pick;
-    const c = document.getElementById("job-" + id);
+    const c = document.getElementById("job-" + t.dataset.pick);
     if (c){ c.scrollIntoView({behavior:"smooth", block:"center"}); c.classList.add("flash"); setTimeout(() => c.classList.remove("flash"), 1300); }
     return;
   }
-  if (t.id === "refresh"){ toast("Mock data: nothing to refresh."); return; }
+  if (t.id === "refresh"){ if (mode === "ready") load(true); return; }
+  if (t.id === "changesheet"){ notice = null; mode = "setup"; renderAll(); const i = $("#sheetLink"); if (i) i.focus(); return; }
   const act = t.dataset.act; if (!act) return;
-  const el = t.closest("[data-id]"); const id = +el.dataset.id;
-  const j = JOBS.find(x => x.id === id);
-  if (act === "save") setStatus(id, "Saved", "Saved. It's in Pipeline.", el);
-  else if (act === "pass") showPass(el, id);
-  else if (act === "skip" || act === "passgo") setStatus(id, "Passed", "Passed.", el);
+  if (act === "retryload"){ load(true); return; }
+  if (act === "setupcancel"){ notice = null; mode = "ready"; renderAll(); return; }
+  const el = t.closest("[data-row]"); if (!el) return;
+  const row = +el.dataset.row, j = JOBS.find(x => x.row === row); if (!j) return;
+  if (act === "save") changeStatus(row, "Saved", "Saved. It's in Pipeline.", "", el);
+  else if (act === "pass") showPass(el, row);
+  else if (act === "skip") changeStatus(row, "Passed", "Passed.", "", el);
+  else if (act === "passgo") changeStatus(row, "Passed", "Passed.", (el.querySelector("input").value || "").trim(), el);
   else if (act === "build") copyText("/apply " + j.Org + ", " + j.Title, el);
   else if (act === "applied") showApplied(el);
-  else if (act === "appliedyes") setStatus(id, "Applied", "Marked " + j.Org + " as Applied.", el);
-  else if (act === "appliedno") cancelAct();
-  else if (act === "toInterview") setStatus(id, "Interviewing", "Moved to Interviewing.", el);
-  else if (act === "toOffer") setStatus(id, "Offer", "Moved to Offer.", el);
+  else if (act === "appliedyes") changeStatus(row, "Applied", "Marked " + j.Org + " as Applied.", "", el);
+  else if (act === "appliedno") renderAll();
+  else if (act === "toInterview") changeStatus(row, "Interviewing", "Moved to Interviewing.", "", el);
+  else if (act === "toOffer") changeStatus(row, "Offer", "Moved to Offer.", "", el);
 });
-syncThemeBtn();
-render();
+
+/* ---------- start ---------- */
+(async function start(){
+  syncThemeBtn(); renderAll();
+  try { mcp = window.claude ? await window.claude.use("mcp") : null; } catch(e){ mcp = null; }
+  if (!mcp){ mode = "nomcp"; renderAll(); return; }
+  let url = await getStoredUrl();
+  if (!url && PREFILL_SHEET_URL){ url = PREFILL_SHEET_URL; await storeUrl(url); }
+  const id = extractId(url);
+  if (!id){ mode = "setup"; renderAll(); return; }
+  sheetUrl = url; sheetId = id; mode = "ready"; renderAll();
+  load(false);
+})();
 </script>
 </body>
 </html>

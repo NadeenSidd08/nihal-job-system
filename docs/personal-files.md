@@ -65,6 +65,9 @@ The sources /find-jobs checks. On by default, he can turn any off.
 ## Tracker sheet
 <full Google Sheet URL>
 
+## Inbox page
+<claude.ai artifact link for his Job Inbox, added at onboarding step 7b>
+
 ## Applications folder
 (set on first /apply)
 

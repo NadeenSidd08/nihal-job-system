@@ -55,6 +55,8 @@ Otherwise onboarding is finished. Use the rules below. Unattended runs (morning 
   6. `rm -r ../job-system-update-tmp`
 
   If any step fails, stop, say which one, run the cleanup step (6) to remove the temp folder, and do not say the system was updated. If a `job-system-update-tmp` folder already exists next to the repo, ask him before using that name. Never overwrite or delete his personal files (`profile.md`, `facts.md`, `clips.md`, `clips/`, `learnings.md`, `feedback.md`, `applications/`) or `resume.md` above the repo. They are not in the ZIP, so the copy leaves them alone. Say what changed.
+
+  After updating (either way), if `profile.md` has `## Inbox page`, republish `inbox.html` to that same link so his inbox gets the new version. Make a scratch copy of `inbox.html` outside the repo, set `const PREFILL_SHEET_URL = "";` in the copy to his Sheet URL from `## Tracker sheet`, and publish it to the same URL with the capabilities in the comment at the top of `inbox.html`. Never put his URL in the repo's `inbox.html`.
 - **Never fabricate** jobs, clips, or résumé claims. If a connector or source is unavailable, say so.
 - **Personal files stay gitignored.** Keep it that way.
 - **Skills**: `/find-jobs`, `/apply` and `/jobs` are available. Don't call the archived `/scan-jobs`.

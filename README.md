@@ -6,6 +6,10 @@ This helps you find journalism jobs, track them in a Google Sheet, and tailor yo
 
 You start from the onboarding page Nadeen sends you (link to be added). It tells you to make a new folder, put your résumé and LinkedIn PDF in it, open Claude in that folder, and paste a setup message. Claude downloads this system and then walks you through setup one question at a time. It takes about 30 minutes. If you stop halfway, open Claude in the `nihal-job-system` folder and it picks up where you left off.
 
+## Job Inbox page
+
+`inbox.html` is a one-page inbox for your jobs. Claude publishes it for you as a private page during setup, and it reads and updates your Google Sheet. See `docs/onboarding.md`, step 7b.
+
 ## Where to open Claude
 
 Open Claude in the `nihal-job-system` folder. If you open the folder above it instead, a small file that setup left there sends Claude to the right place.
