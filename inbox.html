@@ -369,7 +369,7 @@ function renderHeader(){
 }
 function noticeHtml(){
   if (!notice) return "";
-  return `<div class="notice" role="alert"><span>${esc(notice.text)}</span>${notice.retry ? '<button class="btn fill" type="button" data-act="retryload">${esc(notice.label || "Try again")}</button>' : ""}</div>`;
+  return `<div class="notice" role="alert"><span>${esc(notice.text)}</span>${notice.retry ? `<button class="btn fill" type="button" data-act="retryload">${esc(notice.label || "Try again")}</button>` : ""}</div>`;
 }
 function setupHtml(){
   return `<div class="setup"><h2>Paste the link to your job tracker Sheet</h2>
