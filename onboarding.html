@@ -427,7 +427,7 @@ h3.sub { margin-top: 24px; }
     var web = url
       ? 'My website with my published articles is ' + url + '.'
       : "I don't have a website, so please ask me for links to my 10 to 15 best articles.";
-    return 'Please set up my job search system. Download it from https://github.com/NadeenSidd08/nihal-job-system into this folder (use git clone, or a ZIP download if git is not available). Then read nihal-job-system/CLAUDE.md and follow it. My r\u00e9sum\u00e9 and my LinkedIn PDF are in this folder. ' + web;
+    return 'Please set up my job search system. Download it from https://github.com/NadeenSidd08/nihal-job-system into this folder (use git clone, or a ZIP download if git is not available). If the download fails because a website is blocked, stop and tell me to add the five domains from Level 2 of my setup page, then start a new chat on this folder and paste this message again. Then read nihal-job-system/CLAUDE.md and follow it. My r\u00e9sum\u00e9 and my LinkedIn PDF are in this folder. ' + web;
   }
   function updateMsg() { pre.textContent = setupText(); }
   site.addEventListener('input', function () {
