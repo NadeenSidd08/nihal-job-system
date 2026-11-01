@@ -114,6 +114,10 @@ input[type="text"], input[type="url"] { width: 100%; font: inherit; padding: 9px
 pre { margin: 0 0 8px; padding: 12px; background: var(--code-bg); border: 1px solid var(--line); border-radius: 6px; white-space: pre-wrap; word-break: break-word; font: .9rem/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; color: var(--ink); }
 .btn { font: inherit; font-weight: 600; background: var(--accent); color: var(--accent-ink); border: 0; border-radius: 6px; padding: 9px 16px; cursor: pointer; min-height: 40px; }
 .btn:hover { filter: brightness(1.08); }
+.domrow { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 6px 0; }
+.domrow code { font-size: 1rem; padding: 6px 10px; }
+.domrow .btn { min-height: 34px; padding: 5px 14px; }
+.domrow .copied { margin-left: 0; }
 .copied { margin-left: 10px; font-size: .88rem; color: var(--done); font-weight: 600; }
 
 /* week */
@@ -183,7 +187,7 @@ h3.sub { margin-top: 24px; }
   <section class="level" id="level2" data-level="2" aria-labelledby="h2-title">
     <div class="slug">Level 2 / Connect</div>
     <h3 id="h2-title">Connect your accounts</h3>
-    <p class="goal">Goal: let Claude reach your Google account and Indeed.</p>
+    <p class="goal">Goal: let Claude reach your Google account, Indeed and the job sites.</p>
     <ol>
       <li>Open the Claude app, then Settings, then Connectors.</li>
       <li>Find each connector below, click Connect, and sign in.</li>
@@ -194,8 +198,26 @@ h3.sub { margin-top: 24px; }
       <li><b>Gmail.</b> Claude reads LinkedIn job alert emails, which is how it sees jobs at sites it cannot read directly, like Politico, The Atlantic and The Hill. It never sends email.</li>
       <li><b>Indeed.</b> Optional but recommended. It adds a broad set of listings to the daily search.</li>
     </ul>
-    <div class="peek"><b>What you'll see</b>Each connector shows as connected in the list. If one is missing, Claude will tell you in Level 3 and show you how to fix it.</div>
-    <p class="donewhen">Done when: Drive and Sheets are connected. Gmail and Indeed if you can.</p>
+    <h3 class="sub">Let Claude reach the job sites</h3>
+    <p>This lets Claude read JournalismJobs, Mediabistro and Daybook, and download and update your job system. You do it once.</p>
+    <ol>
+      <li>Open <a href="https://claude.ai/settings/capabilities" target="_blank" rel="noopener">claude.ai/settings/capabilities</a> (opens in a new tab). In the app, it is Settings, then Capabilities.</li>
+      <li>Under "Code execution and file creation", check that <b>Allow network egress</b> is on.</li>
+      <li>Under <b>Domain allowlist</b>, keep <b>Package managers only</b>. Do not choose "All domains". Job posts are text from strangers, and a short list keeps Claude from reaching anything else.</li>
+      <li>Under <b>Additional allowed domains</b>, add the five domains below. Add them one at a time. Click Copy, paste the domain into the box, and click <b>Add</b>. Then do the next one. The box rejects several at once.</li>
+    </ol>
+    <div class="msg">
+      <div class="domrow"><code id="dom1">*.journalismjobs.com</code><button type="button" class="btn" data-copy="dom1">Copy</button><span class="copied" id="copiedDom1" role="status" aria-live="polite"></span></div>
+      <div class="domrow"><code id="dom2">*.mediabistro.com</code><button type="button" class="btn" data-copy="dom2">Copy</button><span class="copied" id="copiedDom2" role="status" aria-live="polite"></span></div>
+      <div class="domrow"><code id="dom3">*.daybook.com</code><button type="button" class="btn" data-copy="dom3">Copy</button><span class="copied" id="copiedDom3" role="status" aria-live="polite"></span></div>
+      <div class="domrow"><code id="dom4">github.com</code><button type="button" class="btn" data-copy="dom4">Copy</button><span class="copied" id="copiedDom4" role="status" aria-live="polite"></span></div>
+      <div class="domrow"><code id="dom5">codeload.github.com</code><button type="button" class="btn" data-copy="dom5">Copy</button><span class="copied" id="copiedDom5" role="status" aria-live="polite"></span></div>
+    </div>
+    <div class="note"><b>Check and heads-up</b>
+      Each domain shows in a list under the box once it is added. All five should be there. A new setting may only work in a new chat, so start a fresh chat in Level 3.
+    </div>
+    <div class="peek"><b>What you'll see</b>Each connector shows as connected in the list, and five domains show in the allowlist. If something is missing, Claude will tell you in Level 3 and show you how to fix it.</div>
+    <p class="donewhen">Done when: Drive and Sheets are connected, and the five domains are in the allowlist. Gmail and Indeed if you can.</p>
     <p class="lockmsg"></p>
     <div class="check"><input type="checkbox" id="chk2" data-level="2"><label for="chk2">Level 2 done</label></div>
   </section>
@@ -206,7 +228,7 @@ h3.sub { margin-top: 24px; }
     <h3 id="h3-title">Meet Claude</h3>
     <p class="goal">Goal: Claude learns your work and builds your system with you.</p>
     <ol>
-      <li>In the Claude app, open Claude in your "Job search" folder. <!-- CONFIRM-UI-LABELS -->In the Claude desktop app, open the Code tab, start a new session, and choose your Job search folder as its folder.<!-- /CONFIRM-UI-LABELS --></li>
+      <li>In the Claude app, start a chat on your "Job search" folder. Click <b>+ New</b> in the sidebar. Under the message box, click <b>Project or folder</b>, then <b>Add folder</b>, and choose your Job search folder. Do this before you send the first message.</li>
       <li>Type your website link below. It fills into the message.</li>
       <li>Press Copy, paste the message into Claude, and send it.</li>
       <li>Answer Claude's questions. It asks one at a time.</li>
@@ -225,7 +247,8 @@ h3.sub { margin-top: 24px; }
         <li>Claude may ask permission to read the folder above. Say yes.</li>
       </ul>
     </div>
-    <p><b>From now on, open Claude in the <code>nihal-job-system</code> folder</b> (it sits inside your "Job search" folder). That is where the commands live. <!-- CONFIRM-UI-LABELS -->To open it, open the Code tab, start a new session, and choose the nihal-job-system folder as its folder.<!-- /CONFIRM-UI-LABELS --></p>
+    <p><b>From now on, start your chats on the <code>nihal-job-system</code> folder</b> (it sits inside your "Job search" folder). That is where the commands live. Next time, click <b>+ New</b>, then pick <code>nihal-job-system</code> from <b>Project or folder</b>. The first time, choose <b>Add folder</b> and select it.</p>
+    <div class="note"><b>Tip</b>If Claude does not recognize a command like <code>/jobs</code>, send it again.</div>
     <p class="donewhen">Done when: Claude has given you the link to your Google Sheet.</p>
     <p class="lockmsg"></p>
     <div class="check"><input type="checkbox" id="chk3" data-level="3"><label for="chk3">Level 3 done</label></div>
@@ -265,7 +288,7 @@ h3.sub { margin-top: 24px; }
     <p class="goal">Goal: one real application, built by Claude and sent by you.</p>
     <ol>
       <li>Open your Google Sheet and pick a job that interests you.</li>
-      <li>In Claude (in the <code>nihal-job-system</code> folder), type <code>/apply</code> and the job, for example the title and organization. You can also paste a link to a job posting.</li>
+      <li>In a chat on the <code>nihal-job-system</code> folder, type <code>/apply</code> and the job, for example the title and organization. You can also paste a link to a job posting.</li>
       <li>Claude may show a short list of what it will build. Say yes.</li>
       <li>Claude builds a Google Doc résumé and a Google Doc cover letter in your Drive, in a folder called "Job applications". It also picks 3 to 5 of your clips, and lists any claims it wants you to confirm. In your Sheet the job's Status becomes Ready to apply.</li>
       <li>Open the Docs and edit them until they sound like you. Then File, Download, PDF.</li>
@@ -289,7 +312,7 @@ h3.sub { margin-top: 24px; }
   </div>
 
   <h2>Cheat sheet</h2>
-  <p>Open Claude in the <code>nihal-job-system</code> folder. Then say any of these.</p>
+  <p>Start a chat on the <code>nihal-job-system</code> folder. Then say any of these. If Claude does not recognize a command like <code>/jobs</code>, send it again.</p>
   <div class="twrap" role="region" aria-label="Things you can say to Claude" tabindex="0">
     <table>
       <thead><tr><th>You say</th><th>What happens</th></tr></thead>
@@ -420,8 +443,9 @@ h3.sub { margin-top: 24px; }
     sel.addRange(range);
   }
   function wireCopy(btnId, preEl, textFn, statusId) {
-    var btn = document.getElementById(btnId);
-    var status = document.getElementById(statusId);
+    wireCopy2(document.getElementById(btnId), preEl, textFn, document.getElementById(statusId));
+  }
+  function wireCopy2(btn, preEl, textFn, status) {
     btn.addEventListener('click', function () {
       var text = textFn();
       function fallback() {
@@ -439,6 +463,13 @@ h3.sub { margin-top: 24px; }
   wireCopy('copySetup', pre, setupText, 'copiedSetup');
   var scanPre = document.getElementById('scanMsg');
   wireCopy('copyScan', scanPre, function () { return scanPre.textContent; }, 'copiedScan');
+
+  var domEls = document.querySelectorAll('[data-copy]');
+  Array.prototype.forEach.call(domEls, function (btn) {
+    var code = document.getElementById(btn.getAttribute('data-copy'));
+    var statusId = 'copied' + btn.getAttribute('data-copy').replace('dom', 'Dom');
+    wireCopy2(btn, code, function () { return code.textContent; }, document.getElementById(statusId));
+  });
 
   load();
   site.value = state.site;
