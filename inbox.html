@@ -258,7 +258,8 @@ function explain(e){
   let blob = msg; try { blob += " " + JSON.stringify((e && e.result) || ""); } catch(x){}
   if (code === "needs_reauth") return {text:"Reconnect Google Sheets in claude.ai Settings, Connectors."};
   if (code === "server_not_connected") return {text:"Add the Google Sheets connector in claude.ai Settings, Connectors."};
-  if (code === "approval_required" || code === "not_in_manifest") return {text:"This page needs your OK to use Google Sheets.", retry:true};
+  if (code === "selection_required") return {text:"You have two Google Sheets connectors. Pick one in claude.ai Settings, Connectors."};
+  if (code === "approval_required" || code === "not_in_manifest" || code === "consent_required") return {text:"This page needs your OK to use Google Sheets.", retry:true, label:"Allow and try again"};
   if (code === "tool_error"){
     if (/permission|forbidden|denied|not have access|insufficient|403|caller does not/i.test(blob))
       return {text:"Your Google Sheets connector can't open this Sheet. Check it's signed into the same Google account that owns the Sheet."};
@@ -267,8 +268,8 @@ function explain(e){
     return {text:"Google Sheets said: " + (msg || "it could not do that.")};
   }
   if (code === "server_unavailable" || code === "upstream_error" || code === "rate_limited")
-    return {text:"Google Sheets did not answer. Try again in a moment.", retry:true};
-  return {text:"Something went wrong talking to Google Sheets. Try again in a moment.", retry:true};
+    return {text:"Google Sheets did not answer. Try again in a moment.", retry:true, label:"Try again"};
+  return {text:"Something went wrong talking to Google Sheets. Try again in a moment.", retry:true, label:"Try again"};
 }
 
 /* ---------- Sheets calls ---------- */
@@ -277,7 +278,7 @@ async function sheets(tool, input, opts, isRead){
     return await mcp.callTool(SERVER, tool, input, opts);
   } catch (e){
     if (isRead && e && e.retryable){        // reads only: one automatic retry
-      await sleep(600 + Math.random() * 1400);
+      await sleep(Math.max(e.retryAfterMs || 0, 600 + Math.random() * 1400));
       return await mcp.callTool(SERVER, tool, input, opts);
     }
     throw e;
@@ -343,7 +344,9 @@ async function load(fresh){
   try {
     const r = await readRange(TAB_NAME + "!A1:Z", fresh);
     const values = parsePayload(r).values || [];
-    if (!headersOk(values)){
+    if (!headersOk(values) && (values[0] || []).length >= 26 && String(values[0][25]).trim() !== ""){
+      notice = {text:"This Sheet has too many columns for the inbox. Keep the job columns in A to Z."};
+    } else if (!headersOk(values)){
       notice = {text:"This does not look like your job tracker. I need a Jobs tab with Status, Org and Job title columns."};
     } else {
       JOBS = parseJobs(values); loaded = true;
@@ -366,7 +369,7 @@ function renderHeader(){
 }
 function noticeHtml(){
   if (!notice) return "";
-  return `<div class="notice" role="alert"><span>${esc(notice.text)}</span>${notice.retry ? '<button class="btn fill" type="button" data-act="retryload">Allow and try again</button>' : ""}</div>`;
+  return `<div class="notice" role="alert"><span>${esc(notice.text)}</span>${notice.retry ? '<button class="btn fill" type="button" data-act="retryload">${esc(notice.label || "Try again")}</button>' : ""}</div>`;
 }
 function setupHtml(){
   return `<div class="setup"><h2>Paste the link to your job tracker Sheet</h2>
@@ -456,38 +459,51 @@ function renderAll(){
 
 /* ---------- writing ---------- */
 async function writeStatus(job, status, reason){
-  if (!("Status" in COL)) throw {code:"tool_error", message:"This Sheet has no Status column."};
-  const sc = colLetter(COL.Status), r = job.row;
-  // 1. re-read the row and make sure it is still the same job
+  const r = job.row;
+  // 1. re-read the header row and use FRESH column positions for this write
+  const hv = parsePayload(await readRange(TAB_NAME + "!A1:Z1", true)).values || [];
+  const head = ((hv[0]) || []).map(h => String(h).trim());
+  const F = {}; head.forEach((h, i) => { if (h && !(h in F)) F[h] = i; });
+  if (!("Status" in F) || !("Org" in F) || !("Job title" in F)) throw {code:"changed"};
+  const need = ["Status","Org","Job title"].concat(status === "Passed" && reason && "Notes" in F ? ["Notes"] : []);
+  if (need.some(n => F[n] > 25)) throw {code:"tool_error", message:"This Sheet has too many columns for the inbox. Keep the job columns in A to Z."};
+  COL = F;
+  const sc = colLetter(F.Status);
+  // 2. re-read the row and make sure it is still the same job
   const cur = parsePayload(await readRange(`${TAB_NAME}!A${r}:Z${r}`, true)).values || [];
   const row = cur[0] || [];
-  const at = n => (n in COL && row[COL[n]] != null) ? String(row[COL[n]]).trim() : "";
-  if (at("Org") !== job.Org || at("Job title") !== job.Title) throw {code:"changed"};
-  // 2. write only the Status cell. A failure here might still have gone through, so check by reading it back.
+  const at = n => (n in F && row[F[n]] != null) ? String(row[F[n]]).trim() : "";
+  if (at("Org") !== job.Org || at("Job title") !== job.Title || (job.Link && at("Link") !== job.Link)) throw {code:"changed"};
+  const same = (a, b) => a.toLowerCase() === b.toLowerCase();
+  if (same(at("Status"), status)){            // already set (maybe by an earlier try): nothing to write
+    job.Status = status; return {noteFailed:false};
+  }
+  if (!same(at("Status"), job.Status)) throw {code:"changed"};
+  // 3. write only the Status cell. A failure here might still have gone through, so check by reading it back.
   try { await writeCell(`${TAB_NAME}!${sc}${r}`, status); }
   catch(e){
     const back = parsePayload(await readRange(`${TAB_NAME}!${sc}${r}`, true).catch(() => null)).values;
     if (!(back && back[0] && String(back[0][0]).trim() === status)) throw e;
   }
-  // 3. read the Status cell back
+  // 4. read the Status cell back
   const back = parsePayload(await readRange(`${TAB_NAME}!${sc}${r}`, true)).values;
   if (!(back && back[0] && String(back[0][0]).trim() === status)) throw {code:"verify"};
   job.Status = status;
-  // 4. Pass with a reason: add it to Notes (keeps existing text)
+  // 5. Pass with a reason: add it to Notes (keeps existing text)
   let noteFailed = false;
   if (status === "Passed" && reason){
-    if (!("Notes" in COL)) noteFailed = true;
+    if (!("Notes" in F)) noteFailed = true;
     else {
       const old = at("Notes"), add = "Passed: " + reason;
       const nv = old ? old + "; " + add : add;
-      try { await writeCell(`${TAB_NAME}!${colLetter(COL.Notes)}${r}`, nv); job.Notes = nv; } catch(e){ noteFailed = true; }
+      try { await writeCell(`${TAB_NAME}!${colLetter(F.Notes)}${r}`, nv); job.Notes = nv; } catch(e){ noteFailed = true; }
     }
   }
   return {noteFailed};
 }
 async function changeStatus(row, status, okMsg, reason, el){
   const job = JOBS.find(x => x.row === row); if (!job || busy.has(row)) return;
-  busy.add(row); renderAll();
+  busy.add(row); notice = null; renderAll();
   try {
     const res = await writeStatus(job, status, reason);
     busy.delete(row);
@@ -499,7 +515,7 @@ async function changeStatus(row, status, okMsg, reason, el){
     busy.delete(row);
     if (e && e.code === "changed"){ toast("Your Sheet changed. Refreshing."); renderAll(); load(true); return; }
     if (e && e.code === "verify"){ toast("I could not confirm the change in your Sheet. Refreshing."); renderAll(); load(true); return; }
-    toast(explain(e).text); renderAll();
+    notice = explain(e); renderAll();
   }
 }
 
@@ -525,10 +541,10 @@ function copyText(text, el){
     const act = el.querySelector("[data-actions]");
     if (act && !el.querySelector(".copybox")){
       const box = document.createElement("div"); box.className = "copybox";
-      box.innerHTML = `<input readonly value="${esc(text)}" aria-label="Command to copy"><span>Press Cmd+C</span>`;
+      box.innerHTML = `<input readonly value="${esc(text)}" aria-label="Command to copy"><span>Press Ctrl+C (Cmd+C on a Mac)</span>`;
       act.after(box); const inp = box.querySelector("input"); inp.focus(); inp.select();
     }
-    toast("Press Cmd+C to copy, then paste it into Claude.");
+    toast("Press Ctrl+C (Cmd+C on a Mac) to copy, then paste it into Claude.");
   };
   if (navigator.clipboard && navigator.clipboard.writeText){
     navigator.clipboard.writeText(text).then(() => toast("Copied. Paste it into Claude."), fallback);

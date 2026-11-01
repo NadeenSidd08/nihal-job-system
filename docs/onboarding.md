@@ -210,8 +210,8 @@ If a call fails: say which one, retry once, then tell him plainly and stop. Don'
 Say: "Now I'm making you a page where you can see new jobs and save or pass on them with one click."
 
 1. Read the first lines of `inbox.html` in this repo. The HTML comment at the very top holds the exact capabilities to publish with. Use them as written.
-2. Make a copy of `inbox.html` in a scratch location outside the repo. In the copy only, set `const PREFILL_SHEET_URL = "";` to his Sheet URL from `## Tracker sheet` in `profile.md`. Never put his URL in the repo's `inbox.html`.
-3. Publish the copy as a private claude.ai artifact (Artifact tool, with the capabilities from the comment). Keep the link it gives you.
+2. Copy `inbox.html` into your scratchpad directory (the one named in your system prompt). Not /tmp, and not the repo. In the copy only, set `const PREFILL_SHEET_URL = "";` to his Sheet URL from `## Tracker sheet` in `profile.md`. Never put his URL in the repo's `inbox.html`.
+3. Load the artifact-capabilities skill before publishing. Then publish the copy as a private claude.ai artifact (Artifact tool, with the capabilities from the comment). Keep the link it gives you. Delete the scratch copy after the publish.
 4. Add this to `profile.md`, after `## Tracker sheet` (write the heading if it is not there yet):
 
 ```
@@ -221,7 +221,7 @@ Say: "Now I'm making you a page where you can see new jobs and save or pass on t
 
 5. Give him the link and say: "This is your Job Inbox. Open it any time to see new jobs and save or pass on them. Bookmark it." Tell him it needs the Google Sheets connector signed into the same Google account that owns the Sheet. Ask him to open it once and confirm his jobs show up (or "No jobs yet" before the first scan).
 
-Done when `profile.md` holds the link. If publishing fails, tell him plainly, leave `## Inbox page` out, and carry on. The next chat starts here again.
+Done when `profile.md` holds the link. If publishing fails, tell him plainly, leave `## Inbox page` out, and carry on. The next chat starts here again. If a link was already saved (a partial publish), a retry must reuse that link as the `url` parameter instead of making a new page.
 
 ## Step 8. Learnings file
 
