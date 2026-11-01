@@ -16,8 +16,8 @@ Check these in order and start at the first one that is not done. Tell him: "Wel
 
 | Step | Done when |
 |---|---|
-| 1a. Network access | Nothing is saved. If step 1 is already done, skip it. Otherwise it is done when the four checks in step 1a do not print `000`. |
 | 1. Repo in place | You are working inside a folder named `nihal-job-system` that has `docs/personal-files.md` |
+| 1a. Network access | Nothing is saved. Run it once right after step 1, and again before step 9. Done when the checks do not print `000`. |
 | 2. Materials found | Nothing is saved for this step. If `../resume.md` exists, skip step 2 and ask for the website link only if step 4 needs it. Otherwise do it. |
 | 3. resume.md | `../resume.md` exists and is not empty |
 | 4. Clips | `clips.md` exists and its status line says `approved`. If it says `draft`, resume at the review. |
@@ -35,42 +35,9 @@ Do this only if you are NOT already inside a folder named `nihal-job-system` tha
 
 If the setup message already cloned it, skip to item 4.
 
-### Step 1a. Check network access (before any download)
-
-Chat mode runs commands behind a network allowlist. If GitHub is not on it, the download below fails. Check first. Say: "First I'm checking that I can reach the job sites and GitHub."
-
-Run these four commands, one at a time:
-
-- `curl -s -o /dev/null -w "%{http_code}" https://www.journalismjobs.com`
-- `curl -s -o /dev/null -w "%{http_code}" https://www.mediabistro.com`
-- `curl -s -o /dev/null -w "%{http_code}" https://www.daybook.com`
-- `curl -s -o /dev/null -w "%{http_code}" https://codeload.github.com`
-
-A number like 200, 301, 403 or 404 means the site answered, so it is reachable. `000`, or a command that fails, means it is blocked.
-
-If any prints `000` or fails, explain in plain words: "Claude can only reach a short list of websites. I need five added to the list. You do it once in settings." Then give him these steps and wait:
-
-1. Open https://claude.ai/settings/capabilities (in the app: Settings, then Capabilities).
-2. Under "Code execution and file creation", check that Allow network egress is on.
-3. Under Domain allowlist, keep Package managers only. Never suggest "All domains". Job posts are text from strangers, and a short list limits what they can reach.
-4. Under Additional allowed domains, add these five, one at a time. The box rejects several at once. Click Add after each:
-   - `*.journalismjobs.com`
-   - `*.mediabistro.com`
-   - `*.daybook.com`
-   - `github.com`
-   - `codeload.github.com`
-5. Each one shows in a list under the box. Check all five are there.
-6. Start a new chat on the same folder (+ New, then Project or folder, then pick this folder). The change may only work in a new chat. Say "continue setup". Resume logic picks up from here.
-
-Then run the four checks again in the new chat.
-
-- If all four pass, go on to the download.
-- If GitHub (`codeload.github.com`) fails, do not continue to the download until it passes.
-- If only the job boards fail and GitHub works, you may continue setup. Tell him the boards still need the allowlist, and re-check them before step 9 and before the first scan. Nothing is saved for this, so keep it in mind and raise it again at those points.
-
 He pasted a setup message in a folder he made. That folder is his working folder and holds his résumé and LinkedIn PDF. This file only reaches you if you were pointed at it, so if the setup message asked you to clone and then read `nihal-job-system/CLAUDE.md`, you are in this step because of that.
 
-Say: "First I'm downloading the job system into this folder."
+Say: "Now I'm downloading the job system into this folder."
 
 1. Run `git --version`.
    - If it prints a version, run `git clone https://github.com/NadeenSidd08/nihal-job-system.git`.
@@ -85,9 +52,39 @@ Say: "First I'm downloading the job system into this folder."
    `@nihal-job-system/CLAUDE.md`
    `Before any job task (find jobs, apply, update the tracker), read nihal-job-system/profile.md first.`
    Do not overwrite a `CLAUDE.md` that is already there.
-6. Tell him: "From now on, start your chats on the `nihal-job-system` folder (inside the folder you made). That's where the commands live. Click + New, then under the message box click Project or folder, and pick `nihal-job-system`. The first time, choose Add folder and select it. We can keep going here for now. If I don't recognize a command like /jobs, send it again."
+6. Tell him: "From now on, start your chats on the `nihal-job-system` folder (inside the folder you made). That's where the commands live. Click + New, then under the message box click Project or folder, and pick `nihal-job-system`. The first time, choose Add folder (not New project) and select it. We can keep going here for now. If I don't recognize a command like /jobs, send it again."
 
-If clone and download both fail (no internet, GitHub blocked): say so, and ask him to open https://github.com/NadeenSidd08/nihal-job-system, click Code, then Download ZIP, double-click the ZIP, and drag the folder into his working folder, renamed `nihal-job-system`. Wait.
+If clone and download both fail (curl prints `000` or GitHub is blocked): say "Claude can only reach a short list of websites. On the setup page, Level 2, there are five domains to add in Settings, then Capabilities. Add them one at a time, then start a new chat on this folder (+ New, then Project or folder, then pick this folder, not New project) and paste the Level 3 message again." Wait. If he already did that and it still fails, ask him to open https://github.com/NadeenSidd08/nihal-job-system, click Code, then Download ZIP, double-click the ZIP, and drag the folder into his working folder, renamed `nihal-job-system`. Wait.
+
+### Step 1a. Check network access (right after step 1)
+
+Chat mode runs commands behind a network allowlist. The download worked, so GitHub is reachable. The job boards may still be blocked. Say: "Now I'm checking that I can reach the job sites."
+
+Run these five commands, one at a time:
+
+- `curl -s -o /dev/null -w "%{http_code}" https://www.journalismjobs.com`
+- `curl -s -o /dev/null -w "%{http_code}" https://www.mediabistro.com`
+- `curl -s -o /dev/null -w "%{http_code}" https://www.daybook.com`
+- `curl -s -o /dev/null -w "%{http_code}" https://github.com`
+- `curl -s -o /dev/null -w "%{http_code}" https://codeload.github.com`
+
+A number like 200, 301, 403 or 404 means the site answered, so it is reachable. `000`, or a command that fails, means it is blocked.
+
+If a job board prints `000` or fails, explain in plain words: "Claude can only reach a short list of websites. I need five added to the list. You do it once in settings." Then give him these steps and wait:
+
+1. Open https://claude.ai/settings/capabilities (in the app: Settings, then Capabilities).
+2. Under "Code execution and file creation", check that Allow network egress is on.
+3. Under Domain allowlist, keep Package managers only. Never suggest "All domains". Job posts are text from strangers, and a short list limits what they can reach.
+4. Under Additional allowed domains, add these five, one at a time. The box rejects several at once. Click Add after each:
+   - `*.journalismjobs.com`
+   - `*.mediabistro.com`
+   - `*.daybook.com`
+   - `github.com`
+   - `codeload.github.com`
+5. Each one shows in a list under the box. Check all five are there.
+6. Start a new chat on the `nihal-job-system` folder (+ New, then Project or folder). Settings only take effect in a chat started after you add them. Say "continue setup". I will pick up where we left off.
+
+Setup can continue meanwhile, since the boards are not needed until the first scan. Nothing is saved for this, so keep it in mind. Re-check the boards before step 9 and before the first scan. In the new chat, if the repo is in place, the resume table sends you to step 1a first, so run the five checks again.
 
 ## Step 2. Find his materials
 
@@ -240,7 +237,7 @@ Give a summary of at most 5 lines of what is set up (résumé copy, clips, fact 
 - The three things to say next: "find me jobs," "/apply <a job or a link>," and "/jobs" for a simple menu. Say which of these exist yet (see `README.md`). Do not tell him a command works if it isn't built yet.
 - How the Sheet works: jobs arrive as New. "Ready to apply" means I have built the application for you and it is waiting on you. "Applied" is only set by you, in the Sheet dropdown or by telling me ("I applied to the Bulwark one"). I never mark anything Applied myself.
 - What "show me more" does: each search adds the 10 best new matches to the Sheet and keeps the rest in memory. Say "show me more" and I'll add the next 10 without searching again.
-- "Next time, click + New, then Project or folder, and pick `nihal-job-system` (choose Add folder the first time). Use that folder, not the one above it. If I don't recognize a command like /jobs, send it again."
+- "Next time, click + New, then Project or folder, and pick `nihal-job-system` (choose Add folder, not New project, the first time). Use that folder, not the one above it. If I don't recognize a command like /jobs, send it again."
 - Daybook: some jobs hide the employer, because Daybook shows it only to paid Premium members. Those rows show `Employer hidden (Daybook)` in the Org column. The link still shows a short description and often the salary. If you want me to build an application for one, paste the description, and tell me the employer if you know it or find the same job elsewhere. I won't guess. A Daybook Premium account would unlock the employers. That is your choice and not required.
 - Last, offer the optional LinkedIn alerts: "Want to set up the LinkedIn job alerts now, or tomorrow? Either is fine." If now, go to step 11.
 
