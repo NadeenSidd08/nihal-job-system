@@ -43,8 +43,12 @@
   --shadow:5px 5px 0 #000; --shadow-lg:8px 8px 0 #000;
 }
 *{box-sizing:border-box;margin:0;padding:0}
+.strip,.pipeline{scrollbar-width:thin;scrollbar-color:var(--ink-3) var(--paper-2)}
+.strip::-webkit-scrollbar{height:10px}
+.strip::-webkit-scrollbar-track{background:var(--paper-2);border-radius:5px}
+.strip::-webkit-scrollbar-thumb{background:var(--ink-3);border-radius:5px;border:2px solid var(--paper-2)}
 body{font-family:var(--font-body);color:var(--ink);background:var(--paper);font-size:16px;line-height:1.55;min-height:100vh;overflow-x:hidden}
-.wrap{max-width:1180px;margin:0 auto;padding:0 16px 120px}
+.wrap{max-width:1240px;margin:0 auto;padding:0 16px 120px}
 @media(min-width:760px){.wrap{padding:0 40px 120px}}
 :focus-visible{outline:3px solid var(--focus);outline-offset:3px}
 a{color:var(--link)}
@@ -56,9 +60,6 @@ h1{font-family:var(--font-display);font-weight:600;font-size:clamp(44px,8vw,66px
 h1 em{font-style:normal;color:var(--pink)}
 .hright{margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;gap:8px;font-size:15px;color:var(--ink-3)}
 .hright .row{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
-.stats{display:flex;flex-wrap:wrap;gap:8px;padding:14px 0 4px}
-.stat{font-family:var(--font-grot);font-weight:700;font-size:14px;letter-spacing:.04em;text-transform:uppercase;background:var(--card);border:2px solid var(--ink);border-radius:3px;padding:4px 10px;color:var(--ink)}
-.stat b{background:var(--amber);color:var(--fixed-dark);border:2px solid var(--ink);border-radius:3px;padding:0 7px;margin-right:6px}
 
 .chip,.small{font-family:var(--font-grot);font-weight:700;font-size:14px;letter-spacing:.04em;text-transform:uppercase;
   border:2px solid var(--ink);border-radius:3px;padding:9px 14px;background:var(--card);color:var(--ink);cursor:pointer;
@@ -72,31 +73,30 @@ h1 em{font-style:normal;color:var(--pink)}
 .tabs{display:flex;gap:10px;padding:18px 0 4px}
 .tabs .chip{font-size:16px;padding:11px 24px}
 .tabs .chip[aria-selected="true"]{background:var(--violet);color:#fff}
+.tabs .chip .cnt{margin-left:8px;background:var(--paper-2);color:var(--ink);border-radius:3px;padding:0 8px}
+.tabs .chip[aria-selected="true"] .cnt{background:#fff;color:var(--fixed-dark)}
 .filters{display:flex;flex-wrap:wrap;gap:9px;padding:12px 0 6px}
 
 /* section headers */
 section.grp{margin-top:34px}
-.slabel{display:flex;align-items:center;gap:14px;width:100%;background:none;border:0;color:var(--ink);cursor:pointer;text-align:left;font:inherit;padding:6px 0}
+.slabel{display:flex;align-items:center;gap:14px;width:100%;color:var(--ink);padding:6px 0}
 .slabel .t{font-family:var(--font-display);font-weight:600;font-size:clamp(26px,4vw,32px);letter-spacing:-.02em;line-height:1.1}
 .slabel .count{font-family:var(--font-grot);font-weight:700;font-size:15px;color:var(--ink-3)}
 .slabel::after{content:"";flex:1;height:3px;background:var(--ink);border-radius:2px;order:3}
-.slabel .caret{order:4;font-size:22px;transition:transform .2s var(--ease)}
-section.closed .caret{transform:rotate(-90deg)}
-section.closed .body{display:none}
 
 /* top picks */
-.strip{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(250px,1fr);gap:14px;overflow-x:auto;padding:16px 6px 14px;margin:0 -6px}
+.strip{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(215px,1fr);gap:14px;overflow-x:auto;padding:16px 6px 14px;margin:0 -6px}
 .pick{border:3px solid var(--ink);border-radius:var(--radius);padding:16px 18px;text-align:left;cursor:pointer;color:var(--fixed-dark);
   box-shadow:var(--shadow);font:inherit;display:flex;flex-direction:column;gap:6px;transition:transform .16s var(--ease),box-shadow .16s var(--ease)}
 .pick:hover{transform:translate(-2px,-2px);box-shadow:7px 7px 0 var(--ink)}
 .pick .co{font-family:var(--font-display);font-weight:600;font-size:22px;line-height:1.1}
-.pick .ti{font-size:15px;font-weight:500;line-height:1.35;color:inherit;font-family:var(--font-body)}
+.pick .ti{font-size:14px;font-weight:500;line-height:1.35;color:inherit;font-family:var(--font-body)}
 .pick .fit{font-family:var(--font-grot);font-weight:700;font-size:15px;margin-top:auto;padding-top:8px}
 .pick.c0{background:var(--pink)} .pick.c1{background:var(--violet);color:#fff} .pick.c2{background:var(--coral)}
 .pick.c3{background:var(--teal)} .pick.c4{background:var(--amber)}
 
 /* cards */
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px;padding:18px 6px 8px;margin:0 -6px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(288px,1fr));gap:16px;padding:18px 6px 8px;margin:0 -6px}
 @media(max-width:420px){.grid{grid-template-columns:minmax(0,1fr)}}
 .card{background:var(--card);border:3px solid var(--ink);border-radius:var(--radius);padding:18px;display:flex;flex-direction:column;gap:10px;
   box-shadow:var(--shadow);transition:transform .16s var(--ease),opacity .3s var(--ease)}
@@ -107,38 +107,39 @@ section.closed .body{display:none}
 .fitb{font-family:var(--font-grot);font-weight:700;font-size:14px;border:2px solid var(--ink);border-radius:3px;padding:1px 9px;color:var(--fixed-dark)}
 .fit-hi{background:var(--teal)} .fit-mid{background:var(--amber)} .fit-lo{background:var(--paper-2);color:var(--ink)}
 .srcchip{font-family:var(--font-grot);font-weight:600;font-size:13px;color:var(--ink-2);border:2px solid var(--ink-3);border-radius:3px;padding:0 8px;margin-left:auto}
-.co{font-family:var(--font-display);font-weight:600;font-size:25px;line-height:1.1}
-.ti{font-family:var(--font-grot);font-size:17px;font-weight:600;color:var(--ink-2);line-height:1.3}
-.meta{font-size:15px;color:var(--ink-3)}
-.why{font-family:var(--font-display);font-style:italic;font-size:16px;line-height:1.45;border-left:3px solid var(--pink);padding-left:12px}
-.open{font-weight:600;font-size:15px}
+.co{font-family:var(--font-display);font-weight:600;font-size:22px;line-height:1.1}
+.ti{font-family:var(--font-grot);font-size:15px;font-weight:600;color:var(--ink-2);line-height:1.3}
+.meta{font-size:13.5px;color:var(--ink-3);display:flex;flex-wrap:wrap;justify-content:space-between;gap:2px 12px}
+.why{font-family:var(--font-display);font-style:italic;font-size:14.5px;line-height:1.45;border-left:3px solid var(--pink);padding-left:12px}
+.open{font-weight:500;font-size:14px}
 .actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:auto;padding-top:12px;border-top:2px solid var(--ink)}
 .btn{font-family:var(--font-grot);font-weight:700;font-size:14px;letter-spacing:.04em;text-transform:uppercase;border-radius:3px;
   padding:12px 14px;min-height:46px;cursor:pointer;text-align:center;border:2px solid var(--ink);background:var(--card);color:var(--ink);flex:1 1 auto;
   text-decoration:none;display:inline-flex;align-items:center;justify-content:center;transition:transform .12s var(--ease),background .12s var(--ease)}
 .btn:active{transform:translateY(1px)}
-.btn.save:hover{background:var(--teal);color:var(--fixed-dark)}
-.btn.pass:hover{background:var(--coral);color:var(--fixed-dark)}
-.btn.main{background:var(--ink);color:var(--on-ink);flex-basis:100%}
-.btn.main:hover{background:var(--pink);color:var(--fixed-dark)}
+.btn:hover{background:var(--paper-2)}
+.btn.fill{background:var(--ink);color:var(--on-ink)}
+.btn.fill:hover{background:var(--pink);color:var(--fixed-dark)}
+.btn.wide{flex-basis:100%}
 .passbox{display:flex;flex-direction:column;gap:8px;margin-top:auto;padding-top:12px;border-top:2px solid var(--ink)}
 .passbox label{font-weight:600;font-size:15px}
 .passbox input{font:inherit;font-size:16px;padding:10px 12px;border:2px solid var(--ink);border-radius:3px;background:var(--paper);color:var(--ink);width:100%}
 .passbox .row{display:flex;gap:8px}
+.passbox .row .btn{flex:1}
 .copybox{display:flex;flex-direction:column;gap:6px;padding-top:8px;font-size:15px}
 .copybox input{font:inherit;font-size:15px;padding:8px 10px;border:2px solid var(--ink);border-radius:3px;background:var(--paper);color:var(--ink);width:100%}
 
 /* pipeline */
-.pipeline{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:18px;margin-top:22px}
-@media(max-width:1000px){.pipeline{grid-template-columns:minmax(0,1fr)}}
+.pipeline{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px;margin-top:22px;align-items:start}
+@media(max-width:1239px){.pipeline{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:699px){.pipeline{grid-template-columns:minmax(0,1fr)}}
 .pcol{display:flex;flex-direction:column;gap:14px;min-width:0}
 .pcolhead{font-family:var(--font-grot);font-weight:700;font-size:15px;letter-spacing:.05em;text-transform:uppercase;display:flex;align-items:center;gap:8px;padding-bottom:9px;border-bottom:3px solid var(--ink)}
 .pcolhead .n{margin-left:auto;background:var(--ink);color:var(--on-ink);border-radius:3px;padding:0 9px}
 .pcard{background:var(--card);border:3px solid var(--ink);border-radius:var(--radius);padding:14px 16px;box-shadow:4px 4px 0 var(--ink);display:flex;flex-direction:column;gap:7px}
-.pcard .co{font-size:21px}
-.pcard .ti{font-size:16px}
 .pcard .actions{padding-top:10px}
-.pempty{font-family:var(--font-display);font-style:italic;color:var(--ink-3);font-size:16px;padding:6px 2px}
+.pempty{font-family:var(--font-display);font-style:italic;color:var(--ink-3);font-size:15px;padding:6px 2px}
+.helper{font-size:14px;color:var(--ink-3);padding:6px 0 0}
 .hidenote{margin-top:34px;font-size:15px;color:var(--ink-3)}
 .empty{font-family:var(--font-display);font-style:italic;color:var(--ink-2);padding:22px 4px;font-size:18px}
 
@@ -162,13 +163,13 @@ section.closed .body{display:none}
       </div>
     </div>
   </header>
-  <div class="stats" id="stats" aria-label="Totals"></div>
   <div class="tabs" role="tablist" aria-label="Views">
-    <button class="chip" role="tab" id="tab-inbox" data-tab="inbox" aria-selected="true" type="button">Inbox</button>
-    <button class="chip" role="tab" id="tab-pipeline" data-tab="pipeline" aria-selected="false" type="button">Pipeline</button>
+    <button class="chip" role="tab" id="tab-inbox" data-tab="inbox" aria-selected="true" type="button">Inbox <span class="cnt" id="cnt-inbox"></span></button>
+    <button class="chip" role="tab" id="tab-pipeline" data-tab="pipeline" aria-selected="false" type="button">Pipeline <span class="cnt" id="cnt-pipeline"></span></button>
   </div>
   <div id="inboxView">
     <div class="filters" id="filters" role="group" aria-label="Filter by type"></div>
+    <p class="helper">Build in Claude copies a command. Paste it into Claude and it builds your r&eacute;sum&eacute; and cover letter.</p>
     <div id="inboxBody"></div>
   </div>
   <div id="pipelineView" hidden></div>
@@ -201,7 +202,6 @@ const TYPES = ["Staff","Fellowship","Contract/Freelance","Nearby field"];
 const PIPE = ["Saved","Ready to apply","Applied","Interviewing","Offer"];
 const $ = s => document.querySelector(s);
 let tab = "inbox", typeFilter = "ALL";
-const closedSecs = new Set();
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const byStatus = s => JOBS.filter(j => j.Status === s);
 const fitCls = f => f >= 8 ? "fit-hi" : f >= 7 ? "fit-mid" : "fit-lo";
@@ -221,7 +221,7 @@ function toast(msg){
 /* theme */
 function currentTheme(){
   const r = document.documentElement.getAttribute("data-theme");
-  if (r) return r;
+  if (r === "dark" || r === "light") return r;
   return matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 }
 function syncThemeBtn(){ $("#theme").textContent = currentTheme() === "dark" ? "Light mode" : "Dark mode"; }
@@ -229,24 +229,20 @@ $("#theme").addEventListener("click", () => {
   document.documentElement.setAttribute("data-theme", currentTheme() === "dark" ? "light" : "dark");
   syncThemeBtn();
 });
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", syncThemeBtn);
 
 /* render */
-function renderStats(){
-  const items = [["New","New"],["Saved","Saved"],["Ready to apply","Ready to apply"],["Applied","Applied"]];
-  $("#stats").innerHTML = items.map(([l,s]) => `<span class="stat"><b>${byStatus(s).length}</b>${esc(l)}</span>`).join("");
-}
 function card(j){
   return `<article class="card" id="job-${j.id}" data-id="${j.id}">
     <div class="top"><span class="fitb ${fitCls(j.Fit)}">Fit ${j.Fit}</span><span class="srcchip">${esc(j.Source)}</span></div>
     <div class="co">${esc(j.Org)}</div>
     <div class="ti">${esc(j.Title)}</div>
-    <div class="meta">${esc(j.Location)} &middot; ${ago(j.Posted)}</div>
+    <div class="meta"><span>${esc(j.Location)} &middot; ${ago(j.Posted)}</span><a class="open" href="${esc(j.Link)}" target="_blank" rel="noopener">Open posting</a></div>
     <div class="why">&ldquo;${esc(j.Why)}&rdquo;</div>
-    <a class="open" href="${esc(j.Link)}" target="_blank" rel="noopener">Open posting (opens a new tab)</a>
     <div class="actions" data-actions>
-      <button class="btn save" type="button" data-act="save">Save</button>
-      <button class="btn pass" type="button" data-act="pass">Pass</button>
-      <button class="btn main" type="button" data-act="build">Build application</button>
+      <button class="btn fill" type="button" data-act="save">Save</button>
+      <button class="btn" type="button" data-act="pass">Pass</button>
+      <button class="btn wide" type="button" data-act="build">Build in Claude</button>
     </div>
   </article>`;
 }
@@ -262,7 +258,7 @@ function renderInbox(){
   let html = "";
   if (!news.length){ $("#inboxBody").innerHTML = '<p class="empty">Nothing new right now. Nice work.</p>'; return; }
   if (picks.length){
-    html += `<section class="grp" id="sec-picks"><h2 class="slabel" style="cursor:default"><span class="t">Top Picks</span><span class="count">${picks.length}</span></h2>
+    html += `<section class="grp" id="sec-picks"><h2 class="slabel"><span class="t">Top Picks</span><span class="count">${picks.length}</span></h2>
       <div class="strip">${picks.map((j,i) => `<button class="pick c${i}" type="button" data-pick="${j.id}"><span class="co">${esc(j.Org)}</span><span class="ti">${esc(j.Title)}</span><span class="fit">Fit ${j.Fit}</span></button>`).join("")}</div></section>`;
   }
   const types = typeFilter === "ALL" ? TYPES : [typeFilter];
@@ -271,9 +267,8 @@ function renderInbox(){
     const rows = news.filter(j => j.Type === t);
     if (!rows.length) return;
     any = true;
-    const closed = closedSecs.has(t);
-    html += `<section class="grp${closed ? " closed" : ""}" data-sec="${esc(t)}">
-      <h2 style="all:unset;display:block"><button class="slabel" type="button" data-toggle="${esc(t)}" aria-expanded="${!closed}"><span class="t">${esc(t)}</span><span class="count">${rows.length}</span><span class="caret" aria-hidden="true">&#9662;</span></button></h2>
+    html += `<section class="grp" data-sec="${esc(t)}">
+      <h2 class="slabel"><span class="t">${esc(t)}</span><span class="count">${rows.length}</span></h2>
       <div class="body"><div class="grid">${rows.map(card).join("")}</div></div></section>`;
   });
   if (!any) html += '<p class="empty">No new jobs of this type.</p>';
@@ -281,14 +276,16 @@ function renderInbox(){
 }
 function pcard(j){
   let acts = "";
-  if (j.Status === "Saved") acts = `<button class="btn main" type="button" data-act="build" style="flex-basis:auto">Build application</button><button class="btn pass" type="button" data-act="pass">Pass</button>`;
-  if (j.Status === "Ready to apply") acts = `<a class="btn" href="${esc(j.Folder)}" target="_blank" rel="noopener">Open docs folder</a><button class="btn main" type="button" data-act="applied" style="flex-basis:auto">I applied</button>`;
-  if (j.Status === "Applied") acts = `<button class="btn main" type="button" data-act="toInterview" style="flex-basis:auto">Move to Interviewing</button>`;
-  if (j.Status === "Interviewing") acts = `<button class="btn main" type="button" data-act="toOffer" style="flex-basis:auto">Move to Offer</button>`;
-  return `<article class="pcard card-p" data-id="${j.id}">
+  if (j.Status === "Saved") acts = `<button class="btn fill" type="button" data-act="build">Build in Claude</button><button class="btn" type="button" data-act="pass">Pass</button>`;
+  if (j.Status === "Ready to apply") acts = `<a class="btn" href="${esc(j.Folder)}" target="_blank" rel="noopener">Open docs folder</a><button class="btn fill" type="button" data-act="applied">I applied</button>`;
+  if (j.Status === "Applied") acts = `<button class="btn fill" type="button" data-act="toInterview">Move to Interviewing</button>`;
+  if (j.Status === "Interviewing") acts = `<button class="btn fill" type="button" data-act="toOffer">Move to Offer</button>`;
+  const why = (j.Status === "Saved" || j.Status === "Ready to apply") ? `<div class="why">&ldquo;${esc(j.Why)}&rdquo;</div>` : "";
+  return `<article class="pcard" data-id="${j.id}">
     <div class="top"><span class="fitb ${fitCls(j.Fit)}">Fit ${j.Fit}</span></div>
     <div class="co">${esc(j.Org)}</div><div class="ti">${esc(j.Title)}</div>
-    <a class="open" href="${esc(j.Link)}" target="_blank" rel="noopener">Open posting (opens a new tab)</a>
+    <div class="meta"><span>${esc(j.Location)} &middot; ${ago(j.Posted)}</span><a class="open" href="${esc(j.Link)}" target="_blank" rel="noopener">Open posting</a></div>
+    ${why}
     ${acts ? `<div class="actions" data-actions>${acts}</div>` : ""}</article>`;
 }
 function renderPipeline(){
@@ -298,8 +295,12 @@ function renderPipeline(){
       ${rows.length ? rows.map(pcard).join("") : '<p class="pempty">Nothing here yet.</p>'}</div>`;
   }).join("") + `</div><p class="hidenote">Passed and Closed are hidden. They stay in your Sheet.</p>`;
 }
+function renderTabs(){
+  $("#cnt-inbox").textContent = byStatus("New").length;
+  $("#cnt-pipeline").textContent = PIPE.reduce((n,s) => n + byStatus(s).length, 0);
+}
 function render(){
-  renderStats();
+  renderTabs();
   if (tab === "inbox") renderInbox(); else renderPipeline();
 }
 
@@ -323,13 +324,23 @@ function copyText(text, el){
     navigator.clipboard.writeText(text).then(() => toast("Copied. Paste it into Claude."), fallback);
   } else fallback();
 }
+function cancelAct(){ render(); }
 function showPass(el, id){
   const act = el.querySelector("[data-actions]");
   act.outerHTML = `<div class="passbox" data-passbox>
-    <label for="why-${id}">One line on why? (helps Claude learn)</label>
-    <input id="why-${id}" type="text" autocomplete="off">
-    <div class="row"><button class="btn" type="button" data-act="skip">Skip</button><button class="btn pass" type="button" data-act="passgo">Pass</button></div></div>`;
-  el.querySelector("input").focus();
+    <label for="why-${id}">Why pass? One line is enough.</label>
+    <input id="why-${id}" type="text" autocomplete="off" placeholder="e.g. Too junior, wrong beat">
+    <div class="row"><button class="btn" type="button" data-act="skip">Skip</button><button class="btn fill" type="button" data-act="passgo">Pass</button></div></div>`;
+  const inp = el.querySelector("input"); inp.focus();
+  inp.addEventListener("keydown", e => {
+    if (e.key === "Enter"){ e.preventDefault(); setStatus(id, "Passed", "Passed.", el); }
+    else if (e.key === "Escape"){ e.preventDefault(); cancelAct(); }
+  });
+}
+function showApplied(el){
+  el.querySelector("[data-actions]").outerHTML = `<div class="passbox"><label>Did you submit it?</label>
+    <div class="row"><button class="btn" type="button" data-act="appliedno">Not yet</button><button class="btn fill" type="button" data-act="appliedyes">Yes, I applied</button></div></div>`;
+  el.querySelector("[data-act=appliedyes]").focus();
 }
 document.addEventListener("click", e => {
   const t = e.target.closest("button"); if (!t) return;
@@ -340,12 +351,8 @@ document.addEventListener("click", e => {
     render(); return;
   }
   if (t.dataset.type){ typeFilter = t.dataset.type; renderInbox(); return; }
-  if (t.dataset.toggle){
-    const k = t.dataset.toggle; closedSecs.has(k) ? closedSecs.delete(k) : closedSecs.add(k); renderInbox(); return;
-  }
   if (t.dataset.pick){
-    const id = +t.dataset.pick, j = JOBS.find(x => x.id === id);
-    if (closedSecs.has(j.Type)){ closedSecs.delete(j.Type); renderInbox(); }
+    const id = +t.dataset.pick;
     const c = document.getElementById("job-" + id);
     if (c){ c.scrollIntoView({behavior:"smooth", block:"center"}); c.classList.add("flash"); setTimeout(() => c.classList.remove("flash"), 1300); }
     return;
@@ -358,7 +365,9 @@ document.addEventListener("click", e => {
   else if (act === "pass") showPass(el, id);
   else if (act === "skip" || act === "passgo") setStatus(id, "Passed", "Passed.", el);
   else if (act === "build") copyText("/apply " + j.Org + ", " + j.Title, el);
-  else if (act === "applied"){ if (confirm("Mark " + j.Org + " as Applied?")) setStatus(id, "Applied", "Marked as Applied.", el); }
+  else if (act === "applied") showApplied(el);
+  else if (act === "appliedyes") setStatus(id, "Applied", "Marked " + j.Org + " as Applied.", el);
+  else if (act === "appliedno") cancelAct();
   else if (act === "toInterview") setStatus(id, "Interviewing", "Moved to Interviewing.", el);
   else if (act === "toOffer") setStatus(id, "Offer", "Moved to Offer.", el);
 });
