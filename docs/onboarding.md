@@ -194,9 +194,11 @@ Say: "Now I'm checking that Claude can reach your Google Drive and Google Sheets
      - Seen (A to L): Link, Source ID (IDs joined with "; "), Org, Job title, Location, Fit, First seen, On Jobs tab, Type, Source, Posted, Why it fits
    - Bold header row with a background colour. Column widths and wrap on Why it fits as in call 4. Date format `yyyy-mm-dd` on Posted, First seen, Scan log Date, and Seen First seen (G) and Posted (K).
    - Dropdowns on rows 2 to 1000: Status (column A) exactly `New, Saved, Ready to apply, Applied, Interviewing, Offer, Passed, Closed`. Type (column C) exactly `Staff, Fellowship, Freelance, Nearby field`. Fit (column B) whole number 1 to 10. On Seen: column H `yes, no`, and column I the same four Type values as Jobs column C.
+   - Dropdowns display as chips where the connector allows it (see `docs/tracker-sheet.md`, call 4). Otherwise they show as dropdowns with an arrow.
+   - A filter on the Jobs header row, columns A to M, so he can filter by Status, Type and Location.
    - Status colours on column A: New light blue, Saved light yellow, Ready to apply light orange, Applied light green, Interviewing light purple, Offer stronger green, Passed and Closed grey.
    - Hide the `Seen` tab.
-5. Verify before telling him it's done: read back row 1 of all three tabs (Seen A1:L1), check `Seen` is hidden and that the dropdowns exist (`get_spreadsheet`, call 9). Do not add any job rows.
+5. Verify before telling him it's done: read back row 1 of all three tabs (Seen A1:L1), check `Seen` is hidden, that the dropdowns exist and that the Jobs tab has a basic filter (`get_spreadsheet`, call 9, fields `sheets.basicFilter`). Do not add any job rows.
 6. Give him the Sheet link. Say: "This is your tracker. You'll see jobs show up here. Bookmark it." Replace `(not set up yet)` under `## Tracker sheet` in `profile.md` with the full URL.
 
 Done when `profile.md` holds the URL and the read-back matched the headers.
@@ -243,7 +245,7 @@ If he says B: record `Off` and move on.
 
 If he says A (or names another time):
 1. Create the scheduled task using the prompt in `docs/morning-scan.md`, with his real path in place of `<his folder>` and the time from his answer (default weekdays 7:30).
-2. Walk him through the rest of `docs/morning-scan.md` one step at a time, waiting for him after each: first Edit (Working folder to his `nihal-job-system` folder, model Sonnet, permission mode **Auto**), then "Keep computer awake" in Settings > This computer > System, then one "Run now" that he leaves alone until it says "succeeded".
+2. Walk him through the rest of `docs/morning-scan.md` one step at a time, waiting for him after each: first Edit (permission menu **Auto**, model Sonnet 5.5, Advanced settings > General: Require this computer on and Local folder `nihal-job-system`, then Save changes), then "Keep computer awake" in Settings > This computer > System, then one "Run now" that he leaves alone until it says "succeeded".
 3. If Auto is not offered in the permission mode list, his plan may not include it. Record `On, weekdays at 7:30 (needs Auto mode)`, switch the task off, and tell him Nadeen will help set it up another way.
 4. If he wants to skip the test run now, record On anyway and tell him to click Run now once when he has 10 minutes.
 
@@ -257,7 +259,7 @@ Give a summary of at most 5 lines of what is set up (résumé copy, clips, fact 
 
 - The three things to say next: "find me jobs," "/apply <a job or a link>," and "/jobs" for a simple menu. Say which of these exist yet (see `README.md`). Do not tell him a command works if it isn't built yet.
 - How the Sheet works: jobs arrive as New. "Ready to apply" means I have built the application for you and it is waiting on you. "Applied" is only set by you, in the Sheet dropdown or by telling me ("I applied to the Bulwark one"). I never mark anything Applied myself.
-- What "show me more" does: each search adds the 10 best new matches to the Sheet and keeps the rest in memory. Say "show me more" and I'll add the next 10 without searching again.
+- What "show me more" does: each search adds the 10 best new matches to the Sheet and keeps the rest in memory. After a search I'll ask "Do you want to see more job matches?". Say yes, or say "show me more" any time, and I'll add the next 10 without searching again.
 - "Next time, click + New, then Project or folder, and pick `nihal-job-system` (choose Add folder, not New project, the first time). Use that folder, not the one above it. If I don't recognize a command like /jobs, send it again."
 - Daybook: some jobs hide the employer, because Daybook shows it only to paid Premium members. Those rows show `Employer hidden (Daybook)` in the Org column. The link still shows a short description and often the salary. If you want me to build an application for one, paste the description, and tell me the employer if you know it or find the same job elsewhere. I won't guess. A Daybook Premium account would unlock the employers. That is your choice and not required.
 - Last, offer the optional LinkedIn alerts: "Want to set up the LinkedIn job alerts now, or tomorrow? Either is fine." If now, go to step 11.

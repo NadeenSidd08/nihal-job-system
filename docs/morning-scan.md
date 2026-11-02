@@ -19,14 +19,15 @@ The task only runs while the Claude desktop app is open and your Mac is awake. I
 1. **Claude creates the task.** Ask Claude: "Set up my morning scan." Claude creates a scheduled task with the prompt below and your time (default weekdays 7:30). During onboarding, step 9 does this for you. Claude replaces `<his folder>` with your real path.
 
    ```
-   Open the folder <his folder>/nihal-job-system. Read CLAUDE.md there and follow it. This is an unattended run: skip onboarding. Run the find-jobs skill in unattended mode. Never ask me a question. If something needs an answer, skip it and mention it in the summary. Do not edit, create, or delete any file in the folder. Only write to my tracker Sheet, as the skill describes. End with a summary of exactly 3 lines: how many new jobs were added to the Sheet, the best one (title and company), and anything that was skipped or did not work.
+   Open the folder <his folder>/nihal-job-system. Read CLAUDE.md there and follow it. This is an unattended run: skip onboarding. Run the find-jobs skill in unattended mode. Never stop to ask me anything during the run. If something needs an answer, skip it and mention it in the summary. Do not edit, create, or delete any file in the folder. Only write to my tracker Sheet, as the skill describes. End with a summary of exactly 3 lines: how many new jobs were added to the Sheet, the best one (title and company), and anything that was skipped or did not work. Only when matches are waiting below the top 10, add a final line with the question: Do you want to see more job matches?
    ```
 
 2. **Check the task's settings.** In the Claude desktop app, open **Scheduled** in the sidebar, click the task, then **Edit**. Set:
-   - **Working folder** to your `nihal-job-system` folder. In the Edit window it is the folder row at the bottom of the Instructions box. A task that Claude creates starts with the folder of the chat it was made in, which is wrong, so do not skip this. After you save, open the task page again and check that **Folder** now ends in `nihal-job-system`. If it does not, set it again.
-   - **Model** to Sonnet. In the Edit window it is the "Default" menu at the bottom right of the Instructions box.
-   - **Permission mode** to **Auto**. In the Edit window it is the "Manual" button at the bottom left of the Instructions box. In Auto mode, Claude's safety check approves the routine steps (fetching job pages, searching Indeed through its connector, reading Gmail alerts, writing to your Sheet), so the scan never stops to ask you. If Auto is not in the list, your Claude plan may not include it. Stop here and tell Nadeen, because the other modes stop at permission prompts every morning.
-   Save.
+   - **Permission menu** (bottom left of the Instructions box) to **Auto**. The note under the box then says Claude will work and use connectors without pausing for approval. In Auto mode, Claude's safety check approves the routine steps (fetching job pages, searching Indeed through its connector, reading Gmail alerts, writing to your Sheet), so the scan never stops to ask you. If Auto is not in the list, your Claude plan may not include it. Stop here and tell Nadeen, because the other modes stop at permission prompts every morning.
+   - **Model menu** (bottom right of the Instructions box) to **Sonnet 5.5**. The other options are Fable 5.1, Opus 5.5 and Haiku 5.5.
+   - **Trigger** row: check it says Schedule, Daily (or weekdays), at the time you want, for example 07:30 AM.
+   - **Advanced settings**, then the **General** tab: turn on **Require this computer** (the task runs only while the computer is awake), and set **Local folder** to your `nihal-job-system` folder. A task that Claude creates starts with the folder of the chat it was made in, which is wrong, so do not skip this.
+   - Click **Save changes**. Then open the task page again and check that the folder now ends in `nihal-job-system`. If it does not, set it again.
 
 3. **Keep the Mac awake.** In the Claude desktop app, go to Settings > This computer > System and turn on **Keep computer awake**. Otherwise a scan that starts while the Mac sleeps waits until you wake it. Closing the laptop lid still puts it to sleep.
 
@@ -48,7 +49,7 @@ You can also ask Claude to do any of these.
 
 ## If something goes wrong
 
-- **It stalled.** A prompt is waiting for an answer. First check that the task's Permission mode is still **Auto** (Edit). Then open the run from the task's History list and answer the prompt. "Always allow" is not enough on its own for these scans, so if it keeps stopping, tell Nadeen.
+- **It stalled.** A prompt is waiting for an answer. First check that the permission menu in Edit still says **Auto**. Then open the run from the task's History list and answer the prompt. "Always allow" is not enough on its own for these scans, so if it keeps stopping, tell Nadeen.
 - **Scans stopped and the app shows a yellow "sign in again" banner.** Sign in again, then click Run now once.
 - **A run stalls on a prompt after day one.** Tell Nadeen which site or tool it named.
 - **It did not run.** The app was closed or the Mac was asleep at that time. Open the app and wake the Mac. One catch-up run happens on its own. See "Keep computer awake" above.

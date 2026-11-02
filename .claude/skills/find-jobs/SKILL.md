@@ -19,8 +19,8 @@ Rules that never bend:
 
 - **Attended** (he is in the chat): normal.
 - **Pasted link routing.** A link on its own, or with words that do not ask to apply (`here's one`, `what do you think`), goes to `/find-jobs`. Words that ask to apply or build the application go to `/apply`. A pasted link on its own adds just that job (no source scan, no Scan log row). `/find-jobs` plus a link runs the full scan and also adds the link.
-- **Unattended** (the scheduled morning task, nobody to answer): never ask a question. If something needs an answer (a missing header, an ambiguous row, a pasted link you cannot read), skip it and say so in the summary. Never stop to wait.
-- **"Show me more"**: skip to the section "Show me more". Do not search sources.
+- **Unattended** (the scheduled morning task, nobody to answer): never stop to wait for an answer. If something needs an answer (a missing header, an ambiguous row, a pasted link you cannot read), skip it and say so in the summary. The one exception is the closing question in the chat summary (`Do you want to see more job matches?`, only when matches are waiting). Ask it as the last line of the summary and end the run right there. Do not wait for a reply, and do not run "Show me more".
+- **"Show me more"**: skip to the section "Show me more". Do not search sources. This mode also runs when he answers yes ("yes", "sure", "more", "show me more") to the closing question in the same chat. The phrase "show me more" works at any time.
 
 Track the time. The whole run should take a couple of minutes at most.
 
@@ -224,16 +224,17 @@ Added 5 to your Sheet. Top 3:
   9  Congressional Reporter, Example Daily (Washington, DC)
   8  Policy Editor, Sample Policy Weekly (Remote)
   7  Senior News Reporter, U.S. News & World Report (Washington, DC)
-N more matched below today's top 10. Say 'show me more' to add the next 10.
+N more matched below today's top 10.
 Could not check: Mediabistro (the page did not load).
 Daybook: 3 of the matches hide the employer. Daybook shows it only to paid members. The link still shows a short description and the salary.
 Still waiting on you: Politics editor at Sample Gazette is Ready to apply. Say "I applied" when you submit it.
 Sheet: <link>
+Do you want to see more job matches?
 ```
 
 Rules:
 - Found = the count from Step 4 (distinct jobs that passed the filter, the window and the floor). New = rows added to Jobs. Name the top 3 by Fit with title, org and place.
-- The "N more matched" line appears only when N is above 0. N = Seen rows with `On Jobs tab` = `no` that have not aged out (more than 14 days since First seen), counted after this run's writes. Use the exact wording from the spec.
+- The "N more matched" line appears only when N is above 0. N = Seen rows with `On Jobs tab` = `no` that have not aged out (more than 14 days since First seen), counted after this run's writes. Use the exact wording from the spec. When N is above 0, the summary ends with the exact question `Do you want to see more job matches?` as its last line, after the Sheet link, attended and unattended. If he says yes in the same chat, run "Show me more". Unattended, end the run right after the question.
 - If any Daybook job was added with `Employer hidden (Daybook)`, add one line: `Daybook: N of the matches hide the employer. Daybook shows it only to paid members. The link still shows a short description and the salary.`
 - If the LinkedIn search found no alert emails, add `No LinkedIn alert emails yet.` It is not a failure.
 - Always name failed sources plainly, with a short reason. A quiet day must never hide a broken source. If nothing failed, one line saying all sources worked is enough.
@@ -242,7 +243,7 @@ Rules:
 - Nothing new: say `Nothing new today.` plus the failed-source and nudge lines. Do not pad.
 - If the Verify step shows that rows this run wrote duplicate rows written moments earlier by another run, say so plainly and tell him which row numbers to clear. Never delete rows yourself.
 - Unattended: add one line for anything you skipped because it needed an answer.
-- End with the Sheet link (the profile URL).
+- End with the Sheet link (the profile URL), then, only when N is above 0, the closing question.
 
 If he says "reopen" for a Closed row, change only its Status cell (to New, or whatever he names), then read it back and confirm.
 

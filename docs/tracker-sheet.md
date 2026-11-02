@@ -12,7 +12,7 @@ Test Sheet built from this spec (dummy data only): https://docs.google.com/sprea
 
 ### Jobs tab
 
-One row per job. Row 1 is a bold, frozen header. Columns, in this order:
+One row per job. Row 1 is a bold, frozen header with a filter on every column (A to M), so he can filter by Status, Type, Location or anything else. The Status and Type dropdowns are meant to show as chips (see call 4 for what is verified). Columns, in this order:
 
 | Col | Name | Allowed values |
 |---|---|---|
@@ -151,9 +151,9 @@ The cap applies to this run's new jobs only: jobs that cleared the floor this ru
 
 ### "Show me more"
 
-The chat summary of a run says: `N more matched below today's top 10. Say 'show me more' to add the next 10.` (N counts Seen rows with `On Jobs tab` = `no` that have not aged out.)
+The chat summary of a run says `N more matched below today's top 10.` and ends with the question `Do you want to see more job matches?` (N counts Seen rows with `On Jobs tab` = `no` that have not aged out.)
 
-When the user says "show me more", Claude:
+When the user answers yes in the same chat, or says "show me more" at any time, Claude:
 
 1. Reads Seen fresh and takes rows with `On Jobs tab` = `no`, skipping any whose First seen is more than 14 days ago.
 2. Sorts them by Fit, highest first, and takes the next 10.
@@ -182,7 +182,7 @@ Each run ends with a short summary in chat that includes:
 
 - Found: the number of distinct jobs that passed the relevance filter, the 14-day window and the Fit floor, after copies of the same job within this run were collapsed, and before the Sheet check. It shows as "found N that fit" in chat. It is a number in the chat only, not a column.
 - New jobs added to the Jobs tab.
-- The line `N more matched below today's top 10. Say 'show me more' to add the next 10.` when N is above 0.
+- The line `N more matched below today's top 10.` when N is above 0, and as the very last line of the summary the question `Do you want to see more job matches?`. An unattended run asks it and then ends without waiting.
 - Sources that failed.
 - A one-line nudge for each row whose Status is still **Ready to apply**, for example `Still waiting on you: Politics editor at Sample Gazette is Ready to apply. Say "I applied" when you submit it.`
 - Any Closed-row repost, as described above.
@@ -257,6 +257,11 @@ All worked in one batch:
 - Fit check: `setDataValidation` on column B with `NUMBER_BETWEEN` `1` and `10`, `strict:true`.
 - Status colours: one `addConditionalFormatRule` per status, `condition.type` `TEXT_EQ`, same column A range, `format.backgroundColor`. Colours: New light blue, Saved light yellow, Ready to apply light orange, Applied light green, Interviewing light purple, Offer stronger green, Passed and Closed grey.
 - To change the Status list later: `deleteConditionalFormatRule` (`{sheetId, index:0}`, repeated once per rule), re-run `setDataValidation`, then `addConditionalFormatRule` again.
+
+#### Not yet verified (connector could not open the test Sheet, 2026-11-01)
+
+- Filter on the header row: `setBasicFilter` with `filter` `{range:{sheetId:0, startRowIndex:0, startColumnIndex:0, endColumnIndex:13}}` (Jobs, columns A to M, no end row so it grows with the data). STATUS: NOT YET VERIFIED. The 2026-11-01 test could not run because the connector answered "Spreadsheet not found or unavailable" for the test Sheet. Run it on the test Sheet and read back `sheets.basicFilter` before relying on this line.
+- Chips: STATUS: NOT YET VERIFIED. The `setDataValidation` rule above gives dropdowns with an arrow (`showCustomUi:true`). Whether the API can switch them to chip display has not been tested. Do not claim chips until a read-back shows it.
 
 ### 5. Hide the Seen tab (Sheets connector)
 
