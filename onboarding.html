@@ -475,6 +475,36 @@ h3, .h3 { font-size: var(--fs-md); margin-top: var(--space-6); margin-bottom: va
 }
 /* A narrow frame for a tall, thin screenshot such as a sidebar */
 .frame--narrow { max-width: 20rem; }
+.why {
+  max-width: var(--measure);
+  margin-top: var(--space-6);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--rule);
+}
+.why__label {
+  margin: 0 0 var(--space-1);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.why__text {
+  margin: 0;
+  font-size: var(--fs-sm);
+  line-height: var(--lh-snug);
+  color: var(--ink-muted);
+}
+.frame-row {
+  display: grid;
+  gap: var(--space-5);
+  margin-top: var(--space-6);
+}
+.frame-row > .frame { margin: 0; min-width: 0; }
+.frame-row + p { margin-top: var(--space-6); }
+@media (min-width: 960px) {
+  .frame-row { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
+}
 .frame__caption {
   margin-top: var(--space-2);
   font-size: var(--fs-sm);
@@ -1143,7 +1173,7 @@ kbd { border: 1px solid var(--rule-strong); background: var(--paper-soft); }
             <div class="wizard__group">
               <p class="wizard__group-name">Your morning scan</p>
               <ol class="wizard__items">
-                <li><a class="wizard__link" href="#step-10" data-step="10">Check the scan’s settings</a></li>
+                <li><a class="wizard__link" href="#step-10" data-step="10">Check your morning scan</a></li>
                 <li><a class="wizard__link" href="#step-11" data-step="11">Set up LinkedIn job alerts</a></li>
               </ol>
             </div>
@@ -1172,20 +1202,21 @@ kbd { border: 1px solid var(--rule-strong); background: var(--paper-soft); }
           <h2 class="wizard__title" id="wizard-step-1-title" tabindex="-1"><span class="wizard__num" aria-hidden="true">1</span>Check your Mac and Claude plan</h2>
 <ol>
   <li>Use a Mac.</li>
-  <li>Install the Claude desktop app. <a class="link-external" href="https://claude.ai/download" target="_blank" rel="noopener">claude.ai/download<span class="sr-only"> (opens in a new tab)</span></a></li>
-  <li>Check that you are on a paid Claude plan, Pro or Max.</li>
+  <li>Install the Claude desktop app. <a class="link-external" href="https://claude.ai/download" target="_blank" rel="noopener">claude.ai/download<span class="sr-only"> (opens in a new tab)</span></a> The claude.ai website will not work for this, because the system needs to open a folder on your Mac and run a scan on its own each morning.</li>
+  <li>Check that you are on a paid Claude plan: Pro, at least $20 a month.</li>
 </ol>
 <div class="callout callout--headsup">
 <p><strong>Heads-up.</strong> The morning scan needs a plan that offers Auto permission mode. If you do not see Auto in step 10, stop and tell Nadeen.</p>
 </div>
+<div class="why"><p class="why__label">Why this step</p><p class="why__text">Everything runs from the desktop app on your Mac, and the morning scan needs a paid plan with Auto mode. Without these, the daily list of jobs cannot arrive on its own.</p></div>
         </article>
         <article class="wizard__step" id="wizard-step-2" data-phase="Before you start" aria-labelledby="wizard-step-2-title">
           <h2 class="wizard__title" id="wizard-step-2-title" tabindex="-1"><span class="wizard__num" aria-hidden="true">2</span>Make your Job search folder</h2>
 <ol>
-  <li>In Finder, make a new folder. Call it something like <span class="ui">Job search</span>.</li>
-  <li>Put it anywhere easy to find, such as Documents.</li>
+  <li>Make a new folder on your laptop, for example on your Desktop or in Documents. Call it <span class="ui">Job search</span>.</li>
 </ol>
 <p>Everything you gather in the next two steps goes in this folder.</p>
+<div class="why"><p class="why__label">Why this step</p><p class="why__text">One folder holds your résumé, your clips and the job system. Claude always knows where to look, so you never have to point it at anything again.</p></div>
         </article>
         <article class="wizard__step" id="wizard-step-3" data-phase="Before you start" aria-labelledby="wizard-step-3-title">
           <h2 class="wizard__title" id="wizard-step-3-title" tabindex="-1"><span class="wizard__num" aria-hidden="true">3</span>Save your LinkedIn profile as a PDF</h2>
@@ -1207,16 +1238,18 @@ kbd { border: 1px solid var(--rule-strong); background: var(--paper-soft); }
 </figure>
 </div>
 </div>
+<div class="why"><p class="why__label">Why this step</p><p class="why__text">Your LinkedIn profile gives Claude the facts about your career. Every application it writes later is built from them, so they stay true.</p></div>
         </article>
         <article class="wizard__step" id="wizard-step-4" data-phase="Before you start" aria-labelledby="wizard-step-4-title">
           <h2 class="wizard__title" id="wizard-step-4-title" tabindex="-1"><span class="wizard__num" aria-hidden="true">4</span>Add your résumé and have your website link ready</h2>
 <ol>
-  <li>Put your résumé in the same folder, as a PDF or a .docx file.</li>
+  <li>Put your résumé in the same folder, as a PDF or a .docx file. Claude reads the files in this folder to make a clean text copy of your résumé during setup. A Google Doc lives in your Google account, not in the folder, so download it as a PDF and drop it in.</li>
   <li>Have the link to your website with your clips ready. You will paste it in step 8.</li>
 </ol>
 <div class="callout callout--tip">
 <p><strong>Tip.</strong> If your résumé is a Google Doc, open it and click File, Download, PDF. Then move the PDF into your folder.</p>
 </div>
+<div class="why"><p class="why__label">Why this step</p><p class="why__text">Your résumé is the base for every tailored application, and your website link lets Claude pick the clips that fit each job.</p></div>
         </article>
         <article class="wizard__step" id="wizard-step-5" data-phase="Connect your accounts" aria-labelledby="wizard-step-5-title">
           <h2 class="wizard__title" id="wizard-step-5-title" tabindex="-1"><span class="wizard__num" aria-hidden="true">5</span>Connect Google Drive, Sheets, Gmail and Indeed</h2>
@@ -1230,13 +1263,20 @@ kbd { border: 1px solid var(--rule-strong); background: var(--paper-soft); }
   <li><strong>Google Drive.</strong> Claude creates your tracker Sheet here and saves your application Docs.</li>
   <li><strong>Google Sheets.</strong> Claude writes new jobs into your tracker and reads your changes.</li>
   <li><strong>Gmail.</strong> Claude reads LinkedIn job alert emails, which is how it sees jobs at sites it cannot read directly, like Politico, The Atlantic and The Hill. It never sends email.</li>
-  <li><strong>Indeed.</strong> Optional, and recommended. It adds a broad set of listings to the daily search.</li>
+  <li><strong>Indeed.</strong> It adds a broad set of listings to the daily search.</li>
 </ul>
 <div class="callout callout--headsup">
 <p><strong>Heads-up.</strong> Use the <strong>same Google account</strong> for Drive and Sheets.</p>
 </div>
 </div>
 <div class="pair__media">
+<figure class="frame frame--narrow">
+  <div class="frame__window">
+    <div class="frame__bar" aria-hidden="true"><i></i><i></i><i></i></div>
+    <div class="frame__body"><div class="frame__shot"><img src="guide/07a-sidebar-new.jpg" alt="The Claude app sidebar. New, Search, Projects, Artifacts, Scheduled, Design, Customize and More are listed. Customize, the second row from the bottom, is circled." width="437" height="427" loading="lazy"><span class="frame__ring" style="--x: 2.3%; --y: 76.8%; --w: 74.1%; --h: 9.4%" aria-hidden="true"></span></div></div>
+  </div>
+  <figcaption class="frame__caption">Customize, in the left sidebar.</figcaption>
+</figure>
 <figure class="frame">
   <div class="frame__window">
     <div class="frame__bar" aria-hidden="true"><i></i><i></i><i></i></div>
@@ -1246,6 +1286,7 @@ kbd { border: 1px solid var(--rule-strong); background: var(--paper-soft); }
 </figure>
 </div>
 </div>
+<div class="why"><p class="why__label">Why this step</p><p class="why__text">These connections let Claude put new jobs in your Sheet, save applications to your Drive, and read LinkedIn alerts. Without them the morning list has nowhere to go.</p></div>
         </article>
         <article class="wizard__step" id="wizard-step-6" data-phase="Connect your accounts" aria-labelledby="wizard-step-6-title">
           <h2 class="wizard__title" id="wizard-step-6-title" tabindex="-1"><span class="wizard__num" aria-hidden="true">6</span>Let Claude reach the job sites</h2>
@@ -1256,10 +1297,17 @@ kbd { border: 1px solid var(--rule-strong); background: var(--paper-soft); }
   <li>Click your name at the bottom of the left sidebar, then Settings, then <span class="ui">Capabilities</span>. On the web it is <a class="link-external" href="https://claude.ai/settings/capabilities" target="_blank" rel="noopener">claude.ai/settings/capabilities<span class="sr-only"> (opens in a new tab)</span></a>.</li>
   <li>Keep <span class="ui">Allow network egress</span> turned on.</li>
   <li>Keep <span class="ui">Domain allowlist</span> on <span class="ui">Package managers only</span>. Never choose All domains. Job posts are text from strangers, and a short list keeps Claude from reaching anything else.</li>
-  <li>Under <span class="ui">Additional allowed domains</span>, add the five domains below, one at a time. Click Copy, paste the domain into the box, and click <span class="ui">Add</span>.</li>
+  <li>Under <span class="ui">Additional allowed domains</span>, add the five domains below, one at a time. Click Copy, paste the domain into the box, and click <span class="ui">Add</span>. <strong>ADD THEM ONE AT A TIME.</strong></li>
 </ol>
 </div>
 <div class="pair__media">
+<figure class="frame frame--narrow">
+  <div class="frame__window">
+    <div class="frame__bar" aria-hidden="true"><i></i><i></i><i></i></div>
+    <div class="frame__body"><div class="frame__shot"><img src="guide/06a-name-menu.jpg" alt="The bottom of the Claude sidebar. A round N icon, the name Nadeen and the plan name, with a small arrow. The whole name row is circled." width="212" height="66" loading="lazy"><span class="frame__ring" style="--x: 2.8%; --y: 39%; --w: 73.6%; --h: 54.5%" aria-hidden="true"></span></div></div>
+  </div>
+  <figcaption class="frame__caption">Your name, at the bottom of the left sidebar. Click it, then Settings.</figcaption>
+</figure>
 <figure class="frame">
   <div class="frame__window">
     <div class="frame__bar" aria-hidden="true"><i></i><i></i><i></i></div>
@@ -1279,6 +1327,7 @@ kbd { border: 1px solid var(--rule-strong); background: var(--paper-soft); }
 <div class="callout callout--headsup">
 <p><strong>Heads-up.</strong> The box rejects several domains at once, so add them one at a time. Each domain shows in the list under the box once it is added. All five should be there. New settings only work in a chat you start after you add them, so finish this step before step 8.</p>
 </div>
+<div class="why"><p class="why__label">Why this step</p><p class="why__text">The job sites are on the open web, and Claude can only reach sites you allow. This lets it read the listings behind your morning list and little else.</p></div>
         </article>
         <article class="wizard__step" id="wizard-step-7" data-phase="Set up with Claude" aria-labelledby="wizard-step-7-title">
           <h2 class="wizard__title" id="wizard-step-7-title" tabindex="-1"><span class="wizard__num" aria-hidden="true">7</span>Start a chat on your folder</h2>
@@ -1290,9 +1339,6 @@ kbd { border: 1px solid var(--rule-strong); background: var(--paper-soft); }
   <li>Click <span class="ui">Add folder</span>, not New project, and pick your Job search folder.</li>
 </ol>
 <p>Do this before you send anything.</p>
-<div class="callout callout--tip">
-<p><strong>Tip.</strong> If Claude does not recognize a command like <code>/jobs</code>, send it again.</p>
-</div>
 </div>
 <div class="pair__media">
 <figure class="frame frame--narrow" id="shot-07">
@@ -1318,6 +1364,7 @@ kbd { border: 1px solid var(--rule-strong); background: var(--paper-soft); }
 </figure>
 </div>
 </div>
+<div class="why"><p class="why__label">Why this step</p><p class="why__text">A chat on your folder is what lets Claude read and write the job system. A chat anywhere else cannot reach your files.</p></div>
         </article>
         <article class="wizard__step" id="wizard-step-8" data-phase="Set up with Claude" aria-labelledby="wizard-step-8-title">
           <h2 class="wizard__title" id="wizard-step-8-title" tabindex="-1"><span class="wizard__num" aria-hidden="true">8</span>Send the setup message</h2>
@@ -1334,6 +1381,7 @@ kbd { border: 1px solid var(--rule-strong); background: var(--paper-soft); }
 <div class="callout callout--headsup">
 <p><strong>Heads-up.</strong> A Mac window may pop up asking to install “command line developer tools”. Either button is fine. Claude may also ask to read the folder above yours. Say yes. If it says a website is blocked, go back to step 6, then start a new chat on your folder and paste the message again.</p>
 </div>
+<div class="why"><p class="why__label">Why this step</p><p class="why__text">This one message starts setup and hands Claude your website, so it can learn your voice from your clips.</p></div>
         </article>
         <article class="wizard__step" id="wizard-step-9" data-phase="Set up with Claude" aria-labelledby="wizard-step-9-title">
           <h2 class="wizard__title" id="wizard-step-9-title" tabindex="-1"><span class="wizard__num" aria-hidden="true">9</span>What Claude asks you</h2>
@@ -1352,39 +1400,59 @@ kbd { border: 1px solid var(--rule-strong); background: var(--paper-soft); }
 <div class="callout callout--tip">
 <p><strong>Tip.</strong> If you stop halfway, start a new chat on the <code>nihal-job-system</code> folder and say “continue setup”. Claude picks up where you left off. From now on, start your chats on that folder. It sits inside your Job search folder.</p>
 </div>
-<p>After setup, you and Nadeen have a check-in call of about 20 minutes.</p>
+<div class="why"><p class="why__label">Why this step</p><p class="why__text">Setup is where Claude learns what fits you and how you write. Knowing the few moments that need you keeps the 30 minutes smooth.</p></div>
         </article>
         <article class="wizard__step" id="wizard-step-10" data-phase="Your morning scan" aria-labelledby="wizard-step-10-title">
-          <h2 class="wizard__title" id="wizard-step-10-title" tabindex="-1"><span class="wizard__num" aria-hidden="true">10</span>Check the scan’s settings and do a test run</h2>
+          <h2 class="wizard__title" id="wizard-step-10-title" tabindex="-1"><span class="wizard__num" aria-hidden="true">10</span>Check your morning scan</h2>
+<p>This step makes sure your job search runs on its own every morning. A scheduled task is where Claude runs a task by itself at a set time, and Claude created yours during setup.</p>
 <div class="pair">
 <div class="pair__text">
 <ol>
-  <li>In the Claude app, click <span class="ui">Scheduled</span> in the sidebar, click your task, then click <span class="ui">Edit</span>.</li>
-  <li>Set the <strong>Working folder</strong> to your <code>nihal-job-system</code> folder. It is the folder row at the bottom of the Instructions box. Save, open the task again, and check that Folder now ends in <code>nihal-job-system</code>.</li>
-  <li>Set the <strong>Model</strong> to Sonnet. It is the Default menu at the bottom right.</li>
-  <li>Set the <strong>Permission mode</strong> to <strong>Auto</strong>. It is the Manual button at the bottom left. Auto lets the scan run without stopping to ask you.</li>
+  <li>Click <span class="ui">Scheduled</span> in the left sidebar. Your task is listed there (it may be called Job-Scan or Morning job scan). Click it, then click <span class="ui">Edit</span>.</li>
+  <li>Under the Instructions box, set the menu on the left to <strong>Auto</strong>. Claude then runs the scan without stopping to ask you. If Auto is not in the menu, stop and tell Nadeen.</li>
+  <li>Set the menu on the right to <strong>Sonnet 5.5</strong>.</li>
+  <li>Check <strong>Trigger</strong>: Schedule, Daily (or Weekdays), 7:30 AM.</li>
+  <li>Open <strong>Advanced settings</strong>. On the <strong>General</strong> tab, turn on <strong>Require this computer</strong>, and set <strong>Local folder</strong> to <strong>nihal-job-system</strong>.</li>
+  <li>Click <span class="ui">Save changes</span>.</li>
   <li>Go to Settings, then <span class="ui">This computer</span>, then <span class="ui">System</span>, and turn on <span class="ui">Keep computer awake</span>.</li>
-  <li>Open your scan task and click <span class="ui">Run now</span> once. Leave it alone for about 10 minutes. It should say <strong>succeeded</strong> and show a 3-line summary.</li>
+  <li>Open your scan task and click <span class="ui">Run now</span> once. Leave it alone for about 10 minutes. It should say <strong>succeeded</strong> and show a short summary.</li>
 </ol>
 <div class="callout callout--headsup">
 <p><strong>Heads-up.</strong> If Auto is not in the list, stop and tell Nadeen. Your plan may not include it. The scan only runs while the Claude app is open and your Mac is awake, and closing the lid still puts it to sleep. If the test run stops to ask you something, tell Nadeen what it named.</p>
 </div>
 </div>
-<div class="pair__media">
-<figure class="frame" id="shot-10">
-  <!-- When the real screenshot exists, replace the placeholder div with a frame__shot holding guide/10-scheduled-edit.jpg -->
+<div class="pair__media" id="shot-10">
+<figure class="frame">
   <div class="frame__window">
     <div class="frame__bar" aria-hidden="true"><i></i><i></i><i></i></div>
-    <div class="frame__body"><div class="frame__placeholder">Screenshot coming: Claude app: scheduled task Edit window</div></div>
+    <div class="frame__body"><div class="frame__shot"><img src="guide/10a-scheduled-list.jpg" alt="The Claude Scheduled tasks page with a New task button at the top right and a task card named Job-Scan, Active, Daily at 7:30 AM. The card is circled." width="570" height="215" loading="lazy"><span class="frame__ring" style="--x: 0.9%; --y: 34.9%; --w: 98.2%; --h: 64%" aria-hidden="true"></span></div></div>
   </div>
+  <figcaption class="frame__caption">Step 1. Your task on the Scheduled page, circled.</figcaption>
 </figure>
 </div>
+</div>
+<div class="frame-row">
+<figure class="frame">
+  <div class="frame__window">
+    <div class="frame__bar" aria-hidden="true"><i></i><i></i><i></i></div>
+    <div class="frame__body"><div class="frame__shot"><img src="guide/10b-edit-task.jpg" alt="The Edit scheduled task window. The Auto menu at the bottom left of the Instructions box is circled. Further down, the Require this computer switch and the Local folder menu showing nihal-job-system are circled together." width="802" height="999" loading="lazy"><span class="frame__ring" style="--x: 6.7%; --y: 31.6%; --w: 12%; --h: 4.0%" aria-hidden="true"></span><span class="frame__ring" style="--x: 6.0%; --y: 69.0%; --w: 85%; --h: 18.2%" aria-hidden="true"></span></div></div>
+  </div>
+  <figcaption class="frame__caption">Steps 2 and 5. The Auto menu, and the Require this computer and Local folder rows, circled.</figcaption>
+</figure>
+<figure class="frame">
+  <div class="frame__window">
+    <div class="frame__bar" aria-hidden="true"><i></i><i></i><i></i></div>
+    <div class="frame__body"><div class="frame__shot"><img src="guide/10c-model-menu.jpg" alt="The Edit scheduled task window with the model menu open. It lists Default model, Fable 5.1, Opus 5.5, Sonnet 5.5, ticked, and Haiku 5.5. Sonnet 5.5 is circled." width="866" height="1014" loading="lazy"><span class="frame__ring" style="--x: 65.6%; --y: 47.9%; --w: 20.1%; --h: 3.8%" aria-hidden="true"></span></div></div>
+  </div>
+  <figcaption class="frame__caption">Step 3. Sonnet 5.5 in the model menu, circled.</figcaption>
+</figure>
 </div>
 <p>If Claude never offered to set up the scan, paste this message into a chat on your <code>nihal-job-system</code> folder.</p>
 <div class="prompt">
 <p class="prompt__text" id="scanMsg" tabindex="0">Set up my morning scan.</p>
 <div class="prompt__bar"><button class="btn btn--secondary" type="button" data-copy="scanMsg">Copy message</button><span class="prompt__hint" data-copy-hint></span><span class="sr-only" role="status" data-copy-status></span></div>
 </div>
+<div class="why"><p class="why__label">Why this step</p><p class="why__text">This is what makes the scan run itself. With Auto, the right folder and the right time, the list appears each morning without you touching anything.</p></div>
         </article>
         <article class="wizard__step" id="wizard-step-11" data-phase="Your morning scan" aria-labelledby="wizard-step-11-title">
           <h2 class="wizard__title" id="wizard-step-11-title" tabindex="-1"><span class="wizard__num" aria-hidden="true">11</span>Set up LinkedIn job alerts</h2>
@@ -1395,6 +1463,7 @@ kbd { border: 1px solid var(--rule-strong); background: var(--paper-soft); }
   <li>Choose <span class="ui">Daily</span> and <span class="ui">Email</span>.</li>
   <li>Repeat for two or three roles.</li>
 </ol>
+<div class="why"><p class="why__label">Why this step</p><p class="why__text">Some employers block Claude from reading their pages. LinkedIn alert emails bring those jobs into your morning list anyway.</p></div>
         </article>
         <article class="wizard__step" id="wizard-step-12" data-phase="Your first application" aria-labelledby="wizard-step-12-title">
           <h2 class="wizard__title" id="wizard-step-12-title" tabindex="-1"><span class="wizard__num" aria-hidden="true">12</span>Open your Job Inbox</h2>
@@ -1426,6 +1495,7 @@ kbd { border: 1px solid var(--rule-strong); background: var(--paper-soft); }
 </figure>
 </div>
 </div>
+<div class="why"><p class="why__label">Why this step</p><p class="why__text">The Job Inbox is where your morning list lives. It is the one place you decide which jobs to keep or drop.</p></div>
         </article>
         <article class="wizard__step" id="wizard-step-13" data-phase="Your first application" aria-labelledby="wizard-step-13-title">
           <h2 class="wizard__title" id="wizard-step-13-title" tabindex="-1"><span class="wizard__num" aria-hidden="true">13</span>Build an application with /apply</h2>
@@ -1438,13 +1508,14 @@ kbd { border: 1px solid var(--rule-strong); background: var(--paper-soft); }
 <div class="callout callout--headsup">
 <p><strong>Heads-up.</strong> Read the claims to confirm. Fix anything that is wrong before you send. Claude only uses facts from your fact list.</p>
 </div>
+<div class="why"><p class="why__label">Why this step</p><p class="why__text">This is where a tailored application comes from. Claude drafts it from your fact list, so it fits the job and stays accurate.</p></div>
         </article>
         <article class="wizard__step" id="wizard-step-14" data-phase="Your first application" aria-labelledby="wizard-step-14-title">
           <h2 class="wizard__title" id="wizard-step-14-title" tabindex="-1"><span class="wizard__num" aria-hidden="true">14</span>Edit, download, apply, tell Claude</h2>
 <div class="pair">
 <div class="pair__text">
 <ol>
-  <li>Open the two Docs and edit them until they sound like you. Then click File, Download, PDF.</li>
+  <li>Open your two Google Docs, your résumé and your cover letter, in the Job applications folder in your Drive, and edit them until they sound like you. Then click File, Download, PDF.</li>
   <li>Apply on the employer’s own site. Claude never applies for you.</li>
   <li>Click <span class="ui">I applied</span> on the job’s card in the Ready to apply column of the Pipeline tab, or tell Claude “I applied to The Bulwark”.</li>
 </ol>
@@ -1459,23 +1530,25 @@ kbd { border: 1px solid var(--rule-strong); background: var(--paper-soft); }
 </figure>
 </div>
 </div>
+<div class="why"><p class="why__label">Why this step</p><p class="why__text">Claude drafts, and you make it sound like you and send it. That keeps your voice and your control.</p></div>
         </article>
         <article class="wizard__step" id="wizard-step-15" data-phase="Every day after" aria-labelledby="wizard-step-15-title">
           <h2 class="wizard__title" id="wizard-step-15-title" tabindex="-1"><span class="wizard__num" aria-hidden="true">15</span>Your 10-minute morning skim</h2>
 <ol>
-  <li>If your scan is on, it runs weekdays at about 7:30 and adds up to 10 new jobs, each with status New.</li>
+  <li>If your scan is on, it runs weekdays at about 7:30 and adds up to 10 new jobs, each with status New. Then it asks “Do you want to see more job matches?” Answer yes in that chat, or say show me more in any chat on your folder, and Claude adds the next 10.</li>
   <li>Open your Job Inbox. <span class="ui">Save</span> or <span class="ui">Pass</span> each job.</li>
   <li>Build the best one with <span class="ui">Build in Claude</span>.</li>
 </ol>
 <ul>
-  <li>Say <code>show me more</code> to add the next 10 matches. The others wait in your Sheet for 14 days. Say <code>show me more</code> to add them.</li>
+  <li>Say <code>yes</code> when Claude asks “Do you want to see more job matches?” or say <code>show me more</code> to add the next 10 matches. The others wait in your Sheet for 14 days.</li>
   <li>Say <code>find me jobs</code> to run a scan any time.</li>
   <li>Once a week, say <code>my top 3 this week</code>. Claude builds applications for your three best jobs. It shows you the three first, and you confirm or swap them before it builds.</li>
 </ul>
+<div class="why"><p class="why__label">Why this step</p><p class="why__text">This is the daily loop the system is built for. About 10 minutes with a fresh list, and the best job moves toward an application.</p></div>
         </article>
         <article class="wizard__step" id="wizard-step-16" data-phase="Every day after" aria-labelledby="wizard-step-16-title">
           <h2 class="wizard__title" id="wizard-step-16-title" tabindex="-1"><span class="wizard__num" aria-hidden="true">16</span>What each status means</h2>
-<p>Your Google Sheet keeps every job and its status. Ready to apply means the ball is with you. Applied means you sent it.</p>
+<p>Your Google Sheet keeps every job and its status. Ready to apply means the ball is with you. Applied means you sent it. You can filter your Sheet to show one status, one type, or one location. Click any column header, then the filter button in the Sheet’s toolbar.</p>
 <div class="table-figure"><div class="table-wrap" role="region" aria-label="What each status means" tabindex="0">
 <table class="table">
 <thead><tr><th scope="col">Status</th><th scope="col">Meaning</th><th scope="col">Who sets it</th></tr></thead>
@@ -1498,6 +1571,7 @@ kbd { border: 1px solid var(--rule-strong); background: var(--paper-soft); }
   </div>
   <figcaption class="frame__caption">The Status column, circled. Your Google Sheet keeps everything. You can change a Status from its dropdown too. These are example jobs.</figcaption>
 </figure>
+<div class="why"><p class="why__label">Why this step</p><p class="why__text">Statuses let you and Claude agree on where each job stands, so Claude never guesses and your list stays accurate.</p></div>
         </article>
         <article class="wizard__step" id="wizard-step-17" data-phase="Every day after" aria-labelledby="wizard-step-17-title">
           <h2 class="wizard__title" id="wizard-step-17-title" tabindex="-1"><span class="wizard__num" aria-hidden="true">17</span>Things you can say to Claude</h2>
@@ -1509,7 +1583,7 @@ kbd { border: 1px solid var(--rule-strong); background: var(--paper-soft); }
 <tr class="table__group"><td colspan="2">Finding jobs</td></tr>
 <tr><td><code>/jobs</code></td><td>A simple menu that points you to the next step. Type it whenever you forget the commands.</td></tr>
 <tr><td><code>find me jobs</code></td><td>Searches your sources now and adds the best new matches to your Sheet.</td></tr>
-<tr><td><code>show me more</code></td><td>Adds the next 10 matches that were waiting.</td></tr>
+<tr><td><code>yes</code> to “Do you want to see more job matches?”, or <code>show me more</code></td><td>Adds the next 10 matches that were waiting.</td></tr>
 <tr class="table__group"><td colspan="2">Applying</td></tr>
 <tr><td><code>/apply</code> and a job or a link</td><td>Builds your résumé, cover letter and clip picks for that job.</td></tr>
 <tr><td>Paste a job link</td><td>Adds that one job to your Sheet. Say “apply” with it to build the application.</td></tr>
@@ -1531,6 +1605,7 @@ kbd { border: 1px solid var(--rule-strong); background: var(--paper-soft); }
 <div class="callout callout--tip">
 <p><strong>Tip.</strong> If Claude does not recognize a command like <code>/jobs</code>, send it again.</p>
 </div>
+<div class="why"><p class="why__label">Why this step</p><p class="why__text">These plain phrases are all the controls you need. You never edit a file or remember a command.</p></div>
         </article>
         <article class="wizard__step" id="wizard-step-18" data-phase="Every day after" aria-labelledby="wizard-step-18-title">
           <h2 class="wizard__title" id="wizard-step-18-title" tabindex="-1"><span class="wizard__num" aria-hidden="true">18</span>If something goes wrong</h2>
@@ -1538,7 +1613,7 @@ kbd { border: 1px solid var(--rule-strong); background: var(--paper-soft); }
   <li><strong>Claude cannot find a command like /jobs.</strong> Send it again. Check that your chat is on the <code>nihal-job-system</code> folder.</li>
   <li><strong>Claude says a website is blocked.</strong> Go back to step 6 and check all five domains. Then start a new chat on your folder and paste the step 8 message again.</li>
   <li><strong>You cannot find Connectors.</strong> Click Customize in the left sidebar, then Connectors.</li>
-  <li><strong>The scan stalled.</strong> A prompt is waiting for an answer. Check that the task’s Permission mode is still Auto (Scheduled, your task, Edit). Then open the run from the task’s History list and answer the prompt.</li>
+  <li><strong>The scan stalled.</strong> A prompt is waiting for an answer. Check that the menu under the Instructions box still says Auto (Scheduled, your task, Edit). Then open the run from the task’s History list and answer the prompt.</li>
   <li><strong>The app shows a yellow “sign in again” banner.</strong> Sign in again, then click Run now once.</li>
   <li><strong>The scan did not run.</strong> The app was closed or the Mac was asleep. Open the app and wake the Mac. One catch-up run happens on its own. Check that Keep computer awake is on.</li>
   <li><strong>The summary says “no LinkedIn alert emails”.</strong> No alert emails arrived from LinkedIn in the last few days. Set up the alerts in step 11, with email delivery.</li>
@@ -1546,8 +1621,9 @@ kbd { border: 1px solid var(--rule-strong); background: var(--paper-soft); }
   <li><strong>A Daybook job shows “Employer hidden (Daybook)”.</strong> Daybook shows the employer only to paid members. The link still shows a short description. To build an application, paste the description into Claude and tell it the employer if you know it. Claude will not guess.</li>
 </ul>
 <div class="callout callout--headsup">
-<p><strong>Heads-up.</strong> Still stuck? Tell Nadeen what happened and what Claude said, word for word.</p>
+<p><strong>Heads-up.</strong> Still stuck? Tell Nadeen what happened and what Claude said.</p>
 </div>
+<div class="why"><p class="why__label">Why this step</p><p class="why__text">Most stalls have a known cause and a quick fix. Fixing them keeps the morning list arriving.</p></div>
         </article>
 
       <div class="wizard__nav" hidden>
