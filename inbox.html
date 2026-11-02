@@ -256,9 +256,9 @@ matchMedia("(prefers-color-scheme: dark)").addEventListener("change", syncThemeB
 function explain(e){
   const code = e && e.code, msg = (e && e.message) || "";
   let blob = msg; try { blob += " " + JSON.stringify((e && e.result) || ""); } catch(x){}
-  if (code === "needs_reauth") return {text:"Reconnect Google Sheets in claude.ai Settings, Connectors."};
-  if (code === "server_not_connected") return {text:"Add the Google Sheets connector in claude.ai Settings, Connectors."};
-  if (code === "selection_required") return {text:"You have two Google Sheets connectors. Pick one in claude.ai Settings, Connectors."};
+  if (code === "needs_reauth") return {text:"Reconnect Google Sheets in claude.ai Customize, Connectors."};
+  if (code === "server_not_connected") return {text:"Add the Google Sheets connector in claude.ai Customize, Connectors."};
+  if (code === "selection_required") return {text:"You have two Google Sheets connectors. Pick one in claude.ai Customize, Connectors."};
   if (code === "approval_required" || code === "not_in_manifest" || code === "consent_required") return {text:"This page needs your OK to use Google Sheets.", retry:true, label:"Allow and try again"};
   if (code === "tool_error"){
     if (/permission|forbidden|denied|not have access|insufficient|403|caller does not/i.test(blob))

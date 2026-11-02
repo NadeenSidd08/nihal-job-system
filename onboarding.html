@@ -1,481 +1,1886 @@
 <meta charset="utf-8">
 <title>Your Job Desk Setup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap');
+/* Guide design system: tokens.
+   Every value used by components.css lives here. Single light theme, on purpose.
+   Palette is closed: only the hues below. Tints are rgba() of a listed color. */
+
 :root {
-  --bg: #f2f6f7;
-  --surface: #ffffff;
-  --ink: #16252b;
-  --muted: #52646c;
-  --line: #cbd8dc;
-  --accent: #0b6e7f;
-  --accent-ink: #ffffff;
-  --accent-bg: #e1f0f3;
-  --done: #2b7a4b;
-  --done-bg: #e3f3ea;
-  --lock-bg: #e9eef0;
-  --lock-ink: #6c7c83;
-  --code-bg: #eef3f4;
-  --warn: #7a5600;
-  --warn-bg: #fff3d1;
-  --focus: #1a64c8;
   color-scheme: light;
+
+  /* ---------- Color: the whole palette ---------- */
+  --paper: #f4f4f1;
+  --paper-soft: #fbfaf7;
+  --ink: #202126;
+  --ink-muted: #5d626b;
+  --ink-soft: #858b94;
+  --rule: #d8dde2;
+  --rule-strong: #c4cbd1;
+  --hot: #ff2844;
+  --orange: #ff7a1a;
+  --pink: #ff2d8f;
+  --blue: #123c8c;
+  --black: #050505;
+  --white: #ffffff;
+
+  /* ---------- Color: tints (rgba of a listed color only) ---------- */
+  --tint-hot-glow: rgba(255, 40, 68, 0.10);   /* hero glow */
+  --tint-hot-soft: rgba(255, 40, 68, 0.08);   /* badge fill */
+  --tint-hot-line: rgba(255, 40, 68, 0.35);   /* badge edge */
+  --tint-hot-ring: rgba(255, 40, 68, 0.18);   /* glow around a screenshot ring */
+  --tint-blue: rgba(18, 60, 140, 0.07);       /* Tip callout fill */
+  --tint-blue-line: rgba(18, 60, 140, 0.35);  /* blue badge edge */
+  --tint-orange: rgba(255, 122, 26, 0.12);    /* Heads-up callout fill */
+  --tint-orange-line: rgba(255, 122, 26, 0.55);
+  --tint-ink: rgba(32, 33, 38, 0.06);         /* hover wash, inline code */
+  --grid-line-x: rgba(196, 203, 209, 0.5);    /* rule-strong, hero grid */
+  --grid-line-y: rgba(196, 203, 209, 0.4);
+  
+  /* ---------- Typography ---------- */
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  /* Plus Jakarta Sans is for all text. Anton is for the page title (uppercase, hot),
+     step numbers, and rare big figures. */
+  --font-display: Anton, Impact, "Arial Narrow Bold", sans-serif;
+
+  /* Type scale, rem based, 7 steps. Base is 16px. */
+  --fs-xs: 0.8125rem;   /* 13px  labels, badges */
+  --fs-sm: 0.9375rem;   /* 15px  captions, nav, table cells */
+  --fs-base: 1.125rem;  /* 18px  body */
+  --fs-md: 1.375rem;    /* 22px  lead, h3, step titles */
+  --fs-lg: 1.75rem;     /* 28px  h2 */
+  --fs-xl: 2.5rem;      /* 40px  step numbers and rare big figures (Anton) */
+  --fs-display: clamp(3rem, 9vw, 6.5rem); /* 48 to 104px  page title (Anton, uppercase, hot) */
+
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+
+  --lh-display: 1.06;
+  --lh-heading: 1.15;
+  --lh-snug: 1.4;
+  --lh-body: 1.6;
+
+  --tracking-heading: 0;
+  --tracking-label: 0.12em;
+
+  /* ---------- Spacing, 4px base ---------- */
+  --space-1: 0.25rem;  /* 4 */
+  --space-2: 0.5rem;   /* 8 */
+  --space-3: 0.75rem;  /* 12 */
+  --space-4: 1rem;     /* 16 */
+  --space-5: 1.5rem;   /* 24 */
+  --space-6: 2rem;     /* 32 */
+  --space-7: 3rem;     /* 48 */
+  --space-8: 4rem;     /* 64 */
+  --space-9: 6rem;     /* 96 */
+
+  /* ---------- Radius ---------- */
+  --radius-sm: 4px;     /* tags, placeholders, small controls */
+  --radius-md: 10px;    /* cards, windows  */
+  --radius-pill: 999px; /* chips, badges, buttons */
+
+  /* ---------- Shadows (rgba(24,28,38,a) only) ---------- */
+  --shadow-soft: 0 8px 24px rgba(24, 28, 38, 0.08);
+  --shadow: 0 18px 60px rgba(24, 28, 38, 0.12);
+
+  /* ---------- Breakpoints ----------
+     Documentation tokens. CSS cannot read custom properties inside @media,
+     so components.css uses the literal values below. Keep them in sync. */
+  --bp-sm: 480px;   /* small phones become roomy phones */
+  --bp-md: 960px;   /* side nav appears, reading column + nav */
+  --bp-lg: 1200px;  /* wide laptop, more room around the column */
+
+  /* ---------- Layout ---------- */
+  --gutter: clamp(1rem, 4vw, 2rem); /* never below 16px */
+  --wrap: 72rem;
+  --measure: 40rem;   /* about 72 characters at 18px */
+  --wide: 60rem;      /* style guide column */
+  --nav-w: 15rem;
+  --tap: 2.75rem;     /* 44px minimum tap target */
+  --grid-cell: 80px;  /* hero grid, the deck's 160px scaled down for web */
+  --grid-reach: 11rem; /* how far down the hero the grid fades out, so it stops above the lead */
+
+  /* ---------- Focus ---------- */
+  --focus-width: 2px;
+  --focus-color: var(--blue);
+  --focus-color-on-dark: var(--white);
+  --focus-offset: 3px;
+
+  /* ---------- Motion ---------- */
+  --ease-deck: cubic-bezier(0.22, 0.85, 0.18, 1);
+  --dur-fast: 160ms;
+  --dur-move: 800ms;
+
+  /* ---------- Layers ---------- */
+  --z-nav: 10;
+
+  /* ---------- Icons (used as masks, so they take the text color) ---------- */
+  --icon-check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='12' fill='%23202126'/%3E%3Cpath d='M7 12.5l3.2 3.2L17 8.8' fill='none' stroke='%23f4f4f1' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  --icon-external: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4.5 11.5l7-7M5.5 4.5h6v6' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
 }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg: #11191c;
-    --surface: #182226;
-    --ink: #e6eef0;
-    --muted: #9db0b7;
-    --line: #2f3f45;
-    --accent: #5cc0d1;
-    --accent-ink: #0d1a1d;
-    --accent-bg: #19333a;
-    --done: #7fd3a0;
-    --done-bg: #17301f;
-    --lock-bg: #151e21;
-    --lock-ink: #7c8d94;
-    --code-bg: #1d2b30;
-    --warn: #f0c864;
-    --warn-bg: #33290d;
-    --focus: #8cb9f5;
-    color-scheme: dark;
-  }
+
+@media (min-width: 960px) {
+  :root { --grid-reach: 17rem; }
 }
-:root[data-theme="dark"] {
-  --bg: #11191c;
-  --surface: #182226;
-  --ink: #e6eef0;
-  --muted: #9db0b7;
-  --line: #2f3f45;
-  --accent: #5cc0d1;
-  --accent-ink: #0d1a1d;
-  --accent-bg: #19333a;
-  --done: #7fd3a0;
-  --done-bg: #17301f;
-  --lock-bg: #151e21;
-  --lock-ink: #7c8d94;
-  --code-bg: #1d2b30;
-  --warn: #f0c864;
-  --warn-bg: #33290d;
-  --focus: #8cb9f5;
-  color-scheme: dark;
+
+/* Guide design system: components.
+   Built only from tokens.css. Load tokens.css first.
+   Mobile first. The breakpoint literals below match --bp-sm, --bp-md, --bp-lg. */
+
+/* ============================================================
+   1. Base
+   ============================================================ */
+
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-padding-top: var(--space-4);
 }
-* { box-sizing: border-box; }
-html { -webkit-text-size-adjust: 100%; }
+
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+}
+
 body {
   margin: 0;
-  background: var(--bg);
+  background: var(--paper);
   color: var(--ink);
-  font: 16px/1.55 "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-family: var(--font-sans);
+  font-size: var(--fs-base);
+  font-weight: var(--fw-regular);
+  line-height: var(--lh-body);
+  -webkit-font-smoothing: antialiased;
 }
-.wrap { max-width: 760px; margin: 0 auto; padding: 24px 16px 64px; }
-h1, h2, h3 { font-family: "Newsreader", Georgia, "Times New Roman", serif; font-weight: 600; line-height: 1.2; margin: 0; }
-h1 { font-size: 2rem; }
-h2 { font-size: 1.45rem; margin: 40px 0 10px; }
-h3 { font-size: 1.15rem; }
-p { margin: 0 0 10px; }
-a { color: var(--accent); }
-code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .9em; background: var(--code-bg); padding: 1px 5px; border-radius: 4px; }
-:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
-.slug { font: 600 .72rem/1 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
-.lede { color: var(--muted); font-size: 1.05rem; margin: 10px 0 0; }
 
-/* progress */
-.progress { position: sticky; top: 0; z-index: 5; background: var(--bg); padding: 12px 0 10px; margin-top: 18px; border-bottom: 1px solid var(--line); }
-.progress-row { display: flex; justify-content: space-between; font-size: .9rem; font-weight: 600; margin-bottom: 6px; }
-.bar { height: 10px; background: var(--lock-bg); border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
-.bar > i { display: block; height: 100%; width: 0; background: var(--done); transition: width .3s ease; }
+img { max-width: 100%; height: auto; }
 
-/* levels */
-.level { background: var(--surface); border: 1px solid var(--line); border-left: 5px solid var(--accent); border-radius: 8px; padding: 16px; margin-top: 18px; }
-.level.done { border-left-color: var(--done); }
-.level.locked { background: var(--lock-bg); border-left-color: var(--line); color: var(--lock-ink); }
-.level.locked h3, .level.locked .goal, .level.locked .slug { color: var(--lock-ink); }
-.level.locked pre, .level.locked code, .level.locked .peek { opacity: .75; }
-.goal { font-weight: 500; margin: 6px 0 10px; }
-.level ol, .level ul { margin: 0 0 12px; padding-left: 22px; }
-.level li { margin-bottom: 5px; }
-.lockmsg { display: none; font-size: .88rem; font-weight: 600; margin: 8px 0 0; }
-.level.locked .lockmsg { display: block; }
-.peek, .note { border-radius: 6px; padding: 10px 12px; margin: 12px 0; font-size: .95rem; }
-.peek { background: var(--accent-bg); }
-.note { background: var(--warn-bg); color: var(--ink); border-left: 4px solid var(--warn); }
-.peek b, .note b { display: block; font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 2px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
-.donewhen { font-weight: 600; margin: 12px 0 10px; }
-.check { display: flex; gap: 10px; align-items: center; padding-top: 10px; border-top: 1px solid var(--line); font-weight: 600; }
-.check input { width: 22px; height: 22px; flex: none; accent-color: var(--done); }
-.check label { cursor: pointer; }
-.level.locked .check label { cursor: not-allowed; }
-
-/* message box */
-.msg { margin: 12px 0; }
-.msg-label { font-size: .85rem; font-weight: 600; margin-bottom: 4px; display: block; }
-input[type="text"], input[type="url"] { width: 100%; font: inherit; padding: 9px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); color: var(--ink); margin-bottom: 8px; }
-pre { margin: 0 0 8px; padding: 12px; background: var(--code-bg); border: 1px solid var(--line); border-radius: 6px; white-space: pre-wrap; word-break: break-word; font: .9rem/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; color: var(--ink); }
-.btn { font: inherit; font-weight: 600; background: var(--accent); color: var(--accent-ink); border: 0; border-radius: 6px; padding: 9px 16px; cursor: pointer; min-height: 40px; }
-.btn:hover { filter: brightness(1.08); }
-.domrow { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 6px 0; }
-.domrow code { font-size: 1rem; padding: 6px 10px; }
-.domrow .btn { min-height: 34px; padding: 5px 14px; }
-.domrow .copied { margin-left: 0; }
-.copied { margin-left: 10px; font-size: .88rem; color: var(--done); font-weight: 600; }
-
-/* week */
-.week { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 22px; margin: 14px 0; }
-.wbox { position: relative; background: var(--surface); border: 1px solid var(--line); border-top: 4px solid var(--accent); border-radius: 8px; padding: 12px; font-size: .92rem; }
-.wbox h3 { font-size: 1.02rem; margin-bottom: 4px; }
-.wbox p { margin: 0; color: var(--muted); }
-.wbox .say { display: block; margin-top: 6px; }
-.wbox:not(:last-child)::after { content: ""; position: absolute; top: 50%; right: -17px; border: 6px solid transparent; border-left: 8px solid var(--muted); border-right: 0; transform: translateY(-50%); }
-
-/* cheat sheet */
-.twrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
-table { border-collapse: collapse; width: 100%; font-size: .95rem; }
-th, td { text-align: left; vertical-align: top; padding: 9px 12px; border-bottom: 1px solid var(--line); }
-th { font-size: .75rem; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); background: var(--lock-bg); }
-tr:last-child td { border-bottom: 0; }
-td:first-child { white-space: nowrap; }
-.note ul.tight { margin: 4px 0 0; padding-left: 20px; }
-h3.sub { margin-top: 24px; }
-.gap-top { margin-top: 12px; }
-.card { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; margin: 10px 0; }
-.card ul { margin: 6px 0 0; padding-left: 20px; }
-.card li { margin-bottom: 6px; }
-
-@media (max-width: 640px) {
-  h1 { font-size: 1.65rem; }
-  .week { grid-template-columns: 1fr; gap: 24px; }
-  .wbox:not(:last-child)::after { top: auto; bottom: -17px; right: auto; left: 50%; border: 6px solid transparent; border-top: 8px solid var(--muted); border-bottom: 0; transform: translateX(-50%); }
-  td:first-child { white-space: normal; }
-  table { font-size: .9rem; }
+h1, h2, h3, h4 {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-weight: var(--fw-semibold);
+  line-height: var(--lh-heading);
+  letter-spacing: var(--tracking-heading);
+  color: var(--ink);
+  text-wrap: balance;
 }
+
+p, ul, ol, dl { margin: 0 0 var(--space-4); }
+
+/* Links: ink text, hot underline, thicker on hover. Never hot text. */
+a {
+  color: var(--ink);
+  text-decoration-line: underline;
+  text-decoration-color: var(--hot);
+  text-decoration-thickness: 0.1em;
+  text-underline-offset: 0.2em;
+  transition: text-decoration-thickness var(--dur-fast) ease;
+}
+a:hover,
+a.is-hover { text-decoration-thickness: 0.22em; }
+
+/* One visible focus ring for every interactive element */
+:where(a, button, input, summary, [tabindex]):focus-visible {
+  outline: var(--focus-width) solid var(--focus-color);
+  outline-offset: var(--focus-offset);
+  border-radius: var(--radius-sm);
+}
+
+strong { font-weight: var(--fw-semibold); }
+
+[hidden] { display: none !important; }
+
+hr, .rule {
+  height: 0;
+  margin: var(--space-7) 0;
+  border: 0;
+  border-top: 1px solid var(--rule-strong);
+}
+.rule--short { width: 4rem; border-top: 3px solid var(--hot); }
+
+/* Inline code in the style guide: same face, quiet chip */
+code {
+  padding: 0.1em 0.4em;
+  border-radius: var(--radius-sm);
+  background: var(--tint-ink);
+  font-family: var(--font-sans);
+  font-size: 0.9em;
+  font-weight: var(--fw-medium);
+  overflow-wrap: anywhere;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip-link {
+  position: absolute;
+  left: var(--space-4);
+  top: var(--space-2);
+  z-index: calc(var(--z-nav) + 1);
+  padding: var(--space-2) var(--space-4);
+  background: var(--ink);
+  color: var(--paper);
+  border-radius: var(--radius-sm);
+  transform: translateY(-300%);
+}
+.skip-link:focus { transform: none; }
+
+/* Fade-up on load. Content is visible at rest: the animation only pulls the
+   start state in before it runs, and nothing waits on script. */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: none; }
+}
+.fade-up { animation: fade-up var(--dur-move) var(--ease-deck) backwards; }
+.fade-up--2 { animation-delay: 120ms; }
+
 @media (prefers-reduced-motion: reduce) {
-  * { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ============================================================
+   2. Layout: wrap, masthead, page grid, content column
+   ============================================================ */
+
+.wrap {
+  width: 100%;
+  max-width: var(--wrap);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.page { padding-top: var(--space-5); }
+
+.content {
+  min-width: 0;
+  max-width: var(--measure);
+  padding-block: var(--space-5) var(--space-6);
+}
+.content--wide { max-width: var(--wide); }
+
+/* Text keeps a readable line length even inside the wide column */
+:where(.content) :where(p, ul, ol, dl, .callout, .prompt, .checklist) { max-width: var(--measure); }
+
+.content > h2:first-child { margin-top: 0; }
+
+
+/* ============================================================
+   4. Masthead, site header, page hero
+   ============================================================ */
+
+/* Groups header and hero so the soft red glow sits behind both, top right */
+.masthead {
+  background:
+    radial-gradient(circle at 86% 10%, var(--tint-hot-glow), transparent 640px),
+    var(--paper);
+}
+
+/* Hero: sentence case title in ink, plain lead. The faint grid lives here and nowhere
+   near reading text. */
+.hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image:
+    linear-gradient(90deg, var(--grid-line-x) 1px, transparent 1px),
+    linear-gradient(180deg, var(--grid-line-y) 1px, transparent 1px);
+  background-size: var(--grid-cell) var(--grid-cell);
+  opacity: 0.6;
+  /* Fades out above the lead paragraph, so the grid never sits behind reading text */
+  -webkit-mask-image: linear-gradient(to bottom, var(--black) calc(var(--grid-reach) * 0.4), transparent var(--grid-reach));
+  mask-image: linear-gradient(to bottom, var(--black) calc(var(--grid-reach) * 0.4), transparent var(--grid-reach));
+}
+.hero__inner { padding-block: var(--space-7) var(--space-8); }
+
+/* Page title: the deck's big red Anton moment. Write it in sentence case in the HTML;
+   CSS uppercases it. Large Anton clears the 3:1 contrast bar for large text. */
+.hero__title {
+  max-width: 12ch; /* "Get started with Claude" breaks as GET STARTED / WITH CLAUDE */
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--fs-display);
+  font-weight: var(--fw-regular);
+  line-height: 0.95;
+  letter-spacing: var(--tracking-heading);
+  text-transform: uppercase;
+  color: var(--hot);
+  text-wrap: balance;
+}
+
+.hero__lead {
+  max-width: 36rem;
+  margin: var(--space-5) 0 0;
+  font-size: var(--fs-base);
+  line-height: var(--lh-snug);
+  color: var(--ink-muted);
+}
+
+@media (min-width: 480px) {
+  .hero__lead { font-size: var(--fs-md); }
+}
+
+@media (min-width: 960px) {
+  .hero__inner { padding-block: var(--space-8) var(--space-9); }
+}
+
+/* ============================================================
+   7. Section headings
+   ============================================================ */
+
+h2, .h2 { font-size: var(--fs-lg); margin-top: var(--space-8); margin-bottom: var(--space-4); }
+h3, .h3 { font-size: var(--fs-md); margin-top: var(--space-6); margin-bottom: var(--space-3); }
+.h2, .h3 { display: block; font-weight: var(--fw-semibold); }
+
+/* Plain intro text under the hero or a heading */
+.lead {
+  font-size: var(--fs-md);
+  line-height: var(--lh-snug);
+  color: var(--ink-muted);
+}
+
+/* ============================================================
+   9. Copyable prompt block
+   ============================================================ */
+
+.prompt {
+  margin-block: var(--space-5);
+  padding: var(--space-5);
+  background: var(--paper-soft);
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--radius-md);
+}
+.prompt__text {
+  margin: 0 0 var(--space-4);
+  color: var(--ink);
+  user-select: text;
+  white-space: pre-line; /* keeps the line breaks you type, and the ones that get copied */
+}
+.prompt__bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3) var(--space-4);
+}
+.prompt__hint {
+  font-size: var(--fs-sm);
+  color: var(--ink-muted);
+}
+
+/* ============================================================
+   10. Screenshot frame
+   ============================================================ */
+
+.frame { margin: var(--space-5) 0; }
+.frame__window {
+  overflow: hidden;
+  background: var(--paper-soft);
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-soft);
+}
+.frame__bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: 2.5rem;
+  padding-inline: var(--space-4);
+  background: var(--paper);
+  border-bottom: 1px solid var(--rule-strong);
+}
+.frame__bar i {
+  display: block;
+  width: 12px;
+  height: 12px;
+  border: 1.5px solid var(--ink-soft);
+  border-radius: 50%;
+}
+.frame__title {
+  margin-left: var(--space-3);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-medium);
+  color: var(--ink-muted);
+}
+.frame__body img { display: block; width: 100%; height: auto; }
+/* Screenshot annotation ring. Position it in percent of the image with
+   --x --y --w --h, so it scales with the image at every width. */
+.frame__shot { position: relative; }
+.frame__ring {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: var(--w);
+  height: var(--h);
+  border: 3px solid var(--hot);
+  border-radius: var(--radius-md);
+  box-shadow: 0 0 0 4px var(--tint-hot-ring), 0 0 14px 2px var(--tint-hot-ring);
+  pointer-events: none;
+}
+
+/* Phone crop: on a phone the screenshot can be swapped for a tighter crop with a
+   <picture> source (max-width: 600px). Give the ring a second set of numbers for
+   that crop with --x-sm --y-sm --w-sm --h-sm. Without them the ring keeps --x --y --w --h. */
+@media (max-width: 600px) {
+  .frame__ring {
+    left: var(--x-sm, var(--x));
+    top: var(--y-sm, var(--y));
+    width: var(--w-sm, var(--w));
+    height: var(--h-sm, var(--h));
+  }
+}
+
+/* Embedded video: a 16 by 9 box, whatever the source */
+.frame__body iframe,
+.frame__body video {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  border: 0;
+  background: var(--paper-soft);
+}
+.frame__placeholder {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 16 / 9;
+  padding: var(--space-4);
+  background: var(--paper-soft);
+  color: var(--ink-muted);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-medium);
+  text-align: center;
+}
+/* A narrow frame for a tall, thin screenshot such as a sidebar */
+.frame--narrow { max-width: 20rem; }
+.frame__caption {
+  margin-top: var(--space-2);
+  font-size: var(--fs-sm);
+  line-height: var(--lh-snug);
+  color: var(--ink-muted);
+}
+
+/* ============================================================
+   11. Callouts. Square corners, flat edge accent, ink text.
+   ============================================================ */
+
+.callout {
+  margin-block: var(--space-5);
+  padding: var(--space-4) var(--space-5);
+  border-left: 3px solid var(--blue);
+  background: var(--tint-blue);
+  color: var(--ink);
+}
+.callout > :last-child { margin-bottom: 0; }
+.callout--tip { border-left-color: var(--blue); background: var(--tint-blue); }
+.callout--headsup { border-left-color: var(--orange); background: var(--tint-orange); }
+
+/* ============================================================
+   13. Buttons
+   ============================================================ */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--tap);
+  min-width: var(--tap);
+  padding: 0 var(--space-5);
+  border: 1.5px solid var(--ink);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  font-family: var(--font-sans);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+  line-height: 1.2;
+  text-decoration: none;
+  color: var(--ink);
+  cursor: pointer;
+  transition: background var(--dur-fast) ease, color var(--dur-fast) ease;
+}
+.btn--primary { background: var(--ink); color: var(--paper); }
+.btn--primary:hover,
+.btn--primary.is-hover {
+  text-decoration-line: underline;
+  text-decoration-color: var(--hot);
+  text-decoration-thickness: 0.12em;
+  text-underline-offset: 0.25em;
+}
+.btn--secondary:hover,
+.btn--secondary.is-hover { background: var(--tint-ink); }
+/* .is-hover and .is-focus freeze a state so the style guide can show it */
+.btn.is-focus {
+  outline: var(--focus-width) solid var(--focus-color);
+  outline-offset: var(--focus-offset);
+}
+
+/* Arrow icon inside a button: matches the stroke style of the chevrons */
+.btn svg {
+  flex: none;
+  width: 1.15em;
+  height: 1.15em;
+}
+.btn svg:first-child { margin-right: 0.5em; }
+.btn [data-wz-next-icon] { display: inline-flex; margin-left: 0.5em; }
+.btn [data-wz-next-icon] svg { margin: 0; }
+
+/* Launch button: a rounded rectangle that opens another site. Hot outline and
+   icon, ink text, never hot text. */
+.btn--launch {
+  min-height: var(--tap);
+  padding: 0 var(--space-5);
+  border: 2px solid var(--hot);
+  border-radius: var(--radius-md);
+  background: var(--paper-soft);
+  color: var(--ink);
+}
+.btn--launch:hover,
+.btn--launch.is-hover { background: var(--tint-hot-soft); }
+.btn--launch svg {
+  margin: 0 0 0 0.6em;
+  color: var(--hot);
+}
+
+/* Text button: reads like a link, acts like a button */
+.btn--text {
+  padding: 0 var(--space-2);
+  border-color: transparent;
+  border-radius: var(--radius-sm);
+  text-decoration-line: underline;
+  text-decoration-color: var(--hot);
+  text-decoration-thickness: 0.1em;
+  text-underline-offset: 0.2em;
+}
+.btn--text:hover,
+.btn--text.is-hover { text-decoration-thickness: 0.22em; }
+
+.btn:disabled,
+.btn[aria-disabled="true"] {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ============================================================
+   14. Links
+   ============================================================ */
+
+/* Inline links use the base `a` style. External links add an arrow. */
+.link-external::after {
+  content: "";
+  display: inline-block;
+  width: 0.75em;
+  height: 0.75em;
+  margin-left: 0.25em;
+  vertical-align: -0.02em;
+  background: currentColor;
+  -webkit-mask: var(--icon-external) no-repeat center / contain;
+  mask: var(--icon-external) no-repeat center / contain;
+}
+
+.link-term {
+  text-decoration-style: dotted;
+  text-decoration-thickness: 0.14em;
+}
+a.link-term:hover { text-decoration-style: dotted; text-decoration-thickness: 0.24em; }
+
+/* Name an interface control or a key in running text */
+.ui,
+kbd {
+  padding: 0.05em 0.45em;
+  border-radius: var(--radius-sm);
+  background: var(--tint-ink);
+  font-family: var(--font-sans);
+  font-size: 0.95em;
+  font-weight: var(--fw-medium);
+  white-space: nowrap;
+  color: var(--ink);
+}
+kbd { border: 1px solid var(--rule-strong); background: var(--paper-soft); }
+
+/* ============================================================
+   15. Checklist
+   ============================================================ */
+
+.checklist {
+  margin: var(--space-4) 0;
+  padding: 0;
+  list-style: none;
+}
+.checklist > li { border-top: 1px solid var(--rule); }
+.checklist > li:last-child { border-bottom: 1px solid var(--rule); }
+
+.check {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  min-height: var(--tap);
+  padding-block: var(--space-2);
+  cursor: pointer;
+}
+.check__input {
+  position: absolute;
+  left: 0;
+  top: calc(var(--space-2) + 0.15rem);
+  width: 1.5rem;
+  height: 1.5rem;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.check__box {
+  flex: none;
+  width: 1.5rem;
+  height: 1.5rem;
+  margin-top: 0.15rem;
+  border: 2px solid var(--rule-strong);
+  border-radius: 50%;
+  background: transparent center / 100% 100% no-repeat;
+  background-origin: border-box;
+  transition: border-color var(--dur-fast) ease;
+}
+.check:hover .check__box { border-color: var(--ink-soft); }
+/* Checked fills the circle with ink and a paper check mark */
+.check__input:checked + .check__box {
+  border-color: transparent;
+  background-image: var(--icon-check);
+}
+.check__input:focus-visible + .check__box {
+  outline: var(--focus-width) solid var(--focus-color);
+  outline-offset: var(--focus-offset);
+}
+
+/* ============================================================
+   16. Example output table
+   ============================================================ */
+
+.table-figure { margin: var(--space-5) 0; max-width: 100%; }
+.table-figure__caption {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+  margin-bottom: var(--space-3);
+  font-size: var(--fs-sm);
+  color: var(--ink-muted);
+}
+/* The table always scrolls inside its own wrapper, never the page */
+.table-wrap {
+  max-width: 100%;
+  overflow-x: auto;
+  border-top: 1px solid var(--rule-strong);
+  border-bottom: 1px solid var(--rule-strong);
+}
+.table {
+  width: 100%;
+  min-width: 40rem;
+  border-collapse: collapse;
+  font-size: var(--fs-sm);
+  line-height: var(--lh-snug);
+}
+.table th,
+.table td {
+  padding: var(--space-3) var(--space-4) var(--space-3) 0;
+  text-align: left;
+  vertical-align: top;
+}
+.table th {
+  border-bottom: 2px solid var(--ink);
+  font-weight: var(--fw-semibold);
+  white-space: nowrap;
+}
+.table td { border-bottom: 1px solid var(--rule); }
+.table tr:last-child td { border-bottom: 0; }
+.table td:first-child { font-weight: var(--fw-medium); }
+.table__muted { color: var(--ink-muted); }
+
+/* ============================================================
+   17. Badge / chip
+   ============================================================ */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45em;
+  padding: 0.1rem 0.7rem;
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--radius-pill);
+  background: var(--paper-soft);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-medium);
+  line-height: 1.6;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--ink);
+}
+.badge--hot::before {
+  content: "";
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--hot);
+}
+.badge--hot { border-color: var(--tint-hot-line); background: var(--tint-hot-soft); }
+.badge--blue { border-color: var(--tint-blue-line); background: var(--tint-blue); }
+.badge--orange { border-color: var(--tint-orange-line); background: var(--tint-orange); }
+
+/* ============================================================
+   21. Step by step wizard: one step per screen
+   Without script, every step shows stacked in order and the bar and the
+   Back and Next buttons stay hidden. Script adds .wizard--js.
+   ============================================================ */
+
+.wizard__bar {
+  scroll-margin-top: var(--space-4);
+  margin-bottom: var(--space-6);
+  padding: var(--space-4) var(--space-5);
+  background: var(--paper-soft);
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--radius-md);
+}
+.wizard__top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-1) var(--space-4);
+  margin: 0 0 var(--space-3);
+}
+.wizard__stepnav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+/* Round 44px arrow buttons, outlined like the secondary button */
+.wizard__arrow {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: var(--tap);
+  height: var(--tap);
+  padding: 0;
+  border: 1.5px solid var(--ink);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+  transition: background var(--dur-fast) ease;
+}
+.wizard__arrow:hover { background: var(--tint-ink); }
+.wizard__arrow[aria-disabled="true"] {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+.wizard__count {
+  margin: 0;
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-medium);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+.wizard__phase {
+  margin: 0;
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-medium);
+  color: var(--ink);
+}
+
+.wizard__progress {
+  position: relative;
+  height: 6px;
+  margin-bottom: var(--space-4);
+  border-radius: var(--radius-pill);
+  background: var(--rule);
+}
+.wizard__fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: var(--p, 0%);
+  border-radius: var(--radius-pill);
+  background: var(--hot);
+  transition: width var(--dur-move) var(--ease-deck);
+}
+.wizard__fill::after {
+  content: "";
+  position: absolute;
+  right: -2px;
+  top: 50%;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--hot);
+  transform: translateY(-50%);
+}
+
+/* All steps: a disclosure list of every step, grouped by phase */
+.wizard__all > summary {
+  list-style: none;
+  cursor: pointer;
+}
+.wizard__all > summary::-webkit-details-marker { display: none; }
+.wizard__all > summary::after {
+  content: "";
+  width: 0.45em;
+  height: 0.45em;
+  margin: -0.2em 0 0 0.7em;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg);
+  transition: transform var(--dur-fast) ease;
+}
+.wizard__all[open] > summary::after { transform: rotate(-135deg); margin-top: 0.2em; }
+
+.wizard__panel {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: var(--space-4) var(--space-6);
+  margin-top: var(--space-4);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--rule);
+}
+.wizard__group-name {
+  margin: 0 0 var(--space-1);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-medium);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+.wizard__items { margin: 0; padding: 0; list-style: none; }
+.wizard__link {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: var(--tap);
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-sm);
+  text-decoration: none;
+  color: var(--ink);
+}
+.wizard__link::before {
+  content: attr(data-step);
+  flex: none;
+  min-width: 1.25rem;
+  font-weight: var(--fw-medium);
+  color: var(--ink-muted);
+}
+.wizard__link:hover { background: var(--tint-ink); }
+.wizard__link[aria-current="step"] {
+  background: var(--tint-ink);
+  font-weight: var(--fw-semibold);
+}
+.wizard__link[aria-current="step"]::after {
+  content: "";
+  flex: none;
+  width: 0.5rem;
+  height: 0.5rem;
+  margin-left: auto;
+  border-radius: 50%;
+  background: var(--hot);
+}
+
+.wizard:not(.wizard--js) .wizard__step + .wizard__step {
+  margin-top: var(--space-8);
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--rule);
+}
+.wizard__title {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-4);
+  margin: 0 0 var(--space-4);
+  font-size: var(--fs-lg);
+}
+.wizard__num {
+  flex: none;
+  font-family: var(--font-display);
+  font-size: var(--fs-xl);
+  font-weight: var(--fw-regular);
+  line-height: 1;
+  color: var(--hot);
+}
+.wizard__title:focus { outline: none; }
+
+.wizard__nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-top: var(--space-7);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--rule);
+}
+.wizard__nav [data-wz-next] { margin-left: auto; }
+
+/* ============================================================
+   23. Pair: an instruction beside its screenshot
+   One pair per instruction and its screenshot. Stacked below 960px (text, then
+   screenshot). From 960px, text on the left and media on the right.
+   ============================================================ */
+
+.pair {
+  display: grid;
+  gap: var(--space-4);
+  margin-top: var(--space-6);
+}
+.pair__text {
+  min-width: 0;
+  max-width: var(--measure);
+}
+.pair__text > :first-child { margin-top: 0; }
+.pair__text > :last-child { margin-bottom: 0; }
+.pair__media {
+  display: grid;
+  gap: var(--space-5);
+  min-width: 0;
+}
+.pair__media > .frame { margin: 0; }
+.pair__media > .frame--narrow { justify-self: start; width: 100%; }
+
+/* Whatever follows a pair gets room above it */
+.pair + :not(.pair) { margin-top: var(--space-6); }
+
+@media (min-width: 960px) {
+  .pair {
+    grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+    column-gap: var(--space-7);
+    align-items: start;
+  }
+  .pair + .pair {
+    margin-top: var(--space-7);
+    padding-top: var(--space-7);
+    border-top: 1px solid var(--rule);
+  }
+}
+
+/* A row of buttons that wrap on a phone */
+.download-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+
+/* ============================================================
+   24. This guide: hero size, forms, domain rows, step list, tables
+   ============================================================ */
+
+.hero__inner { padding-block: var(--space-6) var(--space-6); }
+.hero__title { max-width: 14ch; font-size: clamp(2.75rem, 7vw, 4.5rem); }
+.hero__lead { margin-top: var(--space-4); }
+@media (min-width: 960px) {
+  .hero__inner { padding-block: var(--space-7) var(--space-7); }
+}
+
+.page, .page.page { display: block; padding-top: var(--space-5); }
+.content { max-width: none; }
+.wrap.page > .content { padding-top: var(--space-2); }
+
+.content ol, .content ul { padding-left: 1.4rem; }
+.content li { margin-bottom: var(--space-2); }
+.content .checklist { padding-left: 0; }
+.content .checklist > li { margin-bottom: 0; }
+.content .flow { padding-left: 0; }
+.wizard__step > p:first-of-type { margin-top: 0; }
+
+.field__label { display: block; margin-bottom: var(--space-2); font-size: var(--fs-sm); font-weight: var(--fw-semibold); }
+.field__input {
+  display: block;
+  width: 100%;
+  min-height: var(--tap);
+  max-width: var(--measure);
+  margin-bottom: var(--space-4);
+  padding: 0 var(--space-4);
+  border: 1.5px solid var(--rule-strong);
+  border-radius: var(--radius-md);
+  background: var(--white);
+  font: inherit;
+  font-size: var(--fs-base);
+  color: var(--ink);
+}
+.prompt__text { overflow-wrap: anywhere; }
+.prompt__label { display: block; margin-bottom: var(--space-2); font-size: var(--fs-sm); font-weight: var(--fw-semibold); color: var(--ink-muted); }
+
+.domrow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+  margin: 0 0 var(--space-2);
+}
+.domrow code { font-size: var(--fs-base); padding: 0.35rem 0.7rem; background: var(--white); border: 1px solid var(--rule-strong); }
+.domrow .btn { min-height: 2.5rem; padding: 0 var(--space-4); }
+
+.done-box { margin-top: var(--space-6); }
+.checklist .check { font-weight: var(--fw-semibold); }
+
+.table td:first-child { overflow-wrap: anywhere; }
+.table { min-width: 0; }
+.table th { white-space: normal; }
+.table td:last-child, .table th:last-child { padding-right: 0; }
+.table .table__group td {
+  padding-top: var(--space-5);
+  border-bottom: 2px solid var(--ink);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+
+.flow { margin: var(--space-4) 0; padding: 0; list-style: none; counter-reset: flow; }
+.flow > li {
+  position: relative;
+  margin: 0;
+  padding: var(--space-3) 0 var(--space-3) 2.5rem;
+  border-top: 1px solid var(--rule);
+  counter-increment: flow;
+}
+.flow > li:last-child { border-bottom: 1px solid var(--rule); }
+.flow > li::before {
+  content: counter(flow);
+  position: absolute;
+  left: 0;
+  top: var(--space-3);
+  font-family: var(--font-display);
+  font-size: var(--fs-md);
+  line-height: 1.3;
+  color: var(--ink-soft);
+}
+.flow > li.flow--you::before { color: var(--hot); }
+.flow .badge { margin-right: var(--space-2); }
+
+.wizard__donecount { margin: 0; font-size: var(--fs-xs); font-weight: var(--fw-medium); color: var(--ink-muted); }
+.wizard__tick { display: inline-block; min-width: 1em; margin-left: auto; font-weight: var(--fw-semibold); color: var(--ink); text-align: center; }
+.wizard__link[aria-current="step"]::after { margin-left: var(--space-2); }
+
+@media (max-width: 480px) {
+  .wizard__bar { padding: var(--space-4); }
+  .btn--launch { width: 100%; }
 }
 </style>
 
-<div class="wrap">
-  <header>
-    <div class="slug">Job desk / Setup guide</div>
-    <h1>Your Job Desk Setup</h1>
-    <p class="lede">Every weekday morning, this system finds journalism jobs for you and adds them to a Google Sheet. When one looks good, it drafts a tailored résumé, a cover letter in your voice, and clip picks for that application. Setup takes about an hour in total, in a few sittings. Work through the five levels below before your check-in call with Nadeen.</p>
-  </header>
+<a class="skip-link" href="#main">Skip to the guide</a>
 
-  <div class="progress" role="group" aria-label="Progress">
-    <div class="progress-row"><span id="progLabel">0 of 5 levels done</span><span id="progPct">0%</span></div>
-    <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="5" aria-valuenow="0" aria-labelledby="progLabel" id="bar"><i id="barFill"></i></div>
-  </div>
-
-  <!-- LEVEL 1 -->
-  <section class="level" id="level1" data-level="1" aria-labelledby="h1-title">
-    <div class="slug">Level 1 / Gather</div>
-    <h3 id="h1-title">Gather your stuff</h3>
-    <p class="goal">Goal: have everything in one folder before you meet Claude.</p>
-    <ol>
-      <li>Install the Claude desktop app on your Mac. You need a paid Claude plan.</li>
-      <li>Make a new folder. Call it something like "Job search".</li>
-      <li>Put two files in it: your résumé (PDF or .docx), and your LinkedIn profile as a PDF. To get the PDF, open your own profile on LinkedIn, click More, then Save to PDF. Move the downloaded file into your folder.</li>
-      <li>Have the link to your personal website of clips ready.</li>
-    </ol>
-    <div class="peek"><b>What you'll see</b>A folder with two files in it: your résumé and a LinkedIn PDF (usually named Profile.pdf).</div>
-    <p class="donewhen">Done when: the Claude app is installed, and the folder holds your résumé and your LinkedIn PDF.</p>
-    <p class="lockmsg"></p>
-    <div class="check"><input type="checkbox" id="chk1" data-level="1"><label for="chk1">Level 1 done</label></div>
+<div class="masthead">
+  <section class="hero" id="top">
+    <div class="wrap hero__inner">
+      <h1 class="hero__title fade-up">Your Job Desk Setup</h1>
+      <p class="hero__lead fade-up fade-up--2">Set up Claude to find journalism jobs and build your applications, then use it every morning.</p>
+    </div>
   </section>
+</div>
 
-  <!-- LEVEL 2 -->
-  <section class="level" id="level2" data-level="2" aria-labelledby="h2-title">
-    <div class="slug">Level 2 / Connect</div>
-    <h3 id="h2-title">Connect your accounts</h3>
-    <p class="goal">Goal: let Claude reach your Google account, Indeed and the job sites.</p>
-    <ol>
-      <li>Open the Claude app, then Settings, then Connectors.</li>
-      <li>Find each connector below, click Connect, and sign in.</li>
-    </ol>
-    <ul>
-      <li><b>Google Drive.</b> Claude creates your tracker Sheet here and saves your application Docs.</li>
-      <li><b>Google Sheets.</b> Claude writes new jobs into your tracker and reads your changes.</li>
-      <li><b>Gmail.</b> Claude reads LinkedIn job alert emails, which is how it sees jobs at sites it cannot read directly, like Politico, The Atlantic and The Hill. It never sends email.</li>
-      <li><b>Indeed.</b> Optional but recommended. It adds a broad set of listings to the daily search.</li>
-    </ul>
-    <h3 class="sub">Let Claude reach the job sites</h3>
-    <p>This lets Claude read JournalismJobs, Mediabistro and Daybook, and download and update your job system. You do it once.</p>
-    <ol>
-      <li>Open <a href="https://claude.ai/settings/capabilities" target="_blank" rel="noopener">claude.ai/settings/capabilities</a> (opens in a new tab). In the app, it is Settings, then Capabilities.</li>
-      <li>Under "Code execution and file creation", check that <b>Allow network egress</b> is on.</li>
-      <li>Under <b>Domain allowlist</b>, keep <b>Package managers only</b>. Do not choose "All domains". Job posts are text from strangers, and a short list keeps Claude from reaching anything else.</li>
-      <li>Under <b>Additional allowed domains</b>, add the five domains below. Add them one at a time. Click Copy, paste the domain into the box, and click <b>Add</b>. Then do the next one. The box rejects several at once.</li>
-    </ol>
-    <div class="msg">
-      <div class="domrow"><code id="dom1">*.journalismjobs.com</code><button type="button" class="btn" data-copy="dom1">Copy</button><span class="copied" id="copiedDom1" role="status" aria-live="polite"></span></div>
-      <div class="domrow"><code id="dom2">*.mediabistro.com</code><button type="button" class="btn" data-copy="dom2">Copy</button><span class="copied" id="copiedDom2" role="status" aria-live="polite"></span></div>
-      <div class="domrow"><code id="dom3">*.daybook.com</code><button type="button" class="btn" data-copy="dom3">Copy</button><span class="copied" id="copiedDom3" role="status" aria-live="polite"></span></div>
-      <div class="domrow"><code id="dom4">github.com</code><button type="button" class="btn" data-copy="dom4">Copy</button><span class="copied" id="copiedDom4" role="status" aria-live="polite"></span></div>
-      <div class="domrow"><code id="dom5">codeload.github.com</code><button type="button" class="btn" data-copy="dom5">Copy</button><span class="copied" id="copiedDom5" role="status" aria-live="polite"></span></div>
-    </div>
-    <div class="note"><b>Check and heads-up</b>
-      Each domain shows in a list under the box once it is added. All five should be there. Do this before Level 3. Settings only take effect in a chat started after you add them.
-    </div>
-    <div class="peek"><b>What you'll see</b>Each connector shows as connected in the list, and five domains show in the allowlist. If something is missing, Claude will tell you in Level 3 and show you how to fix it.</div>
-    <p class="donewhen">Done when: Drive and Sheets are connected, and the five domains are in the allowlist. Gmail and Indeed if you can.</p>
-    <p class="lockmsg"></p>
-    <div class="check"><input type="checkbox" id="chk2" data-level="2"><label for="chk2">Level 2 done</label></div>
-  </section>
+<div class="wrap page">
+  <main class="content" id="main">
+    <div class="wizard" data-wizard data-wizard-hash id="wizard">
+      <p class="sr-only" role="status" aria-live="polite" data-wz-live></p>
+      <div class="wizard__bar" hidden>
+        <div class="wizard__top">
+          <div class="wizard__stepnav">
+            <button class="wizard__arrow" type="button" data-wz-prev aria-label="Previous step" aria-disabled="true"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+            <p class="wizard__count">Step <span data-wz-current>1</span> of 19</p>
+            <button class="wizard__arrow" type="button" data-wz-fwd aria-label="Next step"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          </div>
+          <p class="wizard__phase" data-wz-phase>Before you start</p>
+        </div>
+        <div class="wizard__progress" role="progressbar" aria-label="Progress through the setup steps" aria-valuemin="1" aria-valuemax="19" aria-valuenow="1"><span class="wizard__fill"></span></div>
+        <details class="wizard__all">
+          <summary class="btn btn--secondary">All steps</summary>
+          <p class="wizard__donecount" data-wz-donecount aria-live="polite">0 of 19 steps done</p>
+          <div class="wizard__panel">
+            <div class="wizard__group">
+              <p class="wizard__group-name">Before you start</p>
+              <ol class="wizard__items">
+                <li><a class="wizard__link" href="#step-1" data-step="1">Check your Mac and Claude plan</a></li>
+                <li><a class="wizard__link" href="#step-2" data-step="2">Make your Job search folder</a></li>
+                <li><a class="wizard__link" href="#step-3" data-step="3">Save your LinkedIn profile as a PDF</a></li>
+                <li><a class="wizard__link" href="#step-4" data-step="4">Add your résumé and have your website link ready</a></li>
+              </ol>
+            </div>
+            <div class="wizard__group">
+              <p class="wizard__group-name">Connect your accounts</p>
+              <ol class="wizard__items">
+                <li><a class="wizard__link" href="#step-5" data-step="5">Connect Google Drive, Sheets, Gmail and Indeed</a></li>
+                <li><a class="wizard__link" href="#step-6" data-step="6">Let Claude reach the job sites</a></li>
+              </ol>
+            </div>
+            <div class="wizard__group">
+              <p class="wizard__group-name">Set up with Claude</p>
+              <ol class="wizard__items">
+                <li><a class="wizard__link" href="#step-7" data-step="7">Start a chat on your folder</a></li>
+                <li><a class="wizard__link" href="#step-8" data-step="8">Send the setup message</a></li>
+                <li><a class="wizard__link" href="#step-9" data-step="9">What Claude asks you</a></li>
+              </ol>
+            </div>
+            <div class="wizard__group">
+              <p class="wizard__group-name">Your morning scan</p>
+              <ol class="wizard__items">
+                <li><a class="wizard__link" href="#step-10" data-step="10">Check the scan’s settings</a></li>
+                <li><a class="wizard__link" href="#step-11" data-step="11">Keep your Mac awake and do one test run</a></li>
+                <li><a class="wizard__link" href="#step-12" data-step="12">Set up LinkedIn job alerts</a></li>
+              </ol>
+            </div>
+            <div class="wizard__group">
+              <p class="wizard__group-name">Your first application</p>
+              <ol class="wizard__items">
+                <li><a class="wizard__link" href="#step-13" data-step="13">Open your Job Inbox</a></li>
+                <li><a class="wizard__link" href="#step-14" data-step="14">Build an application with /apply</a></li>
+                <li><a class="wizard__link" href="#step-15" data-step="15">Edit, download, apply, tell Claude</a></li>
+              </ol>
+            </div>
+            <div class="wizard__group">
+              <p class="wizard__group-name">Every day after</p>
+              <ol class="wizard__items">
+                <li><a class="wizard__link" href="#step-16" data-step="16">Your 10-minute morning skim</a></li>
+                <li><a class="wizard__link" href="#step-17" data-step="17">What each status means</a></li>
+                <li><a class="wizard__link" href="#step-18" data-step="18">Things you can say to Claude</a></li>
+                <li><a class="wizard__link" href="#step-19" data-step="19">If something goes wrong</a></li>
+              </ol>
+            </div>
+          </div>
+        </details>
+      </div>
 
-  <!-- LEVEL 3 -->
-  <section class="level" id="level3" data-level="3" aria-labelledby="h3-title">
-    <div class="slug">Level 3 / Meet Claude / about 30 min</div>
-    <h3 id="h3-title">Meet Claude</h3>
-    <p class="goal">Goal: Claude learns your work and builds your system with you.</p>
-    <ol>
-      <li>In the Claude app, start a chat on your "Job search" folder. Click <b>+ New</b> in the sidebar. Under the message box, click <b>Project or folder</b>, then <b>Add folder</b> (not New project), and choose your Job search folder. Do this before you send the first message.</li>
-      <li>Type your website link below. It fills into the message.</li>
-      <li>Press Copy, paste the message into Claude, and send it.</li>
-      <li>Answer Claude's questions. It asks one at a time.</li>
-    </ol>
-    <div class="msg">
-      <label class="msg-label" for="siteUrl">Your website link (leave empty if you have no site)</label>
-      <input type="url" id="siteUrl" inputmode="url" autocomplete="off" placeholder="https://yourname.com">
-      <span class="msg-label" id="msgLabel">Message to paste into Claude</span>
-      <pre id="setupMsg" aria-labelledby="msgLabel" tabindex="0"></pre>
-      <button type="button" class="btn" id="copySetup">Copy message</button><span class="copied" id="copiedSetup" role="status" aria-live="polite"></span>
-    </div>
-    <div class="peek"><b>What you'll see</b>Claude downloads the job system into your folder, reads your résumé and your website, and shows a table of your clips for you to approve. Then it asks about the jobs you want, one question at a time, and builds your Google Sheet. It gives you the Sheet link. Bookmark it.</div>
-    <div class="note"><b>Heads-ups</b>
-      <ul class="tight">
-        <li>A Mac window may pop up asking to install "command line developer tools". Either button is fine.</li>
-        <li>Claude may ask permission to read the folder above. Say yes.</li>
-      </ul>
-    </div>
-    <p><b>From now on, start your chats on the <code>nihal-job-system</code> folder</b> (it sits inside your "Job search" folder). That is where the commands live. Next time, click <b>+ New</b>, then pick <code>nihal-job-system</code> from <b>Project or folder</b>. The first time, choose <b>Add folder</b> (not New project) and select it.</p>
-    <div class="note"><b>Tip</b>If Claude does not recognize a command like <code>/jobs</code>, send it again.</div>
-    <p class="donewhen">Done when: Claude has given you the link to your Google Sheet.</p>
-    <p class="lockmsg"></p>
-    <div class="check"><input type="checkbox" id="chk3" data-level="3"><label for="chk3">Level 3 done</label></div>
-  </section>
-
-  <!-- LEVEL 4 -->
-  <section class="level" id="level4" data-level="4" aria-labelledby="h4-title">
-    <div class="slug">Level 4 / Morning scan</div>
-    <h3 id="h4-title">Check your morning scan</h3>
-    <p class="goal">Goal: new jobs land in your Sheet every weekday morning on their own.</p>
-    <p>Claude set this up with you at the end of Level 3 and walked you through these settings. Use this list to double-check, or to do it later. If Claude never offered it, paste this message:</p>
-    <div class="msg">
-      <pre id="scanMsg" tabindex="0">Set up my morning scan.</pre>
-      <button type="button" class="btn" id="copyScan">Copy message</button><span class="copied" id="copiedScan" role="status" aria-live="polite"></span>
-    </div>
-    <ol>
-      <li>In the Claude app, open Scheduled in the sidebar, click your task, then Edit.</li>
-      <li>Working folder: set it to your <code>nihal-job-system</code> folder. It is the folder row at the bottom of the Instructions box. Save, open the task page again, and check that Folder now ends in <code>nihal-job-system</code>.</li>
-      <li>Model: set it to Sonnet. It is the "Default" menu at the bottom right of the Instructions box.</li>
-      <li>Permission mode: set it to Auto. It is the "Manual" button at the bottom left of the Instructions box. Auto lets the scan run without stopping to ask you. If Auto is not in the list, stop and tell Nadeen.</li>
-      <li>Go to Settings, then This computer, then System, and turn on Keep computer awake.</li>
-      <li>Click Run now once, and leave it alone for about 10 minutes.</li>
-    </ol>
-    <div class="peek"><b>What you'll see</b>The test run finishes with "succeeded" and a 3-line summary: how many jobs were added, the best one, and anything skipped. New rows appear in your Sheet with Status New. If it stops to ask you something, tell Nadeen what it named.</div>
-    <div class="note"><b>Optional: LinkedIn job alerts</b>
-      Some employers block Claude from reading their job pages. LinkedIn alert emails are how it sees those jobs. On linkedin.com, click Jobs, search for a role you want, and set the location to Washington, DC. Turn on the Set alert switch, then choose Daily and Email. Repeat for two or three roles.
-    </div>
-    <p class="donewhen">Done when: the Run now test says "succeeded". The scan only runs while the Claude app is open and your Mac is awake.</p>
-    <p class="lockmsg"></p>
-    <div class="check"><input type="checkbox" id="chk4" data-level="4"><label for="chk4">Level 4 done</label></div>
-  </section>
-
-  <!-- LEVEL 5 -->
-  <section class="level" id="level5" data-level="5" aria-labelledby="h5-title">
-    <div class="slug">Level 5 / First application</div>
-    <h3 id="h5-title">Your first application</h3>
-    <p class="goal">Goal: one real application, built by Claude and sent by you.</p>
-    <ol>
-      <li>Open your Google Sheet and pick a job that interests you.</li>
-      <li>In a chat on the <code>nihal-job-system</code> folder, type <code>/apply</code> and the job, for example the title and organization. You can also paste a link to a job posting.</li>
-      <li>Claude may show a short list of what it will build. Say yes.</li>
-      <li>Claude builds a Google Doc résumé and a Google Doc cover letter in your Drive, in a folder called "Job applications". It also picks 3 to 5 of your clips, and lists any claims it wants you to confirm. In your Sheet the job's Status becomes Ready to apply.</li>
-      <li>Open the Docs and edit them until they sound like you. Then File, Download, PDF.</li>
-      <li>Apply on the employer's own site. Claude never applies for you.</li>
-      <li>Tell Claude "I applied to" and the organization name, for example "I applied to The Bulwark". Claude changes the Status to Applied.</li>
-    </ol>
-    <div class="peek"><b>What you'll see</b>A reply listing your two Google Docs, the clip picks, and any claims to confirm. Your Sheet row now has a Folder link.</div>
-    <p class="donewhen">Done when: you have applied to one job and told Claude.</p>
-    <p class="lockmsg"></p>
-    <div class="check"><input type="checkbox" id="chk5" data-level="5"><label for="chk5">Level 5 done</label></div>
-  </section>
-
-  <p id="allDone" class="note" hidden><b>All five levels done</b>You are set up. Bring your questions to your check-in call with Nadeen.</p>
-
-  <h2>How your week works</h2>
-  <div class="week">
-    <div class="wbox"><div class="slug">Morning</div><h3>The scan runs</h3><p>It adds up to 10 new jobs to your Sheet. You skim the Sheet over coffee.</p></div>
-    <div class="wbox"><div class="slug">Something looks good</div><h3>Say /apply</h3><p>Claude builds your résumé, cover letter and clip picks in Google Docs.</p></div>
-    <div class="wbox"><div class="slug">After you apply</div><h3>Tell Claude</h3><p>Say "I applied to" and the organization. Claude marks it Applied in your Sheet.</p></div>
-    <div class="wbox"><div class="slug">Weekly batch</div><h3>Top 3</h3><p>Say <code>my top 3 this week</code> and Claude builds applications for your three best jobs.</p></div>
+        <article class="wizard__step" id="wizard-step-1" data-phase="Before you start" aria-labelledby="wizard-step-1-title">
+          <h2 class="wizard__title" id="wizard-step-1-title" tabindex="-1"><span class="wizard__num" aria-hidden="true">1</span>Check your Mac and Claude plan</h2>
+<ol>
+  <li>Use a Mac.</li>
+  <li>Install the Claude desktop app. <a class="link-external" href="https://claude.ai/download" target="_blank" rel="noopener">claude.ai/download<span class="sr-only"> (opens in a new tab)</span></a></li>
+  <li>Check that you are on a paid Claude plan, Pro or Max.</li>
+</ol>
+<div class="callout callout--headsup">
+<p><strong>Heads-up.</strong> The morning scan needs a plan that offers Auto permission mode. If you do not see Auto in step 10, stop and tell Nadeen.</p>
+</div>
+<ul class="checklist done-box">
+  <li><label class="check"><input class="check__input" type="checkbox" data-check="1"><span class="check__box" aria-hidden="true"></span><span>Done with this step</span></label></li>
+</ul>
+        </article>
+        <article class="wizard__step" id="wizard-step-2" data-phase="Before you start" aria-labelledby="wizard-step-2-title">
+          <h2 class="wizard__title" id="wizard-step-2-title" tabindex="-1"><span class="wizard__num" aria-hidden="true">2</span>Make your Job search folder</h2>
+<ol>
+  <li>In Finder, make a new folder. Call it something like <span class="ui">Job search</span>.</li>
+  <li>Put it anywhere easy to find, such as Documents.</li>
+</ol>
+<p>Everything you gather in the next two steps goes in this folder.</p>
+<ul class="checklist done-box">
+  <li><label class="check"><input class="check__input" type="checkbox" data-check="2"><span class="check__box" aria-hidden="true"></span><span>Done with this step</span></label></li>
+</ul>
+        </article>
+        <article class="wizard__step" id="wizard-step-3" data-phase="Before you start" aria-labelledby="wizard-step-3-title">
+          <h2 class="wizard__title" id="wizard-step-3-title" tabindex="-1"><span class="wizard__num" aria-hidden="true">3</span>Save your LinkedIn profile as a PDF</h2>
+<div class="pair">
+<div class="pair__text">
+<ol>
+  <li>Open your own profile on LinkedIn.</li>
+  <li>Click <span class="ui">Resources</span>, the button under your name, then click <span class="ui">Save to PDF</span>.</li>
+  <li>Move the downloaded file into your Job search folder.</li>
+</ol>
+</div>
+<div class="pair__media">
+<figure class="frame">
+  <div class="frame__window">
+    <div class="frame__bar" aria-hidden="true"><i></i><i></i><i></i></div>
+    <div class="frame__body"><div class="frame__shot"><img src="guide/03-linkedin-save-pdf.jpg" alt="A LinkedIn profile with the Resources menu open. The menu lists Send profile in a message, Save to PDF, Saved items, Activity and About this member. Save to PDF is circled." width="1250" height="658"><span class="frame__ring" style="--x: 56.8%; --y: 38.0%; --w: 38.4%; --h: 10.3%" aria-hidden="true"></span></div></div>
   </div>
-
-  <h2>Cheat sheet</h2>
-  <p>Start a chat on the <code>nihal-job-system</code> folder. Then say any of these. If Claude does not recognize a command like <code>/jobs</code>, send it again.</p>
-  <div class="twrap" role="region" aria-label="Things you can say to Claude" tabindex="0">
-    <table>
-      <thead><tr><th>You say</th><th>What happens</th></tr></thead>
-      <tbody>
-        <tr><td>Open your Job Inbox</td><td>Your bookmarked inbox page shows new jobs. Save, Pass or Build in Claude from there.</td></tr>
-        <tr><td><code>/jobs</code></td><td>A simple menu that points you to the next step. Type it whenever you forget the commands.</td></tr>
-        <tr><td><code>find me jobs</code></td><td>Claude searches your sources now and adds the best new matches to your Sheet. Also <code>/find-jobs</code>.</td></tr>
-        <tr><td><code>show me more</code></td><td>Adds the next 10 matches that were waiting. No new search.</td></tr>
-        <tr><td><code>/apply</code> plus a job or link</td><td>Builds your résumé, cover letter and clip picks for that job.</td></tr>
-        <tr><td><code>I applied to X</code></td><td>Sets that job to Applied.</td></tr>
-        <tr><td><code>pass on X</code></td><td>Sets that job to Passed. Claude asks for a one-line reason.</td></tr>
-        <tr><td><code>I published something new</code></td><td>Claude asks for the link and, once you confirm it is your piece, offers to add it to your clips.</td></tr>
-        <tr><td><code>update my job system</code></td><td>Gets the newest version of the system. Your own files are not touched.</td></tr>
-      </tbody>
-    </table>
+  <figcaption class="frame__caption">Resources, then Save to PDF, circled.</figcaption>
+</figure>
+</div>
+</div>
+<ul class="checklist done-box">
+  <li><label class="check"><input class="check__input" type="checkbox" data-check="3"><span class="check__box" aria-hidden="true"></span><span>Done with this step</span></label></li>
+</ul>
+        </article>
+        <article class="wizard__step" id="wizard-step-4" data-phase="Before you start" aria-labelledby="wizard-step-4-title">
+          <h2 class="wizard__title" id="wizard-step-4-title" tabindex="-1"><span class="wizard__num" aria-hidden="true">4</span>Add your résumé and have your website link ready</h2>
+<ol>
+  <li>Put your résumé in the same folder, as a PDF or a .docx file.</li>
+  <li>Have the link to your website with your clips ready. You will paste it in step 8.</li>
+</ol>
+<div class="callout callout--tip">
+<p><strong>Tip.</strong> If your résumé is a Google Doc, open it and click File, Download, PDF. Then move the PDF into your folder.</p>
+</div>
+<ul class="checklist done-box">
+  <li><label class="check"><input class="check__input" type="checkbox" data-check="4"><span class="check__box" aria-hidden="true"></span><span>Done with this step</span></label></li>
+</ul>
+        </article>
+        <article class="wizard__step" id="wizard-step-5" data-phase="Connect your accounts" aria-labelledby="wizard-step-5-title">
+          <h2 class="wizard__title" id="wizard-step-5-title" tabindex="-1"><span class="wizard__num" aria-hidden="true">5</span>Connect Google Drive, Sheets, Gmail and Indeed</h2>
+<div class="pair">
+<div class="pair__text">
+<ol>
+  <li>In the Claude app, click <span class="ui">Customize</span> in the left sidebar, then <span class="ui">Connectors</span>.</li>
+  <li>Find each one below, click Connect, and sign in. A check mark means it is connected.</li>
+</ol>
+<ul>
+  <li><strong>Google Drive.</strong> Claude creates your tracker Sheet here and saves your application Docs.</li>
+  <li><strong>Google Sheets.</strong> Claude writes new jobs into your tracker and reads your changes.</li>
+  <li><strong>Gmail.</strong> Claude reads LinkedIn job alert emails, which is how it sees jobs at sites it cannot read directly, like Politico, The Atlantic and The Hill. It never sends email.</li>
+  <li><strong>Indeed.</strong> Optional, and recommended. It adds a broad set of listings to the daily search.</li>
+</ul>
+<div class="callout callout--headsup">
+<p><strong>Heads-up.</strong> Use the <strong>same Google account</strong> for Drive and Sheets.</p>
+</div>
+</div>
+<div class="pair__media">
+<figure class="frame">
+  <div class="frame__window">
+    <div class="frame__bar" aria-hidden="true"><i></i><i></i><i></i></div>
+    <div class="frame__body"><div class="frame__shot"><img src="guide/05-connectors.jpg" alt="The Claude Connectors page. The Google Drive, Gmail and Google Sheets cards are circled, and each shows a check mark." width="1160" height="1036" loading="lazy"><span class="frame__ring" style="--x: 2%; --y: 15%; --w: 46.6%; --h: 14.5%" aria-hidden="true"></span><span class="frame__ring" style="--x: 50%; --y: 15%; --w: 46.5%; --h: 14.5%" aria-hidden="true"></span><span class="frame__ring" style="--x: 2%; --y: 80%; --w: 46.6%; --h: 14.7%" aria-hidden="true"></span></div></div>
   </div>
-
-  <h3 class="sub">The 10-a-day cap</h3>
-  <p>Each search adds only the 10 best new jobs to your Sheet, so it never floods. The other matches wait in Claude's memory, and they expire after 14 days. Say "show me more" to add the next 10.</p>
-
-  <h3 class="sub">What each Status means</h3>
-  <div class="twrap" role="region" aria-label="Status meanings" tabindex="0">
-    <table>
-      <thead><tr><th>Status</th><th>Meaning</th></tr></thead>
-      <tbody>
-        <tr><td>New</td><td>Found by a scan. You have not looked at it yet.</td></tr>
-        <tr><td>Saved</td><td>You want to keep it.</td></tr>
-        <tr><td>Ready to apply</td><td>Claude has built your application and it is waiting for you to send it.</td></tr>
-        <tr><td>Applied</td><td>You sent it. Only you set this, in the dropdown or by telling Claude 'I applied'. Claude never marks it Applied on its own.</td></tr>
-        <tr><td>Interviewing</td><td>You are in a hiring process.</td></tr>
-        <tr><td>Offer</td><td>You have an offer.</td></tr>
-        <tr><td>Passed</td><td>You are not interested.</td></tr>
-        <tr><td>Closed</td><td>The posting is gone or the process ended.</td></tr>
-      </tbody>
-    </table>
+  <figcaption class="frame__caption">Google Drive, Gmail and Google Sheets, circled. A check mark means connected.</figcaption>
+</figure>
+</div>
+</div>
+<ul class="checklist done-box">
+  <li><label class="check"><input class="check__input" type="checkbox" data-check="5"><span class="check__box" aria-hidden="true"></span><span>Done with this step</span></label></li>
+</ul>
+        </article>
+        <article class="wizard__step" id="wizard-step-6" data-phase="Connect your accounts" aria-labelledby="wizard-step-6-title">
+          <h2 class="wizard__title" id="wizard-step-6-title" tabindex="-1"><span class="wizard__num" aria-hidden="true">6</span>Let Claude reach the job sites</h2>
+<div class="pair">
+<div class="pair__text">
+<p>This lets Claude read JournalismJobs, Mediabistro and Daybook, and download your job system. You do it once.</p>
+<ol>
+  <li>Click your name at the bottom of the left sidebar, then Settings, then <span class="ui">Capabilities</span>. On the web it is <a class="link-external" href="https://claude.ai/settings/capabilities" target="_blank" rel="noopener">claude.ai/settings/capabilities<span class="sr-only"> (opens in a new tab)</span></a>.</li>
+  <li>Keep <span class="ui">Allow network egress</span> turned on.</li>
+  <li>Keep <span class="ui">Domain allowlist</span> on <span class="ui">Package managers only</span>. Never choose All domains. Job posts are text from strangers, and a short list keeps Claude from reaching anything else.</li>
+  <li>Under <span class="ui">Additional allowed domains</span>, add the five domains below, one at a time. Click Copy, paste the domain into the box, and click <span class="ui">Add</span>.</li>
+</ol>
+</div>
+<div class="pair__media">
+<figure class="frame">
+  <div class="frame__window">
+    <div class="frame__bar" aria-hidden="true"><i></i><i></i><i></i></div>
+    <div class="frame__body"><div class="frame__shot"><img src="guide/06-capabilities-allowlist.jpg" alt="The Claude Capabilities settings. Allow network egress is on. The Domain allowlist menu reads Package managers only, and below it the Additional allowed domains box and its list of added domains are circled." width="1232" height="960" loading="lazy"><span class="frame__ring" style="--x: 70.2%; --y: 26.2%; --w: 25%; --h: 5.8%" aria-hidden="true"></span><span class="frame__ring" style="--x: 3.4%; --y: 50.3%; --w: 93.2%; --h: 46.2%" aria-hidden="true"></span></div></div>
   </div>
-  <p class="gap-top">Ready to apply and Applied are different: Ready to apply means the ball is with you. Applied means you sent it.</p>
-  <p>Some Daybook jobs show "Employer hidden (Daybook)" in the Org column. Daybook shows the employer only to paid members. The link still shows a short description and often the salary. To build an application for one, paste the description into Claude, and tell it the employer if you know it. Claude will not guess.</p>
-
-  <h2>If something goes wrong</h2>
-  <div class="card">
-    <ul>
-      <li><b>The scan stalled.</b> A prompt is waiting for an answer. Check that the task's Permission mode is still Auto (Scheduled, your task, Edit). Then open the run from the task's History list and answer the prompt. If it keeps stopping, tell Nadeen.</li>
-      <li><b>The app shows a yellow "sign in again" banner.</b> Sign in again, then click Run now once.</li>
-      <li><b>It did not run.</b> The app was closed or the Mac was asleep. Open the app and wake the Mac. One catch-up run happens on its own. Also check that Keep computer awake is on.</li>
-      <li><b>The summary says "no LinkedIn alert emails".</b> No alert emails arrived from LinkedIn in the last few days. Set up the LinkedIn job alerts from Level 4, with email delivery.</li>
-      <li><b>The run was rejected.</b> You are at your Claude plan's usage limit. Wait for it to reset.</li>
-    </ul>
+  <figcaption class="frame__caption">The Package managers only menu, and the box and list where the domains go, circled.</figcaption>
+</figure>
+</div>
+</div>
+<div class="domains">
+<div class="domrow"><code id="dom1">*.journalismjobs.com</code><button class="btn btn--secondary" type="button" data-copy="dom1" aria-label="Copy *.journalismjobs.com">Copy</button><span class="prompt__hint" data-copy-hint></span><span class="sr-only" role="status" data-copy-status></span></div>
+<div class="domrow"><code id="dom2">*.mediabistro.com</code><button class="btn btn--secondary" type="button" data-copy="dom2" aria-label="Copy *.mediabistro.com">Copy</button><span class="prompt__hint" data-copy-hint></span><span class="sr-only" role="status" data-copy-status></span></div>
+<div class="domrow"><code id="dom3">*.daybook.com</code><button class="btn btn--secondary" type="button" data-copy="dom3" aria-label="Copy *.daybook.com">Copy</button><span class="prompt__hint" data-copy-hint></span><span class="sr-only" role="status" data-copy-status></span></div>
+<div class="domrow"><code id="dom4">github.com</code><button class="btn btn--secondary" type="button" data-copy="dom4" aria-label="Copy github.com">Copy</button><span class="prompt__hint" data-copy-hint></span><span class="sr-only" role="status" data-copy-status></span></div>
+<div class="domrow"><code id="dom5">codeload.github.com</code><button class="btn btn--secondary" type="button" data-copy="dom5" aria-label="Copy codeload.github.com">Copy</button><span class="prompt__hint" data-copy-hint></span><span class="sr-only" role="status" data-copy-status></span></div>
+</div>
+<div class="callout callout--headsup">
+<p><strong>Heads-up.</strong> The box rejects several domains at once, so add them one at a time. Each domain shows in the list under the box once it is added. All five should be there. New settings only work in a chat you start after you add them, so finish this step before step 8.</p>
+</div>
+<ul class="checklist done-box">
+  <li><label class="check"><input class="check__input" type="checkbox" data-check="6"><span class="check__box" aria-hidden="true"></span><span>Done with this step</span></label></li>
+</ul>
+        </article>
+        <article class="wizard__step" id="wizard-step-7" data-phase="Set up with Claude" aria-labelledby="wizard-step-7-title">
+          <h2 class="wizard__title" id="wizard-step-7-title" tabindex="-1"><span class="wizard__num" aria-hidden="true">7</span>Start a chat on your folder</h2>
+<div class="pair">
+<div class="pair__text">
+<ol>
+  <li>In the Claude app, click <span class="ui">+ New</span>.</li>
+  <li>Under the message box, click <span class="ui">Project or folder</span>.</li>
+  <li>Click <span class="ui">Add folder</span>, not New project, and pick your Job search folder.</li>
+</ol>
+<p>Do this before you send anything.</p>
+<div class="callout callout--tip">
+<p><strong>Tip.</strong> If Claude does not recognize a command like <code>/jobs</code>, send it again.</p>
+</div>
+</div>
+<div class="pair__media">
+<figure class="frame" id="shot-07">
+  <!-- When the real screenshot exists, replace the placeholder div with a frame__shot holding guide/07-new-folder.jpg -->
+  <div class="frame__window">
+    <div class="frame__bar" aria-hidden="true"><i></i><i></i><i></i></div>
+    <div class="frame__body"><div class="frame__placeholder">Screenshot coming: Claude app: + New, Project or folder, Add folder</div></div>
   </div>
+</figure>
+</div>
+</div>
+<ul class="checklist done-box">
+  <li><label class="check"><input class="check__input" type="checkbox" data-check="7"><span class="check__box" aria-hidden="true"></span><span>Done with this step</span></label></li>
+</ul>
+        </article>
+        <article class="wizard__step" id="wizard-step-8" data-phase="Set up with Claude" aria-labelledby="wizard-step-8-title">
+          <h2 class="wizard__title" id="wizard-step-8-title" tabindex="-1"><span class="wizard__num" aria-hidden="true">8</span>Send the setup message</h2>
+<ol>
+  <li>Type your website link below. It fills into the message. Leave it empty if you have no site.</li>
+  <li>Click Copy, paste the message into the chat you started in step 7, and send it.</li>
+</ol>
+<label class="field__label" for="siteUrl">Your website link</label>
+<input class="field__input" type="url" id="siteUrl" inputmode="url" autocomplete="off" placeholder="https://yourname.com">
+<div class="prompt">
+<span class="prompt__label" id="setupMsg-label">Message to paste into Claude</span><p class="prompt__text" id="setupMsg" aria-labelledby="setupMsg-label" tabindex="0"></p>
+<div class="prompt__bar"><button class="btn btn--secondary" type="button" data-copy="setupMsg">Copy message</button><span class="prompt__hint" data-copy-hint></span><span class="sr-only" role="status" data-copy-status></span></div>
+</div>
+<div class="callout callout--headsup">
+<p><strong>Heads-up.</strong> A Mac window may pop up asking to install “command line developer tools”. Either button is fine. Claude may also ask to read the folder above yours. Say yes. If it says a website is blocked, go back to step 6, then start a new chat on your folder and paste the message again.</p>
+</div>
+<ul class="checklist done-box">
+  <li><label class="check"><input class="check__input" type="checkbox" data-check="8"><span class="check__box" aria-hidden="true"></span><span>Done with this step</span></label></li>
+</ul>
+        </article>
+        <article class="wizard__step" id="wizard-step-9" data-phase="Set up with Claude" aria-labelledby="wizard-step-9-title">
+          <h2 class="wizard__title" id="wizard-step-9-title" tabindex="-1"><span class="wizard__num" aria-hidden="true">9</span>What Claude asks you</h2>
+<p>Claude works through setup one question at a time. It takes about 30 minutes. The moments where you do something are marked.</p>
+<ol class="flow">
+  <li>Claude downloads the job system into your folder.</li>
+  <li>Claude checks that it can reach the job sites.</li>
+  <li>Claude makes a clean text copy of your résumé.</li>
+  <li class="flow--you"><span class="badge badge--hot">You</span> Claude lists your clips from your website. Approve the list, fix any rows, and star your favorites.</li>
+  <li class="flow--you"><span class="badge badge--hot">You</span> Claude writes a fact list from your résumé, LinkedIn and clips. Skim it, and answer 2 or 3 questions about wins that are not on paper.</li>
+  <li class="flow--you"><span class="badge badge--hot">You</span> Claude asks about your beats, target roles, location, salary floor and dealbreakers. It takes about 5 minutes.</li>
+  <li class="flow--you"><span class="badge badge--hot">You</span> Claude builds your Google Sheet and gives you the link. Bookmark it.</li>
+  <li class="flow--you"><span class="badge badge--hot">You</span> Claude publishes your Job Inbox and gives you the link. Bookmark it, and open it once to check.</li>
+  <li class="flow--you"><span class="badge badge--hot">You</span> Claude asks if you want the morning scan on or off.</li>
+</ol>
+<div class="callout callout--tip">
+<p><strong>Tip.</strong> If you stop halfway, start a new chat on the <code>nihal-job-system</code> folder and say “continue setup”. Claude picks up where you left off. From now on, start your chats on that folder. It sits inside your Job search folder.</p>
+</div>
+<p>After setup, you and Nadeen have a check-in call of about 20 minutes.</p>
+<ul class="checklist done-box">
+  <li><label class="check"><input class="check__input" type="checkbox" data-check="9"><span class="check__box" aria-hidden="true"></span><span>Done with this step</span></label></li>
+</ul>
+        </article>
+        <article class="wizard__step" id="wizard-step-10" data-phase="Your morning scan" aria-labelledby="wizard-step-10-title">
+          <h2 class="wizard__title" id="wizard-step-10-title" tabindex="-1"><span class="wizard__num" aria-hidden="true">10</span>Check the scan’s settings</h2>
+<div class="pair">
+<div class="pair__text">
+<ol>
+  <li>In the Claude app, click <span class="ui">Scheduled</span> in the sidebar, click your task, then click <span class="ui">Edit</span>.</li>
+  <li>Set the <strong>Working folder</strong> to your <code>nihal-job-system</code> folder. It is the folder row at the bottom of the Instructions box. Save, open the task again, and check that Folder now ends in <code>nihal-job-system</code>.</li>
+  <li>Set the <strong>Model</strong> to Sonnet. It is the Default menu at the bottom right.</li>
+  <li>Set the <strong>Permission mode</strong> to <strong>Auto</strong>. It is the Manual button at the bottom left. Auto lets the scan run without stopping to ask you.</li>
+</ol>
+<div class="callout callout--headsup">
+<p><strong>Heads-up.</strong> If Auto is not in the list, stop and tell Nadeen. Your plan may not include it.</p>
+</div>
+</div>
+<div class="pair__media">
+<figure class="frame" id="shot-10">
+  <!-- When the real screenshot exists, replace the placeholder div with a frame__shot holding guide/10-scheduled-edit.jpg -->
+  <div class="frame__window">
+    <div class="frame__bar" aria-hidden="true"><i></i><i></i><i></i></div>
+    <div class="frame__body"><div class="frame__placeholder">Screenshot coming: Claude app: scheduled task Edit window</div></div>
+  </div>
+</figure>
+</div>
+</div>
+<p>If Claude never offered to set up the scan, paste this message into a chat on your <code>nihal-job-system</code> folder.</p>
+<div class="prompt">
+<p class="prompt__text" id="scanMsg" tabindex="0">Set up my morning scan.</p>
+<div class="prompt__bar"><button class="btn btn--secondary" type="button" data-copy="scanMsg">Copy message</button><span class="prompt__hint" data-copy-hint></span><span class="sr-only" role="status" data-copy-status></span></div>
+</div>
+<ul class="checklist done-box">
+  <li><label class="check"><input class="check__input" type="checkbox" data-check="10"><span class="check__box" aria-hidden="true"></span><span>Done with this step</span></label></li>
+</ul>
+        </article>
+        <article class="wizard__step" id="wizard-step-11" data-phase="Your morning scan" aria-labelledby="wizard-step-11-title">
+          <h2 class="wizard__title" id="wizard-step-11-title" tabindex="-1"><span class="wizard__num" aria-hidden="true">11</span>Keep your Mac awake and do one test run</h2>
+<div class="pair">
+<div class="pair__text">
+<ol>
+  <li>Go to Settings, then <span class="ui">This computer</span>, then <span class="ui">System</span>, and turn on <span class="ui">Keep computer awake</span>.</li>
+  <li>Open your scan task and click <span class="ui">Run now</span> once.</li>
+  <li>Leave it alone for about 10 minutes. It should say <strong>succeeded</strong> and show a 3-line summary.</li>
+</ol>
+<div class="callout callout--headsup">
+<p><strong>Heads-up.</strong> Closing the lid still puts your Mac to sleep. The scan only runs while the Claude app is open and your Mac is awake. If the test run stops to ask you something, tell Nadeen what it named.</p>
+</div>
+</div>
+<div class="pair__media">
+<figure class="frame" id="shot-11">
+  <!-- When the real screenshot exists, replace the placeholder div with a frame__shot holding guide/11-keep-awake.jpg -->
+  <div class="frame__window">
+    <div class="frame__bar" aria-hidden="true"><i></i><i></i><i></i></div>
+    <div class="frame__body"><div class="frame__placeholder">Screenshot coming: Claude app: Keep computer awake</div></div>
+  </div>
+</figure>
+</div>
+</div>
+<ul class="checklist done-box">
+  <li><label class="check"><input class="check__input" type="checkbox" data-check="11"><span class="check__box" aria-hidden="true"></span><span>Done with this step</span></label></li>
+</ul>
+        </article>
+        <article class="wizard__step" id="wizard-step-12" data-phase="Your morning scan" aria-labelledby="wizard-step-12-title">
+          <h2 class="wizard__title" id="wizard-step-12-title" tabindex="-1"><span class="wizard__num" aria-hidden="true">12</span>Set up LinkedIn job alerts</h2>
+<p>Some employers block Claude from reading their job pages. LinkedIn alert emails are how it sees jobs at Politico, The Atlantic and The Hill.</p>
+<ol>
+  <li>On linkedin.com, click Jobs and search for a role you want. Set the location to Washington, DC.</li>
+  <li>Turn on the <span class="ui">Set alert</span> switch.</li>
+  <li>Choose <span class="ui">Daily</span> and <span class="ui">Email</span>.</li>
+  <li>Repeat for two or three roles.</li>
+</ol>
+<ul class="checklist done-box">
+  <li><label class="check"><input class="check__input" type="checkbox" data-check="12"><span class="check__box" aria-hidden="true"></span><span>Done with this step</span></label></li>
+</ul>
+        </article>
+        <article class="wizard__step" id="wizard-step-13" data-phase="Your first application" aria-labelledby="wizard-step-13-title">
+          <h2 class="wizard__title" id="wizard-step-13-title" tabindex="-1"><span class="wizard__num" aria-hidden="true">13</span>Open your Job Inbox</h2>
+<div class="pair">
+<div class="pair__text">
+<ol>
+  <li>Open the Job Inbox link Claude gave you in step 9. Bookmark it.</li>
+  <li>The <span class="ui">Inbox</span> tab shows new jobs. The <span class="ui">Pipeline</span> tab shows jobs you are working on.</li>
+  <li>On each card, <span class="ui">Save</span> keeps a job, <span class="ui">Pass</span> drops it, <span class="ui">Build in Claude</span> copies a command, and <span class="ui">Open posting</span> opens the job.</li>
+</ol>
+<div class="callout callout--tip">
+<p><strong>Tip.</strong> The Inbox reads your Google Sheet through your Google Sheets connector. If it cannot open your Sheet, check that the connector uses the same Google account as your Drive.</p>
+</div>
+</div>
+<div class="pair__media">
+<figure class="frame">
+  <div class="frame__window">
+    <div class="frame__bar" aria-hidden="true"><i></i><i></i><i></i></div>
+    <div class="frame__body"><div class="frame__shot"><img src="guide/13-inbox-overview.jpg" alt="The Job Inbox page with Inbox and Pipeline tabs, filter chips, a Top Picks row and Staff job cards below. The Inbox and Pipeline tabs are circled." width="1341" height="896" loading="lazy"><span class="frame__ring" style="--x: 0.7%; --y: 13.6%; --w: 28.5%; --h: 6.9%" aria-hidden="true"></span></div></div>
+  </div>
+  <figcaption class="frame__caption">The Inbox and Pipeline tabs, circled. These are example jobs.</figcaption>
+</figure>
+<figure class="frame">
+  <div class="frame__window">
+    <div class="frame__bar" aria-hidden="true"><i></i><i></i><i></i></div>
+    <div class="frame__body"><div class="frame__shot"><img src="guide/13-inbox-cards.jpg" alt="Two example job cards. Each has Save, Pass and Build in Claude buttons. The three buttons on the first card are circled." width="1512" height="794" loading="lazy"><span class="frame__ring" style="--x: 3.2%; --y: 66.5%; --w: 43%; --h: 26%" aria-hidden="true"></span></div></div>
+  </div>
+  <figcaption class="frame__caption">Save, Pass and Build in Claude on the first card, circled. These are example jobs.</figcaption>
+</figure>
+</div>
+</div>
+<ul class="checklist done-box">
+  <li><label class="check"><input class="check__input" type="checkbox" data-check="13"><span class="check__box" aria-hidden="true"></span><span>Done with this step</span></label></li>
+</ul>
+        </article>
+        <article class="wizard__step" id="wizard-step-14" data-phase="Your first application" aria-labelledby="wizard-step-14-title">
+          <h2 class="wizard__title" id="wizard-step-14-title" tabindex="-1"><span class="wizard__num" aria-hidden="true">14</span>Build an application with /apply</h2>
+<ol>
+  <li>Click <span class="ui">Build in Claude</span> on a job card. It copies a command. Paste it into a chat on your <code>nihal-job-system</code> folder. You can also type <code>/apply</code> and the job, or paste a link to a posting.</li>
+  <li>Claude shows a short list of what it will build. Say yes.</li>
+  <li>Claude builds a résumé Doc and a cover letter Doc in your Drive, in a folder called Job applications. It picks 3 to 5 of your clips and lists any claims it wants you to confirm.</li>
+  <li>The job’s status becomes <strong>Ready to apply</strong>.</li>
+</ol>
+<div class="callout callout--headsup">
+<p><strong>Heads-up.</strong> Read the claims to confirm. Fix anything that is wrong before you send. Claude only uses facts from your fact list.</p>
+</div>
+<ul class="checklist done-box">
+  <li><label class="check"><input class="check__input" type="checkbox" data-check="14"><span class="check__box" aria-hidden="true"></span><span>Done with this step</span></label></li>
+</ul>
+        </article>
+        <article class="wizard__step" id="wizard-step-15" data-phase="Your first application" aria-labelledby="wizard-step-15-title">
+          <h2 class="wizard__title" id="wizard-step-15-title" tabindex="-1"><span class="wizard__num" aria-hidden="true">15</span>Edit, download, apply, tell Claude</h2>
+<div class="pair">
+<div class="pair__text">
+<ol>
+  <li>Open the two Docs and edit them until they sound like you. Then click File, Download, PDF.</li>
+  <li>Apply on the employer’s own site. Claude never applies for you.</li>
+  <li>Click <span class="ui">I applied</span> on the job’s card in the Ready to apply column of the Pipeline tab, or tell Claude “I applied to The Bulwark”.</li>
+</ol>
+</div>
+<div class="pair__media">
+<figure class="frame">
+  <div class="frame__window">
+    <div class="frame__bar" aria-hidden="true"><i></i><i></i><i></i></div>
+    <div class="frame__body"><div class="frame__shot"><img src="guide/15-inbox-pipeline.jpg" alt="The Job Inbox Pipeline view with columns Saved, Ready to apply, Applied, Interviewing and Offer. The Move to Interviewing button on an Applied card is circled." width="1568" height="753" loading="lazy"><span class="frame__ring" style="--x: 42.1%; --y: 47.1%; --w: 15.8%; --h: 11.4%" aria-hidden="true"></span></div></div>
+  </div>
+  <figcaption class="frame__caption">Each card in Pipeline has a next-step button. An Applied card shows Move to Interviewing, and an Interviewing card shows Move to Offer. These are example jobs.</figcaption>
+</figure>
+</div>
+</div>
+<ul class="checklist done-box">
+  <li><label class="check"><input class="check__input" type="checkbox" data-check="15"><span class="check__box" aria-hidden="true"></span><span>Done with this step</span></label></li>
+</ul>
+        </article>
+        <article class="wizard__step" id="wizard-step-16" data-phase="Every day after" aria-labelledby="wizard-step-16-title">
+          <h2 class="wizard__title" id="wizard-step-16-title" tabindex="-1"><span class="wizard__num" aria-hidden="true">16</span>Your 10-minute morning skim</h2>
+<ol>
+  <li>If your scan is on, it runs weekdays at about 7:30 and adds up to 10 new jobs, each with status New.</li>
+  <li>Open your Job Inbox. <span class="ui">Save</span> or <span class="ui">Pass</span> each job.</li>
+  <li>Build the best one with <span class="ui">Build in Claude</span>.</li>
+</ol>
+<ul>
+  <li>Say <code>show me more</code> to add the next 10 matches. The others wait in your Sheet for 14 days. Say <code>show me more</code> to add them.</li>
+  <li>Say <code>find me jobs</code> to run a scan any time.</li>
+  <li>Once a week, say <code>my top 3 this week</code>. Claude builds applications for your three best jobs. It shows you the three first, and you confirm or swap them before it builds.</li>
+</ul>
+<ul class="checklist done-box">
+  <li><label class="check"><input class="check__input" type="checkbox" data-check="16"><span class="check__box" aria-hidden="true"></span><span>Done with this step</span></label></li>
+</ul>
+        </article>
+        <article class="wizard__step" id="wizard-step-17" data-phase="Every day after" aria-labelledby="wizard-step-17-title">
+          <h2 class="wizard__title" id="wizard-step-17-title" tabindex="-1"><span class="wizard__num" aria-hidden="true">17</span>What each status means</h2>
+<p>Your Google Sheet keeps every job and its status. Ready to apply means the ball is with you. Applied means you sent it.</p>
+<div class="table-figure"><div class="table-wrap" role="region" aria-label="What each status means" tabindex="0">
+<table class="table">
+<thead><tr><th scope="col">Status</th><th scope="col">Meaning</th><th scope="col">Who sets it</th></tr></thead>
+<tbody>
+<tr><td>New</td><td>Found by a scan. You have not looked at it yet.</td><td class="table__muted">Claude’s search</td></tr>
+<tr><td>Saved</td><td>You want to keep it.</td><td class="table__muted">You</td></tr>
+<tr><td>Ready to apply</td><td>Claude built your application and it is waiting for you to send it.</td><td class="table__muted">Claude</td></tr>
+<tr><td>Applied</td><td>You sent it.</td><td class="table__muted"><strong>Only you.</strong> Claude never marks it Applied on its own.</td></tr>
+<tr><td>Interviewing</td><td>You are in a hiring process.</td><td class="table__muted">You</td></tr>
+<tr><td>Offer</td><td>You have an offer.</td><td class="table__muted">You</td></tr>
+<tr><td>Passed</td><td>You are not interested.</td><td class="table__muted">You</td></tr>
+<tr><td>Closed</td><td>The posting is gone or the process ended.</td><td class="table__muted">You, or Claude when you say so</td></tr>
+</tbody>
+</table>
+</div></div>
+<figure class="frame">
+  <div class="frame__window">
+    <div class="frame__bar" aria-hidden="true"><i></i><i></i><i></i></div>
+    <div class="frame__body"><div class="frame__shot"><img src="guide/17-sheet-jobs.jpg" alt="The Jobs tab of the Google Sheet with columns Status, Fit, Type, Job title, Org, Location, Why it fits, Source and Posted. The Status column is circled. Its cells are colored dropdowns such as Ready to apply, Applied, Interviewing, Saved, New, Passed and Closed." width="1512" height="791" loading="lazy"><span class="frame__ring" style="--x: 3.2%; --y: 3.0%; --w: 9%; --h: 91.8%" aria-hidden="true"></span></div></div>
+  </div>
+  <figcaption class="frame__caption">The Status column, circled. Your Google Sheet keeps everything. You can change a Status from its dropdown too. These are example jobs.</figcaption>
+</figure>
+<ul class="checklist done-box">
+  <li><label class="check"><input class="check__input" type="checkbox" data-check="17"><span class="check__box" aria-hidden="true"></span><span>Done with this step</span></label></li>
+</ul>
+        </article>
+        <article class="wizard__step" id="wizard-step-18" data-phase="Every day after" aria-labelledby="wizard-step-18-title">
+          <h2 class="wizard__title" id="wizard-step-18-title" tabindex="-1"><span class="wizard__num" aria-hidden="true">18</span>Things you can say to Claude</h2>
+<p>Start a chat on your <code>nihal-job-system</code> folder, then say any of these.</p>
+<div class="table-figure"><div class="table-wrap" role="region" aria-label="Things you can say to Claude" tabindex="0">
+<table class="table">
+<thead><tr><th scope="col">You say</th><th scope="col">What happens</th></tr></thead>
+<tbody>
+<tr class="table__group"><td colspan="2">Finding jobs</td></tr>
+<tr><td><code>/jobs</code></td><td>A simple menu that points you to the next step. Type it whenever you forget the commands.</td></tr>
+<tr><td><code>find me jobs</code></td><td>Searches your sources now and adds the best new matches to your Sheet.</td></tr>
+<tr><td><code>show me more</code></td><td>Adds the next 10 matches that were waiting.</td></tr>
+<tr class="table__group"><td colspan="2">Applying</td></tr>
+<tr><td><code>/apply</code> and a job or a link</td><td>Builds your résumé, cover letter and clip picks for that job.</td></tr>
+<tr><td>Paste a job link</td><td>Adds that one job to your Sheet. Say “apply” with it to build the application.</td></tr>
+<tr><td><code>my top 3 this week</code></td><td>Builds applications for your three best jobs. It shows you the three first, and you confirm or swap them before it builds.</td></tr>
+<tr class="table__group"><td colspan="2">Updating</td></tr>
+<tr><td><code>I applied to The Bulwark</code></td><td>Sets that job to Applied.</td></tr>
+<tr><td><code>pass on The Bulwark</code></td><td>Sets that job to Passed. Claude asks for a one-line reason.</td></tr>
+<tr><td><code>I published something new</code></td><td>Claude asks for the link and, once you confirm it is your piece, offers to add it to your clips.</td></tr>
+<tr class="table__group"><td colspan="2">Learning</td></tr>
+<tr><td><code>what have you learned about me</code></td><td>Shows the preferences Claude has saved. Claude asks before it saves a new one.</td></tr>
+<tr><td><code>forget that</code></td><td>Removes the line Claude just saved.</td></tr>
+<tr class="table__group"><td colspan="2">Settings</td></tr>
+<tr><td><code>raise my salary floor to $75,000</code></td><td>Changes your profile. Ask for any other change the same way.</td></tr>
+<tr><td><code>update my job system</code></td><td>Gets the newest version of the system. Your own files are not touched.</td></tr>
+<tr><td><code>set up my morning scan</code></td><td>Creates the scheduled task again.</td></tr>
+</tbody>
+</table>
+</div></div>
+<div class="callout callout--tip">
+<p><strong>Tip.</strong> If Claude does not recognize a command like <code>/jobs</code>, send it again.</p>
+</div>
+<ul class="checklist done-box">
+  <li><label class="check"><input class="check__input" type="checkbox" data-check="18"><span class="check__box" aria-hidden="true"></span><span>Done with this step</span></label></li>
+</ul>
+        </article>
+        <article class="wizard__step" id="wizard-step-19" data-phase="Every day after" aria-labelledby="wizard-step-19-title">
+          <h2 class="wizard__title" id="wizard-step-19-title" tabindex="-1"><span class="wizard__num" aria-hidden="true">19</span>If something goes wrong</h2>
+<ul>
+  <li><strong>Claude cannot find a command like /jobs.</strong> Send it again. Check that your chat is on the <code>nihal-job-system</code> folder.</li>
+  <li><strong>Claude says a website is blocked.</strong> Go back to step 6 and check all five domains. Then start a new chat on your folder and paste the step 8 message again.</li>
+  <li><strong>You cannot find Connectors.</strong> Click Customize in the left sidebar, then Connectors.</li>
+  <li><strong>The scan stalled.</strong> A prompt is waiting for an answer. Check that the task’s Permission mode is still Auto (Scheduled, your task, Edit). Then open the run from the task’s History list and answer the prompt.</li>
+  <li><strong>The app shows a yellow “sign in again” banner.</strong> Sign in again, then click Run now once.</li>
+  <li><strong>The scan did not run.</strong> The app was closed or the Mac was asleep. Open the app and wake the Mac. One catch-up run happens on its own. Check that Keep computer awake is on.</li>
+  <li><strong>The summary says “no LinkedIn alert emails”.</strong> No alert emails arrived from LinkedIn in the last few days. Set up the alerts in step 12, with email delivery.</li>
+  <li><strong>The run was rejected.</strong> You are at your Claude plan’s usage limit. Wait for it to reset.</li>
+  <li><strong>A Daybook job shows “Employer hidden (Daybook)”.</strong> Daybook shows the employer only to paid members. The link still shows a short description. To build an application, paste the description into Claude and tell it the employer if you know it. Claude will not guess.</li>
+</ul>
+<div class="callout callout--headsup">
+<p><strong>Heads-up.</strong> Still stuck? Tell Nadeen what happened and what Claude said, word for word.</p>
+</div>
+<ul class="checklist done-box">
+  <li><label class="check"><input class="check__input" type="checkbox" data-check="19"><span class="check__box" aria-hidden="true"></span><span>Done with this step</span></label></li>
+</ul>
+        </article>
 
-  <h2>Questions?</h2>
-  <p>Ask Nadeen on your check-in call.</p>
+      <div class="wizard__nav" hidden>
+        <button class="btn btn--secondary" type="button" data-wz-back aria-keyshortcuts="ArrowLeft"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20 12H5M11 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Back</span></button>
+        <button class="btn btn--primary" type="button" data-wz-next aria-keyshortcuts="ArrowRight"><span data-wz-next-label>Next</span><span data-wz-next-icon><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 12h15M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button>
+      </div>
+    </div>
+  </main>
 </div>
 
 <script>
+/* Copy buttons. Any button with data-copy="id" copies that element's text. */
 (function () {
-  var KEY = 'nihalQuest.v1';
-  var state = { checks: [false, false, false, false, false], site: '' };
+  var timers = new WeakMap();
+  function isMac() { return /Mac|iPhone|iPad/.test(navigator.userAgent); }
+  document.addEventListener('click', function (e) {
+    var btn = e.target.closest('[data-copy]');
+    if (!btn) return;
+    var source = document.getElementById(btn.getAttribute('data-copy'));
+    var bar = btn.parentNode;
+    var hint = bar.querySelector('[data-copy-hint]');
+    var status = bar.querySelector('[data-copy-status]');
+    var original = btn.getAttribute('data-label') || btn.textContent;
+    btn.setAttribute('data-label', original);
+    var text = source.textContent.trim();
+
+    function reset() { btn.textContent = original; if (hint) hint.textContent = ''; }
+    function arm() { clearTimeout(timers.get(btn)); timers.set(btn, setTimeout(reset, 2000)); }
+    function ok() {
+      btn.textContent = 'Copied';
+      if (hint) hint.textContent = '';
+      if (status) status.textContent = 'Copied to the clipboard.';
+      arm();
+    }
+    function fallback() {
+      var range = document.createRange();
+      range.selectNodeContents(source);
+      var sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+      var msg = isMac() ? 'Press Cmd+C to copy' : 'Press Ctrl+C to copy';
+      if (hint) hint.textContent = msg;
+      if (status) status.textContent = msg;
+      arm();
+    }
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(ok, fallback);
+    } else {
+      fallback();
+    }
+  });
+})();
+
+/* Saved progress and the setup message. Every storage call is wrapped in try/catch,
+   so the page works when storage is blocked. */
+(function () {
+  var KEY = 'nihalGuide.v2';
+  var N = 19;
+  var state = { checks: [], site: '' };
+  for (var i = 0; i < N; i++) state.checks.push(false);
 
   function load() {
     try {
       var raw = window.localStorage.getItem(KEY);
-      if (raw) {
-        var s = JSON.parse(raw);
-        if (s && Array.isArray(s.checks) && s.checks.length === 5) state.checks = s.checks.map(Boolean);
-        if (s && typeof s.site === 'string') state.site = s.site;
-      }
-    } catch (e) { /* storage unavailable: page still works */ }
+      if (!raw) return;
+      var s = JSON.parse(raw);
+      if (s && Array.isArray(s.checks) && s.checks.length === N) state.checks = s.checks.map(Boolean);
+      if (s && typeof s.site === 'string') state.site = s.site;
+    } catch (e) { /* storage unavailable: the page still works */ }
   }
   function save() {
     try { window.localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) { /* ignore */ }
   }
 
-  var boxes = [];
-  for (var i = 1; i <= 5; i++) boxes.push(document.getElementById('chk' + i));
-  var levels = [];
-  for (var j = 1; j <= 5; j++) levels.push(document.getElementById('level' + j));
+  var boxes = [].slice.call(document.querySelectorAll('[data-check]'));
+  var links = [].slice.call(document.querySelectorAll('.wizard__link'));
+  var countEl = document.querySelector('[data-wz-donecount]');
+
+  links.forEach(function (a) {
+    var tick = document.createElement('span');
+    tick.className = 'wizard__tick';
+    tick.setAttribute('aria-hidden', 'true');
+    a.appendChild(tick);
+    var sr = document.createElement('span');
+    sr.className = 'sr-only';
+    a.appendChild(sr);
+  });
 
   function render() {
     var done = 0;
-    for (var n = 0; n < 5; n++) {
-      var unlocked = n === 0 || state.checks[n - 1];
-      if (!unlocked) state.checks[n] = false;
-      boxes[n].checked = state.checks[n];
-      boxes[n].disabled = !unlocked;
-      levels[n].classList.toggle('locked', !unlocked);
-      levels[n].classList.toggle('done', state.checks[n]);
-      var msg = levels[n].querySelector('.lockmsg');
-      msg.textContent = unlocked ? '' : 'Locked until Level ' + n + ' is done. You can read ahead.';
-      if (state.checks[n]) done++;
-    }
-    document.getElementById('progLabel').textContent = done + ' of 5 levels done';
-    document.getElementById('progPct').textContent = (done * 20) + '%';
-    document.getElementById('barFill').style.width = (done * 20) + '%';
-    document.getElementById('bar').setAttribute('aria-valuenow', String(done));
-    document.getElementById('allDone').hidden = done !== 5;
+    boxes.forEach(function (b) {
+      var k = +b.getAttribute('data-check') - 1;
+      b.checked = !!state.checks[k];
+      if (state.checks[k]) done++;
+    });
+    links.forEach(function (a) {
+      var k = +a.getAttribute('data-step') - 1;
+      var on = !!state.checks[k];
+      a.setAttribute('data-done', on ? 'true' : 'false');
+      a.querySelector('.wizard__tick').textContent = on ? '✓' : '';
+      a.querySelector('.sr-only').textContent = on ? ' (done)' : '';
+    });
+    if (countEl) countEl.textContent = done + ' of ' + N + ' steps done';
   }
-
-  boxes.forEach(function (b, idx) {
+  boxes.forEach(function (b) {
     b.addEventListener('change', function () {
-      state.checks[idx] = b.checked;
+      state.checks[+b.getAttribute('data-check') - 1] = b.checked;
       render();
       save();
     });
   });
 
-  // setup message
+  /* setup message */
   var site = document.getElementById('siteUrl');
-  var pre = document.getElementById('setupMsg');
+  var msg = document.getElementById('setupMsg');
   function setupText() {
     var url = site.value.trim();
     var web = url
       ? 'My website with my published articles is ' + url + '.'
       : "I don't have a website, so please ask me for links to my 10 to 15 best articles.";
-    return 'Please set up my job search system. Download it from https://github.com/NadeenSidd08/nihal-job-system into this folder (use git clone, or a ZIP download if git is not available). If the download fails because a website is blocked, stop and tell me to add the five domains from Level 2 of my setup page, then start a new chat on this folder and paste this message again. Then read nihal-job-system/CLAUDE.md and follow it. My r\u00e9sum\u00e9 and my LinkedIn PDF are in this folder. ' + web;
+    return 'Please set up my job search system. Download it from https://github.com/NadeenSidd08/nihal-job-system into this folder (use git clone, or a ZIP download if git is not available). If the download fails because a website is blocked, stop and tell me to add the five domains from step 6 of my setup page, then start a new chat on this folder and paste this message again. Then read nihal-job-system/CLAUDE.md and follow it. My résumé and my LinkedIn PDF are in this folder. ' + web;
   }
-  function updateMsg() { pre.textContent = setupText(); }
+  function updateMsg() { msg.textContent = setupText(); }
   site.addEventListener('input', function () {
     state.site = site.value;
     updateMsg();
     save();
   });
 
-  function selectText(el) {
-    var range = document.createRange();
-    range.selectNodeContents(el);
-    var sel = window.getSelection();
-    sel.removeAllRanges();
-    sel.addRange(range);
-  }
-  function wireCopy(btnId, preEl, textFn, statusId) {
-    wireCopy2(document.getElementById(btnId), preEl, textFn, document.getElementById(statusId));
-  }
-  function wireCopy2(btn, preEl, textFn, status) {
-    btn.addEventListener('click', function () {
-      var text = textFn();
-      function fallback() {
-        selectText(preEl);
-        status.textContent = 'Press Cmd+C to copy the selected text.';
-      }
-      try {
-        navigator.clipboard.writeText(text).then(function () {
-          status.textContent = 'Copied.';
-          setTimeout(function () { status.textContent = ''; }, 3000);
-        }, fallback);
-      } catch (e) { fallback(); }
-    });
-  }
-  wireCopy('copySetup', pre, setupText, 'copiedSetup');
-  var scanPre = document.getElementById('scanMsg');
-  wireCopy('copyScan', scanPre, function () { return scanPre.textContent; }, 'copiedScan');
-
-  var domEls = document.querySelectorAll('[data-copy]');
-  Array.prototype.forEach.call(domEls, function (btn) {
-    var code = document.getElementById(btn.getAttribute('data-copy'));
-    var statusId = 'copied' + btn.getAttribute('data-copy').replace('dom', 'Dom');
-    wireCopy2(btn, code, function () { return code.textContent; }, document.getElementById(statusId));
-  });
-
   load();
   site.value = state.site;
   updateMsg();
   render();
+})();
+
+/* Wizard: one step per screen. Without script every step shows stacked. */
+(function () {
+  var wizards = [].slice.call(document.querySelectorAll('[data-wizard]'));
+  if (!wizards.length) return;
+
+  function setup(root) {
+    if (root.classList.contains('wizard--js')) return;
+
+    var steps = [].slice.call(root.querySelectorAll('.wizard__step'));
+    var bar = root.querySelector('.wizard__bar');
+    var nav = root.querySelector('.wizard__nav');
+    var curEl = root.querySelector('[data-wz-current]');
+    var phaseEl = root.querySelector('[data-wz-phase]');
+    var fill = root.querySelector('.wizard__fill');
+    var prog = root.querySelector('.wizard__progress');
+    var back = root.querySelector('[data-wz-back]');
+    var next = root.querySelector('[data-wz-next]');
+    var prevArrow = root.querySelector('[data-wz-prev]');
+    var fwdArrow = root.querySelector('[data-wz-fwd]');
+    var nextLabel = root.querySelector('[data-wz-next-label]');
+    var nextIcon = root.querySelector('[data-wz-next-icon]');
+    var all = root.querySelector('.wizard__all');
+    var live = root.querySelector('[data-wz-live]');
+    var links = [].slice.call(root.querySelectorAll('[data-step]'));
+    var useHash = root.hasAttribute('data-wizard-hash');
+    var prefix = '#step-';
+    var n = steps.length;
+    var idx = 0;
+
+    root.classList.add('wizard--js');
+    bar.hidden = false;
+    nav.hidden = false;
+
+    /* opts.move: scroll the progress bar into view and focus the step heading.
+       opts.announce: tell screen readers which step is showing. */
+    function show(i, opts) {
+      opts = opts || {};
+      i = Math.max(0, Math.min(n - 1, i));
+      idx = i;
+      steps.forEach(function (s, k) { s.hidden = (k !== i); });
+      curEl.textContent = i + 1;
+      phaseEl.textContent = steps[i].getAttribute('data-phase');
+      fill.style.setProperty('--p', ((i + 1) / n * 100) + '%');
+      prog.setAttribute('aria-valuenow', i + 1);
+      prog.setAttribute('aria-valuetext', 'Step ' + (i + 1) + ' of ' + n);
+      links.forEach(function (a) {
+        if (+a.getAttribute('data-step') === i + 1) a.setAttribute('aria-current', 'step');
+        else a.removeAttribute('aria-current');
+      });
+      back.hidden = (i === 0);
+      nextLabel.textContent = (i === n - 1) ? 'Back to start' : 'Next';
+      nextIcon.hidden = (i === n - 1);
+      /* The top arrows stop at the ends. They are aria-disabled, not disabled, so focus is never lost. */
+      prevArrow.setAttribute('aria-disabled', i === 0 ? 'true' : 'false');
+      fwdArrow.setAttribute('aria-disabled', i === n - 1 ? 'true' : 'false');
+      next.classList.toggle('btn--primary', i !== n - 1);
+      next.classList.toggle('btn--secondary', i === n - 1);
+      if (all) all.open = false;
+      /* Keep the hash equal to the step shown */
+      if (useHash && opts.hash !== false) {
+        try { history.replaceState(null, '', prefix + (i + 1)); } catch (e) {}
+      }
+      if (opts.move) {
+        /* The bar goes to the top of the window. The content swaps at the same
+           moment, so this is a jump, never a glide. That also covers reduced motion. */
+        bar.scrollIntoView({ block: 'start', behavior: 'instant' });
+        var title = steps[i].querySelector('.wizard__title');
+        if (title) title.focus({ preventScroll: true });
+      }
+      if (opts.announce && live) {
+        live.textContent = 'Step ' + (i + 1) + ' of ' + n + ', ' + steps[i].getAttribute('data-phase');
+      }
+    }
+
+    function go(i) { show(i, { move: true, announce: true }); }
+
+    /* Returns the step index for a #step-N hash, or -1 if the hash is not ours. */
+    function fromHash() {
+      var m = /^#step-(.*)$/.exec(location.hash);
+      if (!m) return -1;
+      var v = parseInt(m[1], 10);
+      return isNaN(v) ? 0 : Math.max(0, Math.min(n - 1, v - 1));
+    }
+
+    back.addEventListener('click', function () { go(idx - 1); });
+    prevArrow.addEventListener('click', function () {
+      if (prevArrow.getAttribute('aria-disabled') !== 'true') go(idx - 1);
+    });
+    fwdArrow.addEventListener('click', function () {
+      if (fwdArrow.getAttribute('aria-disabled') !== 'true') go(idx + 1);
+    });
+    next.addEventListener('click', function () { go(idx === n - 1 ? 0 : idx + 1); });
+    links.forEach(function (a) {
+      a.addEventListener('click', function (e) {
+        e.preventDefault();
+        go(+a.getAttribute('data-step') - 1);
+      });
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+      if (e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+      var t = e.target;
+      if (t && t.closest && t.closest('input, textarea, select, [contenteditable]')) return;
+      var active = document.activeElement;
+      var mine = root.contains(active) || active === document.body || !active;
+      if (!mine) return;
+      e.preventDefault();
+      if (e.key === 'ArrowRight') { if (idx < n - 1) go(idx + 1); }
+      else if (idx > 0) go(idx - 1);
+    });
+
+    if (useHash) {
+      window.addEventListener('hashchange', function () {
+        var h = fromHash();
+        if (h >= 0) go(h);
+      });
+      var start = fromHash();
+      if (start >= 0) {
+        show(start, { move: true });
+        /* Layout settles after the page loads, so scroll the bar again then */
+        if (document.readyState !== 'complete') {
+          window.addEventListener('load', function () { bar.scrollIntoView({ block: 'start', behavior: 'instant' }); });
+        }
+        return;
+      }
+    }
+    show(0, { hash: false });
+  }
+
+  wizards.forEach(setup);
 })();
 </script>

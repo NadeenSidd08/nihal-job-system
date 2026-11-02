@@ -158,7 +158,7 @@ Built for Reporter, News at The Bulwark (markdown files only, Google Drive is of
   cover-letter.md      claims to confirm: 1
   (plus job-post, company-context, clip-picks)
 Sheet: Status is now Ready to apply. Folder holds the local folder path.
-No Google Docs were made. To get them next time, open Claude's connector settings (Settings, then Connectors), turn on Google Drive, and run /apply again.
+No Google Docs were made. To get them next time, open Claude's connector settings (Customize, then Connectors), turn on Google Drive, and run /apply again.
 ```
 
 Say the claims-to-confirm count for each file, and list them if there are any. Print the gap count the same way ("2 gaps noted in company-context.md (8+ years, managing people)"), or omit the line if none. If the posting has an Apply by date within 7 days, say so. For a batch, one block per job.

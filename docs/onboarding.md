@@ -55,7 +55,7 @@ Say: "Now I'm downloading the job system into this folder."
    Do not overwrite a `CLAUDE.md` that is already there.
 6. Tell him: "From now on, start your chats on the `nihal-job-system` folder (inside the folder you made). That's where the commands live. Click + New, then under the message box click Project or folder, and pick `nihal-job-system`. The first time, choose Add folder (not New project) and select it. We can keep going here for now. If I don't recognize a command like /jobs, send it again."
 
-If clone and download both fail (curl prints `000` or GitHub is blocked): say "Claude can only reach a short list of websites. On the setup page, Level 2, there are five domains to add in Settings, then Capabilities. Add them one at a time, then start a new chat on this folder (+ New, then Project or folder, then pick this folder, not New project) and paste the Level 3 message again." Wait. If he already did that and it still fails, ask him to open https://github.com/NadeenSidd08/nihal-job-system, click Code, then Download ZIP, double-click the ZIP, and drag the folder into his working folder, renamed `nihal-job-system`. Wait.
+If clone and download both fail (curl prints `000` or GitHub is blocked): say "Claude can only reach a short list of websites. On the setup page, step 6, there are five domains to add in Settings, then Capabilities. Add them one at a time, then start a new chat on this folder (+ New, then Project or folder, then pick this folder, not New project) and paste the step 8 message again." Wait. If he already did that and it still fails, ask him to open https://github.com/NadeenSidd08/nihal-job-system, click Code, then Download ZIP, double-click the ZIP, and drag the folder into his working folder, renamed `nihal-job-system`. Wait.
 
 ### Step 1a. Check network access (right after step 1)
 
@@ -100,7 +100,7 @@ Look in the repo folder and the folder directly above it. Never search higher wi
 If something is missing, say exactly how to get it:
 
 - Résumé: "Drop your résumé (PDF or Word) into this folder: <full folder path>. If it's a Google Doc, open it, choose File, Download, PDF, and save it there."
-- LinkedIn: "On LinkedIn, open your own profile, click More (the button near the top of your profile), then Save to PDF. Move the downloaded file into <full folder path>."
+- LinkedIn: "On LinkedIn, open your own profile, click Resources (the button under your name), then Save to PDF. Move the downloaded file into <full folder path>."
 - Then wait for him to say it's there, and look again.
 
 Done when you have named the résumé file, the LinkedIn file, and the website link, and he has confirmed them. If he has no website, ask for 10 to 15 links to his best clips instead (step 4 fallback). If he has no LinkedIn PDF, continue and note that facts will come from the résumé and clips only.
@@ -183,7 +183,7 @@ Done when `profile.md` exists with no `⟨` left.
 Say: "Now I'm checking that Claude can reach your Google Drive and Google Sheets. Gmail too, if you can, for LinkedIn alerts. And Indeed, which is optional but recommended."
 
 1. Use ToolSearch to look for each connector's tools: search `gmail`, `google drive` (or `create_file`), `sheets` (or `update_spreadsheet`), and `Indeed job search` (the tools are `search_jobs` and `get_job_details`). Tool name prefixes differ per install, so match on the end of the name.
-2. If any is missing, tell him exactly: "In the Claude desktop app, open Settings, then Connectors. Find <Gmail / Google Drive / Google Sheets / Indeed>, click Connect, and sign in (with your Google account for the Google ones, with your Indeed account or the prompt for Indeed). Tell me when it's done." Wait. Check again. Don't go on without Drive and Sheets. Gmail is only needed for LinkedIn alerts; if he can't connect it yet, continue and tell him the LinkedIn source stays quiet until he does. Indeed is optional but recommended: if he can't or won't connect it, change the `Indeed` line in `## Sources` to `[ ]`, tell him the scan will use the other sources, and continue. He can connect it later and ask you to turn it back on.
+2. If any is missing, tell him exactly: "In the Claude desktop app, click Customize in the left sidebar, then Connectors. Find <Gmail / Google Drive / Google Sheets / Indeed>, click Connect, and sign in (with your Google account for the Google ones, with your Indeed account or the prompt for Indeed). Tell me when it's done." Wait. Check again. Don't go on without Drive and Sheets. Gmail is only needed for LinkedIn alerts; if he can't connect it yet, continue and tell him the LinkedIn source stays quiet until he does. Indeed is optional but recommended: if he can't or won't connect it, change the `Indeed` line in `## Sources` to `[ ]`, tell him the scan will use the other sources, and continue. He can connect it later and ask you to turn it back on.
 3. Look in Drive for a file named `Job tracker`. If one exists, ask whether to reuse it or make a new one. If reusing, check each tab, header, dropdown and the hidden tab against the list below (an older Seen tab with 8 columns needs extending to 12) and fix what is missing.
 4. Create the Sheet from scratch, exactly as `docs/tracker-sheet.md` says in "How onboarding creates his Sheet" and "Connector calls that worked" (calls 1 to 5). Read those sections now. In short:
    - Create an empty Google Sheet named `Job tracker` with the Drive connector (`create_file`, mime type `application/vnd.google-apps.spreadsheet`). Keep its `id` and URL.
@@ -201,7 +201,7 @@ Say: "Now I'm checking that Claude can reach your Google Drive and Google Sheets
 
 Done when `profile.md` holds the URL and the read-back matched the headers.
 
-If a Sheets write is denied right after Drive created the file, Drive and Sheets are probably signed into different Google accounts. Ask him to open Settings, Connectors, Google Sheets and reconnect it with the same account as Drive. Then retry the call.
+If a Sheets write is denied right after Drive created the file, Drive and Sheets are probably signed into different Google accounts. Ask him to open Customize, then Connectors, then Google Sheets and reconnect it with the same account as Drive. Then retry the call.
 
 If a call fails: say which one, retry once, then tell him plainly and stop. Don't write the URL until the headers check out. In the next chat, step 7 starts again and finds the half-made `Job tracker` in Drive (item 3).
 
