@@ -1107,12 +1107,12 @@ kbd { border: 1px solid var(--rule-strong); background: var(--paper-soft); }
         <div class="wizard__top">
           <div class="wizard__stepnav">
             <button class="wizard__arrow" type="button" data-wz-prev aria-label="Previous step" aria-disabled="true"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-            <p class="wizard__count">Step <span data-wz-current>1</span> of 19</p>
+            <p class="wizard__count">Step <span data-wz-current>1</span> of 18</p>
             <button class="wizard__arrow" type="button" data-wz-fwd aria-label="Next step"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
           </div>
           <p class="wizard__phase" data-wz-phase>Before you start</p>
         </div>
-        <div class="wizard__progress" role="progressbar" aria-label="Progress through the setup steps" aria-valuemin="1" aria-valuemax="19" aria-valuenow="1"><span class="wizard__fill"></span></div>
+        <div class="wizard__progress" role="progressbar" aria-label="Progress through the setup steps" aria-valuemin="1" aria-valuemax="18" aria-valuenow="1"><span class="wizard__fill"></span></div>
         <details class="wizard__all">
           <summary class="btn btn--secondary">All steps</summary>
           <div class="wizard__panel">
@@ -1144,25 +1144,24 @@ kbd { border: 1px solid var(--rule-strong); background: var(--paper-soft); }
               <p class="wizard__group-name">Your morning scan</p>
               <ol class="wizard__items">
                 <li><a class="wizard__link" href="#step-10" data-step="10">Check the scan’s settings</a></li>
-                <li><a class="wizard__link" href="#step-11" data-step="11">Keep your Mac awake and do one test run</a></li>
-                <li><a class="wizard__link" href="#step-12" data-step="12">Set up LinkedIn job alerts</a></li>
+                <li><a class="wizard__link" href="#step-11" data-step="11">Set up LinkedIn job alerts</a></li>
               </ol>
             </div>
             <div class="wizard__group">
               <p class="wizard__group-name">Your first application</p>
               <ol class="wizard__items">
-                <li><a class="wizard__link" href="#step-13" data-step="13">Open your Job Inbox</a></li>
-                <li><a class="wizard__link" href="#step-14" data-step="14">Build an application with /apply</a></li>
-                <li><a class="wizard__link" href="#step-15" data-step="15">Edit, download, apply, tell Claude</a></li>
+                <li><a class="wizard__link" href="#step-12" data-step="12">Open your Job Inbox</a></li>
+                <li><a class="wizard__link" href="#step-13" data-step="13">Build an application with /apply</a></li>
+                <li><a class="wizard__link" href="#step-14" data-step="14">Edit, download, apply, tell Claude</a></li>
               </ol>
             </div>
             <div class="wizard__group">
               <p class="wizard__group-name">Every day after</p>
               <ol class="wizard__items">
-                <li><a class="wizard__link" href="#step-16" data-step="16">Your 10-minute morning skim</a></li>
-                <li><a class="wizard__link" href="#step-17" data-step="17">What each status means</a></li>
-                <li><a class="wizard__link" href="#step-18" data-step="18">Things you can say to Claude</a></li>
-                <li><a class="wizard__link" href="#step-19" data-step="19">If something goes wrong</a></li>
+                <li><a class="wizard__link" href="#step-15" data-step="15">Your 10-minute morning skim</a></li>
+                <li><a class="wizard__link" href="#step-16" data-step="16">What each status means</a></li>
+                <li><a class="wizard__link" href="#step-17" data-step="17">Things you can say to Claude</a></li>
+                <li><a class="wizard__link" href="#step-18" data-step="18">If something goes wrong</a></li>
               </ol>
             </div>
           </div>
@@ -1296,12 +1295,26 @@ kbd { border: 1px solid var(--rule-strong); background: var(--paper-soft); }
 </div>
 </div>
 <div class="pair__media">
-<figure class="frame" id="shot-07">
-  <!-- When the real screenshot exists, replace the placeholder div with a frame__shot holding guide/07-new-folder.jpg -->
+<figure class="frame frame--narrow" id="shot-07">
   <div class="frame__window">
     <div class="frame__bar" aria-hidden="true"><i></i><i></i><i></i></div>
-    <div class="frame__body"><div class="frame__placeholder">Screenshot coming: Claude app: + New, Project or folder, Add folder</div></div>
+    <div class="frame__body"><div class="frame__shot"><img src="guide/07a-sidebar-new.jpg" alt="The Claude app sidebar. New is at the top, above Search, Projects, Artifacts, Scheduled, Design and Customize. New is circled." width="437" height="427" loading="lazy"><span class="frame__ring" style="--x: 1.5%; --y: 19%; --w: 76%; --h: 10.5%" aria-hidden="true"></span></div></div>
   </div>
+  <figcaption class="frame__caption">1. + New, at the top of the sidebar.</figcaption>
+</figure>
+<figure class="frame">
+  <div class="frame__window">
+    <div class="frame__bar" aria-hidden="true"><i></i><i></i><i></i></div>
+    <div class="frame__body"><div class="frame__shot"><img src="guide/07b-project-or-folder.jpg" alt="The message box with the Project or folder button under it. The button is circled." width="800" height="178" loading="lazy"><span class="frame__ring" style="--x: 1%; --y: 76%; --w: 22.5%; --h: 22%" aria-hidden="true"></span></div></div>
+  </div>
+  <figcaption class="frame__caption">2. Project or folder, under the message box.</figcaption>
+</figure>
+<figure class="frame">
+  <div class="frame__window">
+    <div class="frame__bar" aria-hidden="true"><i></i><i></i><i></i></div>
+    <div class="frame__body"><div class="frame__shot"><img src="guide/07c-add-folder.jpg" alt="The bottom of the Project or folder menu, showing New project and Add folder. Add folder is circled." width="750" height="88" loading="lazy"><span class="frame__ring" style="--x: 0.5%; --y: 46%; --w: 99%; --h: 46%" aria-hidden="true"></span></div></div>
+  </div>
+  <figcaption class="frame__caption">3. Add folder, at the bottom of the menu. Not New project.</figcaption>
 </figure>
 </div>
 </div>
@@ -1342,7 +1355,7 @@ kbd { border: 1px solid var(--rule-strong); background: var(--paper-soft); }
 <p>After setup, you and Nadeen have a check-in call of about 20 minutes.</p>
         </article>
         <article class="wizard__step" id="wizard-step-10" data-phase="Your morning scan" aria-labelledby="wizard-step-10-title">
-          <h2 class="wizard__title" id="wizard-step-10-title" tabindex="-1"><span class="wizard__num" aria-hidden="true">10</span>Check the scan’s settings</h2>
+          <h2 class="wizard__title" id="wizard-step-10-title" tabindex="-1"><span class="wizard__num" aria-hidden="true">10</span>Check the scan’s settings and do a test run</h2>
 <div class="pair">
 <div class="pair__text">
 <ol>
@@ -1350,9 +1363,11 @@ kbd { border: 1px solid var(--rule-strong); background: var(--paper-soft); }
   <li>Set the <strong>Working folder</strong> to your <code>nihal-job-system</code> folder. It is the folder row at the bottom of the Instructions box. Save, open the task again, and check that Folder now ends in <code>nihal-job-system</code>.</li>
   <li>Set the <strong>Model</strong> to Sonnet. It is the Default menu at the bottom right.</li>
   <li>Set the <strong>Permission mode</strong> to <strong>Auto</strong>. It is the Manual button at the bottom left. Auto lets the scan run without stopping to ask you.</li>
+  <li>Go to Settings, then <span class="ui">This computer</span>, then <span class="ui">System</span>, and turn on <span class="ui">Keep computer awake</span>.</li>
+  <li>Open your scan task and click <span class="ui">Run now</span> once. Leave it alone for about 10 minutes. It should say <strong>succeeded</strong> and show a 3-line summary.</li>
 </ol>
 <div class="callout callout--headsup">
-<p><strong>Heads-up.</strong> If Auto is not in the list, stop and tell Nadeen. Your plan may not include it.</p>
+<p><strong>Heads-up.</strong> If Auto is not in the list, stop and tell Nadeen. Your plan may not include it. The scan only runs while the Claude app is open and your Mac is awake, and closing the lid still puts it to sleep. If the test run stops to ask you something, tell Nadeen what it named.</p>
 </div>
 </div>
 <div class="pair__media">
@@ -1372,31 +1387,7 @@ kbd { border: 1px solid var(--rule-strong); background: var(--paper-soft); }
 </div>
         </article>
         <article class="wizard__step" id="wizard-step-11" data-phase="Your morning scan" aria-labelledby="wizard-step-11-title">
-          <h2 class="wizard__title" id="wizard-step-11-title" tabindex="-1"><span class="wizard__num" aria-hidden="true">11</span>Keep your Mac awake and do one test run</h2>
-<div class="pair">
-<div class="pair__text">
-<ol>
-  <li>Go to Settings, then <span class="ui">This computer</span>, then <span class="ui">System</span>, and turn on <span class="ui">Keep computer awake</span>.</li>
-  <li>Open your scan task and click <span class="ui">Run now</span> once.</li>
-  <li>Leave it alone for about 10 minutes. It should say <strong>succeeded</strong> and show a 3-line summary.</li>
-</ol>
-<div class="callout callout--headsup">
-<p><strong>Heads-up.</strong> Closing the lid still puts your Mac to sleep. The scan only runs while the Claude app is open and your Mac is awake. If the test run stops to ask you something, tell Nadeen what it named.</p>
-</div>
-</div>
-<div class="pair__media">
-<figure class="frame" id="shot-11">
-  <!-- When the real screenshot exists, replace the placeholder div with a frame__shot holding guide/11-keep-awake.jpg -->
-  <div class="frame__window">
-    <div class="frame__bar" aria-hidden="true"><i></i><i></i><i></i></div>
-    <div class="frame__body"><div class="frame__placeholder">Screenshot coming: Claude app: Keep computer awake</div></div>
-  </div>
-</figure>
-</div>
-</div>
-        </article>
-        <article class="wizard__step" id="wizard-step-12" data-phase="Your morning scan" aria-labelledby="wizard-step-12-title">
-          <h2 class="wizard__title" id="wizard-step-12-title" tabindex="-1"><span class="wizard__num" aria-hidden="true">12</span>Set up LinkedIn job alerts</h2>
+          <h2 class="wizard__title" id="wizard-step-11-title" tabindex="-1"><span class="wizard__num" aria-hidden="true">11</span>Set up LinkedIn job alerts</h2>
 <p>Some employers block Claude from reading their job pages. LinkedIn alert emails are how it sees jobs at Politico, The Atlantic and The Hill.</p>
 <ol>
   <li>On linkedin.com, click Jobs and search for a role you want. Set the location to Washington, DC.</li>
@@ -1405,8 +1396,8 @@ kbd { border: 1px solid var(--rule-strong); background: var(--paper-soft); }
   <li>Repeat for two or three roles.</li>
 </ol>
         </article>
-        <article class="wizard__step" id="wizard-step-13" data-phase="Your first application" aria-labelledby="wizard-step-13-title">
-          <h2 class="wizard__title" id="wizard-step-13-title" tabindex="-1"><span class="wizard__num" aria-hidden="true">13</span>Open your Job Inbox</h2>
+        <article class="wizard__step" id="wizard-step-12" data-phase="Your first application" aria-labelledby="wizard-step-12-title">
+          <h2 class="wizard__title" id="wizard-step-12-title" tabindex="-1"><span class="wizard__num" aria-hidden="true">12</span>Open your Job Inbox</h2>
 <div class="pair">
 <div class="pair__text">
 <ol>
@@ -1436,8 +1427,8 @@ kbd { border: 1px solid var(--rule-strong); background: var(--paper-soft); }
 </div>
 </div>
         </article>
-        <article class="wizard__step" id="wizard-step-14" data-phase="Your first application" aria-labelledby="wizard-step-14-title">
-          <h2 class="wizard__title" id="wizard-step-14-title" tabindex="-1"><span class="wizard__num" aria-hidden="true">14</span>Build an application with /apply</h2>
+        <article class="wizard__step" id="wizard-step-13" data-phase="Your first application" aria-labelledby="wizard-step-13-title">
+          <h2 class="wizard__title" id="wizard-step-13-title" tabindex="-1"><span class="wizard__num" aria-hidden="true">13</span>Build an application with /apply</h2>
 <ol>
   <li>Click <span class="ui">Build in Claude</span> on a job card. It copies a command. Paste it into a chat on your <code>nihal-job-system</code> folder. You can also type <code>/apply</code> and the job, or paste a link to a posting.</li>
   <li>Claude shows a short list of what it will build. Say yes.</li>
@@ -1448,8 +1439,8 @@ kbd { border: 1px solid var(--rule-strong); background: var(--paper-soft); }
 <p><strong>Heads-up.</strong> Read the claims to confirm. Fix anything that is wrong before you send. Claude only uses facts from your fact list.</p>
 </div>
         </article>
-        <article class="wizard__step" id="wizard-step-15" data-phase="Your first application" aria-labelledby="wizard-step-15-title">
-          <h2 class="wizard__title" id="wizard-step-15-title" tabindex="-1"><span class="wizard__num" aria-hidden="true">15</span>Edit, download, apply, tell Claude</h2>
+        <article class="wizard__step" id="wizard-step-14" data-phase="Your first application" aria-labelledby="wizard-step-14-title">
+          <h2 class="wizard__title" id="wizard-step-14-title" tabindex="-1"><span class="wizard__num" aria-hidden="true">14</span>Edit, download, apply, tell Claude</h2>
 <div class="pair">
 <div class="pair__text">
 <ol>
@@ -1469,8 +1460,8 @@ kbd { border: 1px solid var(--rule-strong); background: var(--paper-soft); }
 </div>
 </div>
         </article>
-        <article class="wizard__step" id="wizard-step-16" data-phase="Every day after" aria-labelledby="wizard-step-16-title">
-          <h2 class="wizard__title" id="wizard-step-16-title" tabindex="-1"><span class="wizard__num" aria-hidden="true">16</span>Your 10-minute morning skim</h2>
+        <article class="wizard__step" id="wizard-step-15" data-phase="Every day after" aria-labelledby="wizard-step-15-title">
+          <h2 class="wizard__title" id="wizard-step-15-title" tabindex="-1"><span class="wizard__num" aria-hidden="true">15</span>Your 10-minute morning skim</h2>
 <ol>
   <li>If your scan is on, it runs weekdays at about 7:30 and adds up to 10 new jobs, each with status New.</li>
   <li>Open your Job Inbox. <span class="ui">Save</span> or <span class="ui">Pass</span> each job.</li>
@@ -1482,8 +1473,8 @@ kbd { border: 1px solid var(--rule-strong); background: var(--paper-soft); }
   <li>Once a week, say <code>my top 3 this week</code>. Claude builds applications for your three best jobs. It shows you the three first, and you confirm or swap them before it builds.</li>
 </ul>
         </article>
-        <article class="wizard__step" id="wizard-step-17" data-phase="Every day after" aria-labelledby="wizard-step-17-title">
-          <h2 class="wizard__title" id="wizard-step-17-title" tabindex="-1"><span class="wizard__num" aria-hidden="true">17</span>What each status means</h2>
+        <article class="wizard__step" id="wizard-step-16" data-phase="Every day after" aria-labelledby="wizard-step-16-title">
+          <h2 class="wizard__title" id="wizard-step-16-title" tabindex="-1"><span class="wizard__num" aria-hidden="true">16</span>What each status means</h2>
 <p>Your Google Sheet keeps every job and its status. Ready to apply means the ball is with you. Applied means you sent it.</p>
 <div class="table-figure"><div class="table-wrap" role="region" aria-label="What each status means" tabindex="0">
 <table class="table">
@@ -1508,8 +1499,8 @@ kbd { border: 1px solid var(--rule-strong); background: var(--paper-soft); }
   <figcaption class="frame__caption">The Status column, circled. Your Google Sheet keeps everything. You can change a Status from its dropdown too. These are example jobs.</figcaption>
 </figure>
         </article>
-        <article class="wizard__step" id="wizard-step-18" data-phase="Every day after" aria-labelledby="wizard-step-18-title">
-          <h2 class="wizard__title" id="wizard-step-18-title" tabindex="-1"><span class="wizard__num" aria-hidden="true">18</span>Things you can say to Claude</h2>
+        <article class="wizard__step" id="wizard-step-17" data-phase="Every day after" aria-labelledby="wizard-step-17-title">
+          <h2 class="wizard__title" id="wizard-step-17-title" tabindex="-1"><span class="wizard__num" aria-hidden="true">17</span>Things you can say to Claude</h2>
 <p>Start a chat on your <code>nihal-job-system</code> folder, then say any of these.</p>
 <div class="table-figure"><div class="table-wrap" role="region" aria-label="Things you can say to Claude" tabindex="0">
 <table class="table">
@@ -1541,8 +1532,8 @@ kbd { border: 1px solid var(--rule-strong); background: var(--paper-soft); }
 <p><strong>Tip.</strong> If Claude does not recognize a command like <code>/jobs</code>, send it again.</p>
 </div>
         </article>
-        <article class="wizard__step" id="wizard-step-19" data-phase="Every day after" aria-labelledby="wizard-step-19-title">
-          <h2 class="wizard__title" id="wizard-step-19-title" tabindex="-1"><span class="wizard__num" aria-hidden="true">19</span>If something goes wrong</h2>
+        <article class="wizard__step" id="wizard-step-18" data-phase="Every day after" aria-labelledby="wizard-step-18-title">
+          <h2 class="wizard__title" id="wizard-step-18-title" tabindex="-1"><span class="wizard__num" aria-hidden="true">18</span>If something goes wrong</h2>
 <ul>
   <li><strong>Claude cannot find a command like /jobs.</strong> Send it again. Check that your chat is on the <code>nihal-job-system</code> folder.</li>
   <li><strong>Claude says a website is blocked.</strong> Go back to step 6 and check all five domains. Then start a new chat on your folder and paste the step 8 message again.</li>
@@ -1550,7 +1541,7 @@ kbd { border: 1px solid var(--rule-strong); background: var(--paper-soft); }
   <li><strong>The scan stalled.</strong> A prompt is waiting for an answer. Check that the task’s Permission mode is still Auto (Scheduled, your task, Edit). Then open the run from the task’s History list and answer the prompt.</li>
   <li><strong>The app shows a yellow “sign in again” banner.</strong> Sign in again, then click Run now once.</li>
   <li><strong>The scan did not run.</strong> The app was closed or the Mac was asleep. Open the app and wake the Mac. One catch-up run happens on its own. Check that Keep computer awake is on.</li>
-  <li><strong>The summary says “no LinkedIn alert emails”.</strong> No alert emails arrived from LinkedIn in the last few days. Set up the alerts in step 12, with email delivery.</li>
+  <li><strong>The summary says “no LinkedIn alert emails”.</strong> No alert emails arrived from LinkedIn in the last few days. Set up the alerts in step 11, with email delivery.</li>
   <li><strong>The run was rejected.</strong> You are at your Claude plan’s usage limit. Wait for it to reset.</li>
   <li><strong>A Daybook job shows “Employer hidden (Daybook)”.</strong> Daybook shows the employer only to paid members. The link still shows a short description. To build an application, paste the description into Claude and tell it the employer if you know it. Claude will not guess.</li>
 </ul>
@@ -1615,7 +1606,7 @@ kbd { border: 1px solid var(--rule-strong); background: var(--paper-soft); }
    so the page works when storage is blocked. */
 (function () {
   var KEY = 'nihalGuide.v2';
-  var N = 19;
+  var N = 18;
   var state = { checks: [], site: '' };
   for (var i = 0; i < N; i++) state.checks.push(false);
 
