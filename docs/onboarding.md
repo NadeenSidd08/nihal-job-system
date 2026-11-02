@@ -194,11 +194,11 @@ Say: "Now I'm checking that Claude can reach your Google Drive and Google Sheets
      - Seen (A to L): Link, Source ID (IDs joined with "; "), Org, Job title, Location, Fit, First seen, On Jobs tab, Type, Source, Posted, Why it fits
    - Bold header row with a background colour. Column widths and wrap on Why it fits as in call 4. Date format `yyyy-mm-dd` on Posted, First seen, Scan log Date, and Seen First seen (G) and Posted (K).
    - Dropdowns on rows 2 to 1000: Status (column A) exactly `New, Saved, Ready to apply, Applied, Interviewing, Offer, Passed, Closed`. Type (column C) exactly `Staff, Fellowship, Freelance, Nearby field`. Fit (column B) whole number 1 to 10. On Seen: column H `yes, no`, and column I the same four Type values as Jobs column C.
-   - Dropdowns display as chips where the connector allows it (see `docs/tracker-sheet.md`, call 4). Otherwise they show as dropdowns with an arrow.
+   - Status (column A) and Type (column C) on Jobs display as chips (`customUiMode: "CHIP"`, see `docs/tracker-sheet.md`, call 4).
    - A filter on the Jobs header row, columns A to M, so he can filter by Status, Type and Location.
    - Status colours on column A: New light blue, Saved light yellow, Ready to apply light orange, Applied light green, Interviewing light purple, Offer stronger green, Passed and Closed grey.
    - Hide the `Seen` tab.
-5. Verify before telling him it's done: read back row 1 of all three tabs (Seen A1:L1), check `Seen` is hidden, that the dropdowns exist and that the Jobs tab has a basic filter (`get_spreadsheet`, call 9, fields `sheets.basicFilter`). Do not add any job rows.
+5. Verify before telling him it's done: read back row 1 of all three tabs (Seen A1:L1), check `Seen` is hidden, that Jobs A2 and C2 read back `customUiMode` `CHIP`, and that the Jobs tab has `sheets.basicFilter` (`get_spreadsheet`, call 9). Do not add any job rows.
 6. Give him the Sheet link. Say: "This is your tracker. You'll see jobs show up here. Bookmark it." Replace `(not set up yet)` under `## Tracker sheet` in `profile.md` with the full URL.
 
 Done when `profile.md` holds the URL and the read-back matched the headers.

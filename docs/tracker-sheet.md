@@ -12,7 +12,7 @@ Test Sheet built from this spec (dummy data only): https://docs.google.com/sprea
 
 ### Jobs tab
 
-One row per job. Row 1 is a bold, frozen header with a filter on every column (A to M), so he can filter by Status, Type, Location or anything else. The Status and Type dropdowns are meant to show as chips (see call 4 for what is verified). Columns, in this order:
+One row per job. Row 1 is a bold, frozen header with a filter on every column (A to M), so he can filter by Status, Type, Location or anything else. The Status and Type dropdowns show as chips. Columns, in this order:
 
 | Col | Name | Allowed values |
 |---|---|---|
@@ -252,16 +252,12 @@ All worked in one batch:
 - Column widths: `updateDimensionProperties`, `dimension` `COLUMNS`, `properties.pixelSize`, `fields` `"pixelSize"`. Used: Status 100, Fit 50, Type 110, Job title 230, Org 180, Location 130, Why it fits 320, Source 130, Posted 90, First seen 90, Link 260, Folder 260, Notes 220.
 - Wrap text on Why it fits: `userEnteredFormat.wrapStrategy` `WRAP`.
 - Date format on Posted, First seen, Scan log Date, Seen First seen and Seen Posted: `numberFormat` `{type:"DATE", pattern:"yyyy-mm-dd"}`.
-- Status dropdown: `setDataValidation`, column A with `startRowIndex` 1, `endRowIndex` 1000 (rows 2 to 1000), rule `{condition:{type:"ONE_OF_LIST", values:[{userEnteredValue:"New"}, ...8 values]}, strict:true, showCustomUi:true}`.
-- Type dropdown: same, column C of Jobs and column I of Seen.
+- Status dropdown: `setDataValidation`, column A with `startRowIndex` 1, `endRowIndex` 1000 (rows 2 to 1000), rule `{condition:{type:"ONE_OF_LIST", values:[{userEnteredValue:"New"}, ...8 values]}, strict:true, showCustomUi:true, customUiMode:"CHIP"}` (chips). Verified 2026-11-01: read-back of `sheets.data.rowData.values.dataValidation.customUiMode` returns `CHIP`. Without `customUiMode` the read-back shows `ARROW`. Do not use a field named `displayStyle`, it is silently ignored.
+- Type dropdown: same rule with the four Type values and `customUiMode:"CHIP"`, column C of Jobs. Seen column I gets the same values as a plain dropdown (`showCustomUi:true`, no `customUiMode`).
+- Filter on the header row: `setBasicFilter` with `filter` `{range:{sheetId:<Jobs sheetId>, startRowIndex:0, startColumnIndex:0, endColumnIndex:13}}` (Jobs, columns A to M, no end row, Sheets fills it in). Verified 2026-11-01: read-back `sheets.basicFilter.range` is present.
 - Fit check: `setDataValidation` on column B with `NUMBER_BETWEEN` `1` and `10`, `strict:true`.
 - Status colours: one `addConditionalFormatRule` per status, `condition.type` `TEXT_EQ`, same column A range, `format.backgroundColor`. Colours: New light blue, Saved light yellow, Ready to apply light orange, Applied light green, Interviewing light purple, Offer stronger green, Passed and Closed grey.
 - To change the Status list later: `deleteConditionalFormatRule` (`{sheetId, index:0}`, repeated once per rule), re-run `setDataValidation`, then `addConditionalFormatRule` again.
-
-#### Not yet verified (connector could not open the test Sheet, 2026-11-01)
-
-- Filter on the header row: `setBasicFilter` with `filter` `{range:{sheetId:0, startRowIndex:0, startColumnIndex:0, endColumnIndex:13}}` (Jobs, columns A to M, no end row so it grows with the data). STATUS: NOT YET VERIFIED. The 2026-11-01 test could not run because the connector answered "Spreadsheet not found or unavailable" for the test Sheet. Run it on the test Sheet and read back `sheets.basicFilter` before relying on this line.
-- Chips: STATUS: NOT YET VERIFIED. The `setDataValidation` rule above gives dropdowns with an arrow (`showCustomUi:true`). Whether the API can switch them to chip display has not been tested. Do not claim chips until a read-back shows it.
 
 ### 5. Hide the Seen tab (Sheets connector)
 
@@ -281,7 +277,7 @@ All worked in one batch:
 
 ### 9. Verify (Sheets connector)
 
-`get_values` on the changed range. To check dropdowns or date types: `get_spreadsheet` with `includeGridData:true`, `ranges`, and `fields` such as `sheets.data.rowData.values.dataValidation` (full paths, no parentheses). `get_spreadsheet` with `fields` `["sheets.properties"]` shows `hidden` and the row count.
+`get_values` on the changed range. To check chips and the filter: `get_spreadsheet` with `ranges` `["Jobs!A2","Jobs!C2"]` and `fields` `sheets.data.rowData.values.dataValidation.customUiMode` (must be `CHIP` on both), and `fields` `sheets.basicFilter` (the range must be present). To check dropdowns or date types: `get_spreadsheet` with `includeGridData:true`, `ranges`, and `fields` such as `sheets.data.rowData.values.dataValidation` (full paths, no parentheses). `get_spreadsheet` with `fields` `["sheets.properties"]` shows `hidden` and the row count.
 
 ## Things that were awkward
 
